@@ -26,6 +26,7 @@ LIBATOMIC ?= 1
 
 
 ##### Runtime
+PATCH ?= omnibus
 CURRENT := $($(WORKSPACE))
 
 # patch directories
@@ -35,6 +36,13 @@ _current_patches := $(wildcard patches/$(CURRENT)/*)
 
 #### ==== TOP-LEVEL RULES ==== ####
 all: sources workspace package
+
+seal:
+	@echo "Removing omnibus..."
+	@rm -f patches/$(CURRENT)/omnibus.patch.bk
+
+	@echo "Generating new patch..."
+	-diff -Naurdw sources/$(CURRENT)/nginx-$(CURRENT)/src/ workspace/ > patches/$(CURRENT)/omnibus.patch
 
 package: build
 	@echo "Packaging..."

@@ -14,34 +14,35 @@ PSOL_VERSION ?= 1.6.29.5
 PAGESPEED_VERSION ?= 1.6.29.5-beta
 
 # pcre config
+PCRE ?= 1
 PCRE_VERSION ?= 8.33
 
 # openssl config
+OPENSSL ?= 1
 OPENSSL_VERSION ?= 1.0.1e
+
+# libatomic config
+LIBATOMIC ?= 1
 
 
 ##### Routines
 upper = `echo $1 | tr a-z A-Z`
 lower = `echo $1 | tr A-Z a-z`
 
-
-##### Runtime
-
 # patch directories
 _common_patches = $(wildcard patches/common/*)
+
 ifeq ($(WORKSPACE),latest)
-	_current_patches = $(wildcard patches/$(LATEST)/*)
-else
-	_current_patches = $(wildcard patches/$(STABLE)/*)
+_current_patches := $(wildcard patches/$(LATEST)/*)
 endif
 
-# make current patchset
-_runtime_patches += $(_common_patches)
-_runtime_patches += $(_current_patches)
+ifeq ($(WORKSPACE),stable)
+_current_patches := $(wildcard patches/$(STABLE)/*)
+endif
 
 
 #### ==== TOP-LEVEL RULES ==== ####
-all: sources workspace patch package
+all: sources workspace package
 
 package: build
 	@echo "Packaging..."
@@ -49,11 +50,16 @@ package: build
 
 build: patch
 	@echo "Building..."
+
 	@mkdir -p build/
+	@echo "Configuring Nginx..."
+	@echo "Compiling Nginx..."
 
-patch: sources
-	@echo "Patching..."
-
+patch: sources patch_common patch_$($(WORKSPACE))
+	@echo "Patching complete."
+	@echo "Applied patches:"
+	@echo "  -- Common: " $(_common_patches)
+	@echo "  -- Specific:" $(_current_patches)
 
 clean:
 	@echo "Cleaning..."
@@ -72,7 +78,7 @@ distclean: clean
 	@echo "Resetting codebase..."
 	@git reset --hard
 
-sources: sources/latest sources/stable dependencies modules
+sources: sources/$(WORKSPACE) dependencies modules
 	@echo "Finished acquiring sources."
 
 modules: modules/pagespeed
@@ -94,6 +100,14 @@ workspace/.stable: sources/stable
 	@echo "Setting workspace to 'stable'..."
 	@ln -s sources/$(STABLE)/nginx-$(STABLE)/src/ workspace
 	@touch workspace/.stable
+
+
+#### ==== PATCH APPLICATION ==== ####
+patch_common: $(_common_patches)
+	@echo $^
+
+patch_$($(WORKSPACE)): $(_current_patches)
+	@echo $^
 
 
 #### ==== NGINX SOURCES ==== ####
@@ -124,56 +138,74 @@ sources/stable:
 
 #### ==== NGINX DEPENDENCIES ==== ####
 dependencies/pcre:
-	@echo "Fetching PCRE..."
-	@mkdir -p dependencies/pcre/$(PCRE_VERSION)
-	@curl --progress-bar ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/pcre-$(PCRE_VERSION).tar.gz > pcre-$(PCRE_VERSION).tar.gz
+	ifeq ($(PCRE),1)
+		@echo "Fetching PCRE..."
+		@mkdir -p dependencies/pcre/$(PCRE_VERSION)
+		@curl --progress-bar ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/pcre-$(PCRE_VERSION).tar.gz > pcre-$(PCRE_VERSION).tar.gz
 
-	@echo "Extracting PCRE..."
-	@tar -xvf pcre-$(PCRE_VERSION).tar.gz
-	@mv pcre-$(PCRE_VERSION)/ pcre-$(PCRE_VERSION).tar.gz dependencies/pcre/$(PCRE_VERSION)/
-	@ln -s $(PCRE_VERSION)/pcre-$(PCRE_VERSION) dependencies/pcre/latest
+		@echo "Extracting PCRE..."
+		@tar -xvf pcre-$(PCRE_VERSION).tar.gz
+		@mv pcre-$(PCRE_VERSION)/ pcre-$(PCRE_VERSION).tar.gz dependencies/pcre/$(PCRE_VERSION)/
+		@ln -s $(PCRE_VERSION)/pcre-$(PCRE_VERSION) dependencies/pcre/latest
+	else
+		@echo "Skipping PCRE..."
+	endif
 
 dependencies/openssl:
-	@echo "Fetching OpenSSL..."
-	@mkdir -p dependencies/openssl/$(OPENSSL_VERSION)
-	@curl --progress-bar http://www.openssl.org/source/openssl-$(OPENSSL_VERSION).tar.gz > openssl-$(OPENSSL_VERSION).tar.gz
+	ifeq ($(OPENSSL),1)
+		@echo "Fetching OpenSSL..."
+		@mkdir -p dependencies/openssl/$(OPENSSL_VERSION)
+		@curl --progress-bar http://www.openssl.org/source/openssl-$(OPENSSL_VERSION).tar.gz > openssl-$(OPENSSL_VERSION).tar.gz
 
-	@echo "Extracting OpenSSL..."
-	@tar -xvf openssl-$(OPENSSL_VERSION).tar.gz
-	@mv openssl-$(OPENSSL_VERSION)/ openssl-$(OPENSSL_VERSION).tar.gz dependencies/openssl/$(OPENSSL_VERSION)/
-	@ln -s $(OPENSSL_VERSION)/openssl-$(OPENSSL_VERSION) dependencies/openssl/latest
+		@echo "Extracting OpenSSL..."
+		@tar -xvf openssl-$(OPENSSL_VERSION).tar.gz
+		@mv openssl-$(OPENSSL_VERSION)/ openssl-$(OPENSSL_VERSION).tar.gz dependencies/openssl/$(OPENSSL_VERSION)/
+		@ln -s $(OPENSSL_VERSION)/openssl-$(OPENSSL_VERSION) dependencies/openssl/latest
+	else
+		@echo "Skipping openssl..."
+	endif
 
 dependencies/libatomic:
-	@echo "Fetching libatomic..."
-	@mkdir -p dependencies/libatomic/7.2
-	@curl --progress-bar http://www.hpl.hp.com/research/linux/atomic_ops/download/libatomic_ops-7.2d.tar.gz > libatomic_ops-7.2d.tar.gz
+	ifeq ($(LIBATOMIC),1)
+		@echo "Fetching libatomic..."
+		@mkdir -p dependencies/libatomic/7.2
+		@curl --progress-bar http://www.hpl.hp.com/research/linux/atomic_ops/download/libatomic_ops-7.2d.tar.gz > libatomic_ops-7.2d.tar.gz
 
-	@echo "Extracting libatomic..."
-	@tar -xvf libatomic_ops-7.2d.tar.gz
-	@mv libatomic_ops-7.2 libatomic_ops-7.2d.tar.gz dependencies/libatomic/7.2
-	@ln -s 7.2/libatomic_ops-7.2 dependencies/libatomic/latest
+		@echo "Extracting libatomic..."
+		@tar -xvf libatomic_ops-7.2d.tar.gz
+		@mv libatomic_ops-7.2 libatomic_ops-7.2d.tar.gz dependencies/libatomic/7.2
+		@ln -s 7.2/libatomic_ops-7.2 dependencies/libatomic/latest
+	else
+		@echo "Skipping libatomic..."
+	endif
 
 
 #### ==== NGX PAGESPEED ==== ####
 modules/pagespeed: sources/pagespeed
-	@echo "Preparing ngx_pagespeed..."
-	@mkdir -p ./modules/pagespeed
+	ifeq ($(PAGESPEED), 1)
+		@echo "Preparing ngx_pagespeed..."
+		@mkdir -p ./modules/pagespeed
 
-	@mv ngx_pagespeed-release-$(PAGESPEED_VERSION)/ modules/pagespeed/$(PAGESPEED_VERSION)
-	@mv psol-$(PSOL_VERSION).tar.gz release-$(PAGESPEED_VERSION).zip sources/pagespeed/
+		@mv ngx_pagespeed-release-$(PAGESPEED_VERSION)/ modules/pagespeed/$(PAGESPEED_VERSION)
+		@mv psol-$(PSOL_VERSION).tar.gz release-$(PAGESPEED_VERSION).zip sources/pagespeed/
+	endif
 
 sources/pagespeed:
-	@mkdir -p ./sources/pagespeed
+	ifeq ($(PAGESPEED),1)
+		@mkdir -p ./sources/pagespeed
 
-	@echo "Fetching ngx_pagespeed..."
-	@curl --progress-bar https://codeload.github.com/pagespeed/ngx_pagespeed/zip/release-$(PAGESPEED_VERSION) > release-$(PAGESPEED_VERSION).zip
+		@echo "Fetching ngx_pagespeed..."
+		@curl --progress-bar https://codeload.github.com/pagespeed/ngx_pagespeed/zip/release-$(PAGESPEED_VERSION) > release-$(PAGESPEED_VERSION).zip
 
-	@echo "Extracting ngx_pagespeed..."
-	@unzip -o release-$(PAGESPEED_VERSION).zip
+		@echo "Extracting ngx_pagespeed..."
+		@unzip -o release-$(PAGESPEED_VERSION).zip
 
-	@echo "Fetching PSOL..."
-	@curl --progress-bar https://dl.google.com/dl/page-speed/psol/$(PSOL_VERSION).tar.gz > psol-$(PSOL_VERSION).tar.gz
+		@echo "Fetching PSOL..."
+		@curl --progress-bar https://dl.google.com/dl/page-speed/psol/$(PSOL_VERSION).tar.gz > psol-$(PSOL_VERSION).tar.gz
 
-	@echo "Extracting PSOL..."
-	@tar -xvf psol-$(PSOL_VERSION).tar.gz
-	@mv psol/ ngx_pagespeed-release-$(PAGESPEED_VERSION)/
+		@echo "Extracting PSOL..."
+		@tar -xvf psol-$(PSOL_VERSION).tar.gz
+		@mv psol/ ngx_pagespeed-release-$(PAGESPEED_VERSION)/
+	else
+		@echo "Skipping Pagespeed sources..."
+	endif

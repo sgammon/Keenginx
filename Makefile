@@ -14,15 +14,34 @@ PSOL_VERSION ?= 1.6.29.5
 PAGESPEED_VERSION ?= 1.6.29.5-beta
 
 # pcre config
-PCRE_VERSION = 8.33
+PCRE_VERSION ?= 8.33
 
 # openssl config
 OPENSSL_VERSION ?= 1.0.1e
 
 
-#### ==== TOP-LEVEL RULES ==== ####
+##### Routines
+upper = `echo $1 | tr a-z A-Z`
+lower = `echo $1 | tr A-Z a-z`
 
-all: sources workspace package
+
+##### Runtime
+
+# patch directories
+_common_patches = $(wildcard patches/common/*)
+ifeq ($(WORKSPACE),latest)
+	_current_patches = $(wildcard patches/$(LATEST)/*)
+else
+	_current_patches = $(wildcard patches/$(STABLE)/*)
+endif
+
+# make current patchset
+_runtime_patches += $(_common_patches)
+_runtime_patches += $(_current_patches)
+
+
+#### ==== TOP-LEVEL RULES ==== ####
+all: sources workspace patch package
 
 package: build
 	@echo "Packaging..."
@@ -35,14 +54,15 @@ build: patch
 patch: sources
 	@echo "Patching..."
 
+
 clean:
 	@echo "Cleaning..."
 	@echo "    ... buildroot."
 	@rm -fr build/
-	@echo "    ... workspace."
-	@rm -fr workspace
 
 distclean: clean
+	@echo "    ... workspace."
+	@rm -fr workspace
 	@echo "    ... dependencies."
 	@rm -fr dependencies/
 	@echo "    ... modules."
@@ -63,7 +83,6 @@ dependencies: dependencies/pcre dependencies/openssl dependencies/libatomic
 
 
 #### ==== WORKSPACE RULES ==== ####
-
 workspace: workspace/.$(WORKSPACE)
 
 workspace/.latest: sources/latest
@@ -78,7 +97,6 @@ workspace/.stable: sources/stable
 
 
 #### ==== NGINX SOURCES ==== ####
-
 sources/latest:
 	@echo "Preparing Nginx latest..."
 	@mkdir -p sources/$(LATEST)
@@ -137,9 +155,7 @@ dependencies/libatomic:
 
 
 #### ==== NGX PAGESPEED ==== ####
-
 modules/pagespeed: sources/pagespeed
-
 	@echo "Preparing ngx_pagespeed..."
 	@mkdir -p ./modules/pagespeed
 
@@ -147,7 +163,6 @@ modules/pagespeed: sources/pagespeed
 	@mv psol-$(PSOL_VERSION).tar.gz release-$(PAGESPEED_VERSION).zip sources/pagespeed/
 
 sources/pagespeed:
-
 	@mkdir -p ./sources/pagespeed
 
 	@echo "Fetching ngx_pagespeed..."

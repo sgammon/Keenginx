@@ -5,8 +5,8 @@
 WORKSPACE ?= latest
 
 # nginx config
-STABLE ?= 1.4.3
-LATEST ?= 1.5.6
+stable ?= 1.4.3
+latest ?= 1.5.6
 
 # pagespeed config
 PAGESPEED ?= 1
@@ -25,20 +25,12 @@ OPENSSL_VERSION ?= 1.0.1e
 LIBATOMIC ?= 1
 
 
-##### Routines
-upper = `echo $1 | tr a-z A-Z`
-lower = `echo $1 | tr A-Z a-z`
+##### Runtime
+CURRENT := $($(WORKSPACE))
 
 # patch directories
 _common_patches = $(wildcard patches/common/*)
-
-ifeq ($(WORKSPACE),latest)
-_current_patches := $(wildcard patches/$(LATEST)/*)
-endif
-
-ifeq ($(WORKSPACE),stable)
-_current_patches := $(wildcard patches/$(STABLE)/*)
-endif
+_current_patches := $(wildcard patches/$(CURRENT)/*)
 
 
 #### ==== TOP-LEVEL RULES ==== ####
@@ -55,7 +47,7 @@ build: patch
 	@echo "Configuring Nginx..."
 	@echo "Compiling Nginx..."
 
-patch: sources patch_common patch_$($(WORKSPACE))
+patch: sources patch_common patch_$(CURRENT)
 	@echo "Patching complete."
 	@echo "Applied patches:"
 	@echo "  -- Common: " $(_common_patches)
@@ -78,7 +70,7 @@ distclean: clean
 	@echo "Resetting codebase..."
 	@git reset --hard
 
-sources: sources/$(WORKSPACE) dependencies modules
+sources: dependencies modules
 	@echo "Finished acquiring sources."
 
 modules: modules/pagespeed
@@ -91,49 +83,33 @@ dependencies: dependencies/pcre dependencies/openssl dependencies/libatomic
 #### ==== WORKSPACE RULES ==== ####
 workspace: workspace/.$(WORKSPACE)
 
-workspace/.latest: sources/latest
-	@echo "Setting workspace to 'latest'..."
-	@ln -s sources/$(LATEST)/nginx-$(LATEST)/src/ workspace
-	@touch workspace/.latest
-
-workspace/.stable: sources/stable
-	@echo "Setting workspace to 'stable'..."
-	@ln -s sources/$(STABLE)/nginx-$(STABLE)/src/ workspace
-	@touch workspace/.stable
+workspace/.$(WORKSPACE): sources/$(WORKSPACE)
+	@echo "Setting workspace to '$(WORKSPACE)'..."
+	@mkdir -p workspace/
+	@cp -fr sources/$(CURRENT)/nginx-$(CURRENT)/src/* workspace/
+	@touch workspace/.$(WORKSPACE)
 
 
 #### ==== PATCH APPLICATION ==== ####
 patch_common: $(_common_patches)
-	@echo $^
+	@echo "Applying patch " $^ "..."
 
-patch_$($(WORKSPACE)): $(_current_patches)
-	@echo $^
+patch_$(CURRENT): $(_current_patches)
+	@echo "Applying patch " $^ "..."
 
 
 #### ==== NGINX SOURCES ==== ####
-sources/latest:
-	@echo "Preparing Nginx latest..."
-	@mkdir -p sources/$(LATEST)
-	@ln -s $(LATEST)/ sources/latest
+sources/$(WORKSPACE):
+	@echo "Preparing Nginx $(WORKSPACE)..."
+	@mkdir -p sources/$(CURRENT)
+	@ln -s $(CURRENT)/ sources/$(WORKSPACE)
 
-	@echo "Fetching Nginx $(LATEST)..."
-	@curl --progress-bar http://nginx.org/download/nginx-$(LATEST).tar.gz > nginx-$(LATEST).tar.gz
+	@echo "Fetching Nginx $(CURRENT)..."
+	@curl --progress-bar http://nginx.org/download/nginx-$(CURRENT).tar.gz > nginx-$(CURRENT).tar.gz
 
-	@echo "Extracting Nginx $(LATEST)..."
-	@tar -xvf nginx-$(LATEST).tar.gz
-	@mv nginx-$(LATEST).tar.gz nginx-$(LATEST) sources/$(LATEST)
-
-sources/stable:
-	@echo "Preparing Nginx stable..."
-	@mkdir -p sources/$(STABLE)
-	@ln -s $(STABLE)/ sources/stable
-
-	@echo "Fetching Nginx $(STABLE)..."
-	@curl --progress-bar http://nginx.org/download/nginx-$(STABLE).tar.gz > nginx-$(STABLE).tar.gz
-
-	@echo "Extracting Nginx $(STABLE)..."
-	@tar -xvf nginx-$(STABLE).tar.gz
-	@mv nginx-$(STABLE).tar.gz nginx-$(STABLE) sources/$(STABLE)
+	@echo "Extracting Nginx $(CURRENT)..."
+	@tar -xvf nginx-$(CURRENT).tar.gz
+	@mv nginx-$(CURRENT).tar.gz nginx-$(CURRENT) sources/$(CURRENT)
 
 
 #### ==== NGINX DEPENDENCIES ==== ####

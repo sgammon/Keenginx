@@ -49,6 +49,8 @@ distclean: clean
 	@rm -fr modules/
 	@echo "    ... sources."
 	@rm -fr sources/
+	@echo "Resetting codebase..."
+	@git reset --hard
 
 sources: sources/latest sources/stable modules
 	@echo "Finished acquiring sources."

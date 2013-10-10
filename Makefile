@@ -2,6 +2,7 @@
 
 ##### Configuration
 
+DEBUG ?= 1
 WORKSPACE ?= latest
 
 # nginx config
@@ -12,6 +13,12 @@ latest ?= 1.5.6
 PAGESPEED ?= 1
 PSOL_VERSION ?= 1.6.29.5
 PAGESPEED_VERSION ?= 1.6.29.5-beta
+
+ifeq ($(DEBUG),0)
+PAGESPEED_BUILD ?= Release
+else
+PAGESPEED_BUILD ?= Debug
+endif
 
 # pcre config
 PCRE ?= 1
@@ -25,13 +32,107 @@ OPENSSL_VERSION ?= 1.0.1e
 LIBATOMIC ?= 1
 
 
+##### Nginx Configuration
+NGINX_USER ?= nginx
+NGINX_GROUP ?= keen
+
+
 ##### Runtime
+OS := `uname`
 PATCH ?= omnibus
 CURRENT := $($(WORKSPACE))
+
+# flags for mac os x
+ifeq ($(OS),Darwin)
+	CC ?= clang
+	CPP ?= clang
+	ifeq ($(DEBUG),1)
+		CFLAGS += -g -O0
+		CXXFLAGS += -g -O0
+	else
+		CFLAGS += -O3 -mtune=native -mssse3 -march=native -flto
+		CXXFLAGS += -O3 -mtune=native -mssse3 -march=native -flto
+	endif
+endif
+
+ifeq ($(OS),Linux)
+	CC ?= gcc
+	CPP ?= g++
+	EXTRA_FLAGS += --with-file-aio
+	ifeq ($(DEBUG),1)
+		CFLAGS += -g -O0 -fno-stack-protector
+		CXXFLAGS += -g -O0 -fno-stack-protector
+	else
+		CFLAGS += -O3 -mtune=native -march=native -w -fomit-frame-pointer -fno-stack-protector -flto
+		CXXFLAGS += -O3 -mtune=native -march=native -w -fomit-frame-pointer -fno-stack-protector -flto
+	endif
+endif
+
+# commands
 
 # patch directories
 _common_patches = $(wildcard patches/common/*)
 _current_patches := $(wildcard patches/$(CURRENT)/*)
+
+# configure vars
+_nginx_debug_cpuflags = -O0 -g
+_nginx_release_cpuflags = -O3 -mtune=x86_64-linux -march=native
+
+ifeq ($(DEBUG),0)
+	_nginx_gccflags = $(_nginx_release_cpuflags)
+else
+	EXTRA_FLAGS += --with-debug --with-google_perftools_module
+	_nginx_gccflags = $(_nginx_debug_cpuflags)
+endif
+
+_pcre_config := --enable-shared \
+				--enable-static \
+				--enable-pcre16 \
+				--enable-pcre32 \
+				--enable-jit \
+				--enable-utf \
+				--enable-unicode-properties \
+				--enable-newline-is-any \
+				--enable-pcregrep-libz \
+				--enable-pcregrep-libbz2 \
+				--with-pic
+
+_openssl_config := threads \
+				   zlib
+
+_nginx_config_mainflags := --user=$(NGINX_USER) \
+						   --group=$(NGINX_GROUP) \
+						   --with-rtsig_module \
+						   --without-select_module \
+						   --with-poll_module \
+						   --with-ipv6 \
+						   --with-http_ssl_module \
+						   --with-http_spdy_module \
+						   --with-http_gunzip_module \
+						   --with-http_stub_status_module \
+						   --with-http_gzip_static_module \
+						   --with-http_secure_link_module \
+						   --with-cc-opt="$(_nginx_gccflags)" \
+						   --with-pcre=dependencies/pcre/latest \
+						   --with-pcre-jit \
+						   --with-pcre-opt="$(_pcre_config)" \
+						   --with-md5-asm \
+						   --with-sha1-asm \
+						   --with-zlib-asm=pentiumpro \
+						   --with-libatomic=dependencies/libatomic/latest \
+						   --with-openssl=dependencies/openssl/latest \
+						   --with-openssl-opt="$(_openssl_config)" \
+						   --without-http_userid_module \
+						   --without-http_autoindex_module \
+						   --without-http_geo_module \
+						   --without-http_fastcgi_module \
+						   --without-http_scgi_module \
+						   --without-mail_pop3_module \
+						   --without-mail_imap_module \
+						   --without-mail_smtp_module \
+						   --with-cc=$(CC) \
+						   --add-module=modules/pagespeed/$(PAGESPEED_VERSION) \
+						   $(EXTRA_FLAGS) ;
 
 
 #### ==== TOP-LEVEL RULES ==== ####
@@ -51,9 +152,10 @@ package: build
 build: patch
 	@echo "Building..."
 
-	@mkdir -p build/
-	@echo "Configuring Nginx..."
+	@mkdir -p build/ dist/
+	
 	@echo "Compiling Nginx..."
+
 
 patch: sources patch_common patch_$(CURRENT)
 	@echo "Patching complete."
@@ -61,14 +163,14 @@ patch: sources patch_common patch_$(CURRENT)
 	@echo "  -- Common: " $(_common_patches)
 	@echo "  -- Specific:" $(_current_patches)
 
-clean:
+clean: clean_nginx
 	@echo "Cleaning..."
 	@echo "    ... buildroot."
 	@rm -fr build/
-
-distclean: clean
 	@echo "    ... workspace."
 	@rm -fr workspace
+
+distclean: clean
 	@echo "    ... dependencies."
 	@rm -fr dependencies/
 	@echo "    ... modules."
@@ -84,7 +186,7 @@ sources: dependencies modules
 modules: modules/pagespeed
 	@echo "Downloaded module sources."
 
-dependencies: dependencies/pcre dependencies/openssl dependencies/libatomic
+dependencies: dependencies/pcre dependencies/openssl dependencies/libatomic dependencies/depot_tools
 	@echo "Finished fetching dependency sources."
 
 
@@ -101,9 +203,11 @@ workspace/.$(WORKSPACE): sources/$(WORKSPACE)
 #### ==== PATCH APPLICATION ==== ####
 patch_common: $(_common_patches)
 	@echo "Applying patch " $^ "..."
+	-@patch -N -p0 < $^
 
 patch_$(CURRENT): $(_current_patches)
 	@echo "Applying patch " $^ "..."
+	-@patch -N -p0 < $^
 
 
 #### ==== NGINX SOURCES ==== ####
@@ -151,23 +255,26 @@ dependencies/libatomic:
 	@mv libatomic_ops-7.2 libatomic_ops-7.2d.tar.gz dependencies/libatomic/7.2
 	@ln -s 7.2/libatomic_ops-7.2 dependencies/libatomic/latest
 
+dependencies/depot_tools:
+	@echo "Fetching depot_tools..."
+	@cd dependencies/; \
+		svn co http://src.chromium.org/svn/trunk/tools/depot_tools; \
+		cd ../;
+
 
 #### ==== NGX PAGESPEED ==== ####
-modules/pagespeed: sources/pagespeed
-	@echo "Preparing ngx_pagespeed..."
+modules/pagespeed: sources/pagespeed build/psol
+	@echo "Building PSOL..."
 	@mkdir -p ./modules/pagespeed
 
-	@mv ngx_pagespeed-release-$(PAGESPEED_VERSION)/ modules/pagespeed/$(PAGESPEED_VERSION)
-	@mv psol-$(PSOL_VERSION).tar.gz release-$(PAGESPEED_VERSION).zip sources/pagespeed/
-
-sources/pagespeed:
+sources/pagespeed: 
 	@mkdir -p ./sources/pagespeed
 
 	@echo "Fetching ngx_pagespeed..."
-	@curl --progress-bar https://codeload.github.com/pagespeed/ngx_pagespeed/zip/release-$(PAGESPEED_VERSION) > release-$(PAGESPEED_VERSION).zip
-
-	@echo "Extracting ngx_pagespeed..."
-	@unzip -o release-$(PAGESPEED_VERSION).zip
+	@cd sources/pagespeed; \
+		../../dependencies/depot_tools/gclient config http://modpagespeed.googlecode.com/svn/tags/$(PAGESPEED_VERSION)/; \
+		../../dependencies/depot_tools/gclient sync --force --jobs=8; \
+		cd ../../;
 
 	@echo "Fetching PSOL..."
 	@curl --progress-bar https://dl.google.com/dl/page-speed/psol/$(PSOL_VERSION).tar.gz > psol-$(PSOL_VERSION).tar.gz
@@ -175,3 +282,44 @@ sources/pagespeed:
 	@echo "Extracting PSOL..."
 	@tar -xvf psol-$(PSOL_VERSION).tar.gz
 	@mv psol/ ngx_pagespeed-release-$(PAGESPEED_VERSION)/
+
+build/psol: dependencies/depot_tools
+	@echo "Building PSOL..."
+	@cd modules/pagespeed/$(PAGESPEED_VERSION); \
+
+	@echo "Copying sources..."
+	@cp -fr ./sources/pagespeed/* ./modules/pagespeed/;
+
+	@echo "Building pagespeed..."
+	@cd ./modules/pagespeed/$(PAGESPEED_VERSION)/src; \
+		make CFLAGS="$(CFLAGS)" \
+			 CXXFLAGS="$(CXXFLAGS)" \
+			 AR.host="$PWD/build/wrappers/ar.sh" \
+			 AR.target="$PWD/build/wrappers/ar.sh" \
+			 BUILDTYPE=$(PAGESPEED_BUILD) \
+			 mod_pagespeed_test pagespeed_automatic_test;
+
+	@echo "Building PSOL..."
+	@cd ./modules/pagespeed/$(PAGESPEED_VERSION)/src/net/instaweb/automatic; \
+		make CFLAGS="$(CFLAGS)" \
+			 CXXFLAGS="-DSERF_HTTPS_FETCHING=0 $(CXXFLAGS)" \
+			 AR.host="$PWD/../../../build/wrappers/ar.sh" \
+			 AR.target="$PWD/../../../build/wrappers/ar.sh" \
+			 BUILDTYPE=$(PAGESPEED_BUILD) \
+			 all;
+
+
+#### ==== BUILD RULES ==== ####
+clean_nginx:
+	@echo "Cleaning Nginx..."
+	-@cd sources/$(CURRENT)/nginx-$(CURRENT); \
+		make clean; \
+		rm -f modules/; \
+		cd ../../../;
+
+configure_nginx:
+	@echo "Configuring Nginx..."
+	-@cd sources/$(CURRENT)/nginx-$(CURRENT); \
+		ln -s ../../../modules modules; \
+		./configure $(_nginx_config_mainflags) \
+		cd ../../../;

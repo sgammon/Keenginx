@@ -52,7 +52,7 @@ distclean: clean
 	@echo "Resetting codebase..."
 	@git reset --hard
 
-sources: sources/latest sources/stable modules
+sources: sources/latest sources/stable dependencies modules
 	@echo "Finished acquiring sources."
 
 modules: modules/pagespeed

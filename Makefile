@@ -1,6 +1,8 @@
 ## == KEEN NGINX: makefile == ##
 
-## Configuration
+##### Configuration
+
+WORKSPACE ?= latest
 
 # nginx config
 STABLE ?= 1.4.3
@@ -11,21 +13,69 @@ PAGESPEED ?= 1
 PSOL_VERSION ?= 1.6.29.5
 PAGESPEED_VERSION ?= 1.6.29.5-beta
 
-all: sources
+# pcre config
+PCRE_VERSION = 8.33
+
+# openssl config
+OPENSSL_VERSION ?= 1.0.1e
+
+
+#### ==== TOP-LEVEL RULES ==== ####
+
+all: sources workspace package
+
+package: build
+	@echo "Packaging..."
+	@echo "=== Finished Keen-Nginx build. ==="
+
+build: patch
 	@echo "Building..."
 	@mkdir -p build/
+
+patch: sources
+	@echo "Patching..."
 
 clean:
 	@echo "Cleaning..."
 	@echo "    ... buildroot."
 	@rm -fr build/
+	@echo "    ... workspace."
+	@rm -fr workspace
+
+distclean: clean
+	@echo "    ... dependencies."
+	@rm -fr dependencies/
 	@echo "    ... modules."
 	@rm -fr modules/
 	@echo "    ... sources."
 	@rm -fr sources/
 
 sources: sources/latest sources/stable modules
-	@echo "Preparing sources..."
+	@echo "Finished acquiring sources."
+
+modules: modules/pagespeed
+	@echo "Downloaded module sources."
+
+dependencies: dependencies/pcre dependencies/openssl dependencies/libatomic
+	@echo "Finished fetching dependency sources."
+
+
+#### ==== WORKSPACE RULES ==== ####
+
+workspace: workspace/.$(WORKSPACE)
+
+workspace/.latest: sources/latest
+	@echo "Setting workspace to 'latest'..."
+	@ln -s sources/$(LATEST)/nginx-$(LATEST)/src/ workspace
+	@touch workspace/.latest
+
+workspace/.stable: sources/stable
+	@echo "Setting workspace to 'stable'..."
+	@ln -s sources/$(STABLE)/nginx-$(STABLE)/src/ workspace
+	@touch workspace/.stable
+
+
+#### ==== NGINX SOURCES ==== ####
 
 sources/latest:
 	@echo "Preparing Nginx latest..."
@@ -33,9 +83,11 @@ sources/latest:
 	@ln -s $(LATEST)/ sources/latest
 
 	@echo "Fetching Nginx $(LATEST)..."
-	@curl --progress-bar http://nginx.org/download/nginx-$(LATEST).zip > nginx-$(LATEST).zip
-	@unzip -o nginx-$(LATEST).zip -d sources/$(LATEST)
-	@mv nginx-$(LATEST).zip sources/$(LATEST)
+	@curl --progress-bar http://nginx.org/download/nginx-$(LATEST).tar.gz > nginx-$(LATEST).tar.gz
+
+	@echo "Extracting Nginx $(LATEST)..."
+	@tar -xvf nginx-$(LATEST).tar.gz
+	@mv nginx-$(LATEST).tar.gz nginx-$(LATEST) sources/$(LATEST)
 
 sources/stable:
 	@echo "Preparing Nginx stable..."
@@ -43,12 +95,46 @@ sources/stable:
 	@ln -s $(STABLE)/ sources/stable
 
 	@echo "Fetching Nginx $(STABLE)..."
-	@curl --progress-bar http://nginx.org/download/nginx-$(STABLE).zip > nginx-$(STABLE).zip
-	@unzip -o nginx-$(STABLE).zip -d sources/$(STABLE)
-	@mv nginx-$(STABLE).zip sources/$(STABLE)
+	@curl --progress-bar http://nginx.org/download/nginx-$(STABLE).tar.gz > nginx-$(STABLE).tar.gz
 
-modules: modules/pagespeed
-	@echo "Preparing Nginx modules..."
+	@echo "Extracting Nginx $(STABLE)..."
+	@tar -xvf nginx-$(STABLE).tar.gz
+	@mv nginx-$(STABLE).tar.gz nginx-$(STABLE) sources/$(STABLE)
+
+
+#### ==== NGINX DEPENDENCIES ==== ####
+dependencies/pcre:
+	@echo "Fetching PCRE..."
+	@mkdir -p dependencies/pcre/$(PCRE_VERSION)
+	@curl --progress-bar ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/pcre-$(PCRE_VERSION).tar.gz > pcre-$(PCRE_VERSION).tar.gz
+
+	@echo "Extracting PCRE..."
+	@tar -xvf pcre-$(PCRE_VERSION).tar.gz
+	@mv pcre-$(PCRE_VERSION)/ pcre-$(PCRE_VERSION).tar.gz dependencies/pcre/$(PCRE_VERSION)/
+	@ln -s $(PCRE_VERSION)/pcre-$(PCRE_VERSION) dependencies/pcre/latest
+
+dependencies/openssl:
+	@echo "Fetching OpenSSL..."
+	@mkdir -p dependencies/openssl/$(OPENSSL_VERSION)
+	@curl --progress-bar http://www.openssl.org/source/openssl-$(OPENSSL_VERSION).tar.gz > openssl-$(OPENSSL_VERSION).tar.gz
+
+	@echo "Extracting OpenSSL..."
+	@tar -xvf openssl-$(OPENSSL_VERSION).tar.gz
+	@mv openssl-$(OPENSSL_VERSION)/ openssl-$(OPENSSL_VERSION).tar.gz dependencies/openssl/$(OPENSSL_VERSION)/
+	@ln -s $(OPENSSL_VERSION)/openssl-$(OPENSSL_VERSION) dependencies/openssl/latest
+
+dependencies/libatomic:
+	@echo "Fetching libatomic..."
+	@mkdir -p dependencies/libatomic/7.2
+	@curl --progress-bar http://www.hpl.hp.com/research/linux/atomic_ops/download/libatomic_ops-7.2d.tar.gz > libatomic_ops-7.2d.tar.gz
+
+	@echo "Extracting libatomic..."
+	@tar -xvf libatomic_ops-7.2d.tar.gz
+	@mv libatomic_ops-7.2 libatomic_ops-7.2d.tar.gz dependencies/libatomic/7.2
+	@ln -s 7.2/libatomic_ops-7.2 dependencies/libatomic/latest
+
+
+#### ==== NGX PAGESPEED ==== ####
 
 modules/pagespeed: sources/pagespeed
 

@@ -138,74 +138,56 @@ sources/stable:
 
 #### ==== NGINX DEPENDENCIES ==== ####
 dependencies/pcre:
-	ifeq ($(PCRE),1)
-		@echo "Fetching PCRE..."
-		@mkdir -p dependencies/pcre/$(PCRE_VERSION)
-		@curl --progress-bar ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/pcre-$(PCRE_VERSION).tar.gz > pcre-$(PCRE_VERSION).tar.gz
+	@echo "Fetching PCRE..."
+	@mkdir -p dependencies/pcre/$(PCRE_VERSION)
+	@curl --progress-bar ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/pcre-$(PCRE_VERSION).tar.gz > pcre-$(PCRE_VERSION).tar.gz
 
-		@echo "Extracting PCRE..."
-		@tar -xvf pcre-$(PCRE_VERSION).tar.gz
-		@mv pcre-$(PCRE_VERSION)/ pcre-$(PCRE_VERSION).tar.gz dependencies/pcre/$(PCRE_VERSION)/
-		@ln -s $(PCRE_VERSION)/pcre-$(PCRE_VERSION) dependencies/pcre/latest
-	else
-		@echo "Skipping PCRE..."
-	endif
+	@echo "Extracting PCRE..."
+	@tar -xvf pcre-$(PCRE_VERSION).tar.gz
+	@mv pcre-$(PCRE_VERSION)/ pcre-$(PCRE_VERSION).tar.gz dependencies/pcre/$(PCRE_VERSION)/
+	@ln -s $(PCRE_VERSION)/pcre-$(PCRE_VERSION) dependencies/pcre/latest
 
 dependencies/openssl:
-	ifeq ($(OPENSSL),1)
-		@echo "Fetching OpenSSL..."
-		@mkdir -p dependencies/openssl/$(OPENSSL_VERSION)
-		@curl --progress-bar http://www.openssl.org/source/openssl-$(OPENSSL_VERSION).tar.gz > openssl-$(OPENSSL_VERSION).tar.gz
+	@echo "Fetching OpenSSL..."
+	@mkdir -p dependencies/openssl/$(OPENSSL_VERSION)
+	@curl --progress-bar http://www.openssl.org/source/openssl-$(OPENSSL_VERSION).tar.gz > openssl-$(OPENSSL_VERSION).tar.gz
 
-		@echo "Extracting OpenSSL..."
-		@tar -xvf openssl-$(OPENSSL_VERSION).tar.gz
-		@mv openssl-$(OPENSSL_VERSION)/ openssl-$(OPENSSL_VERSION).tar.gz dependencies/openssl/$(OPENSSL_VERSION)/
-		@ln -s $(OPENSSL_VERSION)/openssl-$(OPENSSL_VERSION) dependencies/openssl/latest
-	else
-		@echo "Skipping openssl..."
-	endif
+	@echo "Extracting OpenSSL..."
+	@tar -xvf openssl-$(OPENSSL_VERSION).tar.gz
+	@mv openssl-$(OPENSSL_VERSION)/ openssl-$(OPENSSL_VERSION).tar.gz dependencies/openssl/$(OPENSSL_VERSION)/
+	@ln -s $(OPENSSL_VERSION)/openssl-$(OPENSSL_VERSION) dependencies/openssl/latest
 
 dependencies/libatomic:
-	ifeq ($(LIBATOMIC),1)
-		@echo "Fetching libatomic..."
-		@mkdir -p dependencies/libatomic/7.2
-		@curl --progress-bar http://www.hpl.hp.com/research/linux/atomic_ops/download/libatomic_ops-7.2d.tar.gz > libatomic_ops-7.2d.tar.gz
+	@echo "Fetching libatomic..."
+	@mkdir -p dependencies/libatomic/7.2
+	@curl --progress-bar http://www.hpl.hp.com/research/linux/atomic_ops/download/libatomic_ops-7.2d.tar.gz > libatomic_ops-7.2d.tar.gz
 
-		@echo "Extracting libatomic..."
-		@tar -xvf libatomic_ops-7.2d.tar.gz
-		@mv libatomic_ops-7.2 libatomic_ops-7.2d.tar.gz dependencies/libatomic/7.2
-		@ln -s 7.2/libatomic_ops-7.2 dependencies/libatomic/latest
-	else
-		@echo "Skipping libatomic..."
-	endif
+	@echo "Extracting libatomic..."
+	@tar -xvf libatomic_ops-7.2d.tar.gz
+	@mv libatomic_ops-7.2 libatomic_ops-7.2d.tar.gz dependencies/libatomic/7.2
+	@ln -s 7.2/libatomic_ops-7.2 dependencies/libatomic/latest
 
 
 #### ==== NGX PAGESPEED ==== ####
 modules/pagespeed: sources/pagespeed
-	ifeq ($(PAGESPEED), 1)
-		@echo "Preparing ngx_pagespeed..."
-		@mkdir -p ./modules/pagespeed
+	@echo "Preparing ngx_pagespeed..."
+	@mkdir -p ./modules/pagespeed
 
-		@mv ngx_pagespeed-release-$(PAGESPEED_VERSION)/ modules/pagespeed/$(PAGESPEED_VERSION)
-		@mv psol-$(PSOL_VERSION).tar.gz release-$(PAGESPEED_VERSION).zip sources/pagespeed/
-	endif
+	@mv ngx_pagespeed-release-$(PAGESPEED_VERSION)/ modules/pagespeed/$(PAGESPEED_VERSION)
+	@mv psol-$(PSOL_VERSION).tar.gz release-$(PAGESPEED_VERSION).zip sources/pagespeed/
 
 sources/pagespeed:
-	ifeq ($(PAGESPEED),1)
-		@mkdir -p ./sources/pagespeed
+	@mkdir -p ./sources/pagespeed
 
-		@echo "Fetching ngx_pagespeed..."
-		@curl --progress-bar https://codeload.github.com/pagespeed/ngx_pagespeed/zip/release-$(PAGESPEED_VERSION) > release-$(PAGESPEED_VERSION).zip
+	@echo "Fetching ngx_pagespeed..."
+	@curl --progress-bar https://codeload.github.com/pagespeed/ngx_pagespeed/zip/release-$(PAGESPEED_VERSION) > release-$(PAGESPEED_VERSION).zip
 
-		@echo "Extracting ngx_pagespeed..."
-		@unzip -o release-$(PAGESPEED_VERSION).zip
+	@echo "Extracting ngx_pagespeed..."
+	@unzip -o release-$(PAGESPEED_VERSION).zip
 
-		@echo "Fetching PSOL..."
-		@curl --progress-bar https://dl.google.com/dl/page-speed/psol/$(PSOL_VERSION).tar.gz > psol-$(PSOL_VERSION).tar.gz
+	@echo "Fetching PSOL..."
+	@curl --progress-bar https://dl.google.com/dl/page-speed/psol/$(PSOL_VERSION).tar.gz > psol-$(PSOL_VERSION).tar.gz
 
-		@echo "Extracting PSOL..."
-		@tar -xvf psol-$(PSOL_VERSION).tar.gz
-		@mv psol/ ngx_pagespeed-release-$(PAGESPEED_VERSION)/
-	else
-		@echo "Skipping Pagespeed sources..."
-	endif
+	@echo "Extracting PSOL..."
+	@tar -xvf psol-$(PSOL_VERSION).tar.gz
+	@mv psol/ ngx_pagespeed-release-$(PAGESPEED_VERSION)/

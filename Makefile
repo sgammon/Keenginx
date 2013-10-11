@@ -80,7 +80,7 @@ _common_patches = $(wildcard patches/common/*)
 _current_patches := $(wildcard patches/$(CURRENT)/*)
 
 # configure vars
-_nginx_debug_cpuflags = -O0 -g
+_nginx_debug_cpuflags = -O0
 _nginx_release_cpuflags = -O3 -mtune=native -march=native
 
 ifeq ($(DEBUG),0)
@@ -215,12 +215,17 @@ workspace/.$(WORKSPACE): sources/$(WORKSPACE)
 #### ==== PATCH APPLICATION ==== ####
 patch_common: $(_common_patches)
 	@echo "Applying patch " $^ "..."
-	-@patch -N -p0 < $^
+	-cd sources/$(CURRENT)/nginx-$(CURRENT)/src; \
+		patch -N -p1 < $^; \
+		cd ../../../../;
+	@echo "Patch done."
 
 patch_$(CURRENT): $(_current_patches)
 	@echo "Applying patch " $^ "..."
-	-@patch -N -p0 < $^
-
+	-cd sources/$(CURRENT)/nginx-$(CURRENT)/src; \
+		patch -N -p1 < $^; \
+		cd ../../../../;
+	@echo "Patch done.
 
 #### ==== NGINX SOURCES ==== ####
 sources/$(WORKSPACE):

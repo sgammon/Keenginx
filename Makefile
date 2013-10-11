@@ -4,15 +4,17 @@
 
 DEBUG ?= 1
 WORKSPACE ?= latest
+PROJECT ?= $(shell pwd)
 
 # nginx config
 stable ?= 1.4.3
 latest ?= 1.5.6
 
 # pagespeed config
-PAGESPEED ?= 1
+PAGESPEED ?= 0
 PSOL_VERSION ?= 1.6.29.5
 PAGESPEED_VERSION ?= 1.6.29.5-beta
+PAGESPEED_EXTRA_ENV ?=
 
 # pcre config
 PCRE ?= 1
@@ -33,15 +35,20 @@ NGINX_TEMPPATH ?= cache/nginx
 NGINX_PERFTOOLS ?= 0
 
 ifeq ($(DEBUG),1)
+PAGESPEED_RELEASE ?= Debug
 NGINX_USER ?= $(shell whoami)
 NGINX_GROUP ?= $(shell id -g -n $(NGINX_USER))
-NGINX_ROOT ?= $(shell pwd)/build/
+NGINX_ROOT ?= $(PROJECT)/build/
 else
+PAGESPEED_RELEASE ?= Release
 NGINX_USER ?= nginx
 NGINX_GROUP ?= keen
 NGINX_ROOT ?= /
 endif
 
+PSOL_ENV := PSOL_BINARY=$(PROJECT)/modules/pagespeed/$(PAGESPEED_VERSION)/psol/lib/$(PAGESPEED_RELEASE)/linux/x64/pagespeed_automatic.a
+PAGESPEED_ENV := $(PSOL_ENV) MOD_PAGESPEED_DIR=$(PROJECT)/modules/pagespeed/$(PAGESPEED_VERSION)/
+NGINX_ENV += $(PAGESPEED_ENV)
 
 ##### Runtime
 OS := `uname`
@@ -198,7 +205,7 @@ sources: dependencies modules
 modules: modules/pagespeed
 	@echo "Downloaded module sources."
 
-dependencies: dependencies/pcre dependencies/openssl dependencies/libatomic
+dependencies: dependencies/pcre dependencies/openssl dependencies/libatomic dependencies/depot_tools
 	@echo "Finished fetching dependency sources."
 
 
@@ -226,6 +233,7 @@ patch_$(CURRENT): $(_current_patches)
 		patch -N -p1 < ../../../../$^; \
 		cd ../../../../;
 	@echo "Patch done."
+
 
 #### ==== NGINX SOURCES ==== ####
 sources/$(WORKSPACE):
@@ -272,9 +280,15 @@ dependencies/libatomic:
 	@mv libatomic_ops-7.2 libatomic_ops-7.2d.tar.gz dependencies/libatomic/7.2
 	@ln -s 7.2/libatomic_ops-7.2 dependencies/libatomic/latest
 
+dependencies/depot_tools:
+	@echo "Fetching depot_tools..."
+	@cd dependencies/; \
+		svn co http://src.chromium.org/svn/trunk/tools/depot_tools; \
+		cd ../;
+
 
 #### ==== NGX PAGESPEED ==== ####
-modules/pagespeed: sources/pagespeed
+modules/pagespeed: dependencies/depot_tools sources/pagespeed
 	@echo "Preparing ngx_pagespeed..."
 	@mkdir -p ./modules/pagespeed
 
@@ -297,13 +311,20 @@ sources/pagespeed:
 	@tar -xvf psol-$(PSOL_VERSION).tar.gz
 	@mv psol/ ngx_pagespeed-release-$(PAGESPEED_VERSION)/
 
+	@echo "Fetching ngx_pagespeed..."
+	@mkdir -p sources/pagespeed/$(PAGESPEED_VERSION)/trunk;
+	cd sources/pagespeed/$(PAGESPEED_VERSION)/trunk; \
+		../../../../dependencies/depot_tools/gclient config http://modpagespeed.googlecode.com/svn/tags/$(PSOL_VERSION)/src; \
+		../../../../dependencies/depot_tools/gclient sync --force --jobs=1; \
+		cd ../../../../;
+
 
 #### ==== BUILD RULES ==== ####
 build_nginx:
 	@echo "Compiling Nginx..."
 	@mkdir -p build/ dist/
 	@cd sources/$(CURRENT)/nginx-$(CURRENT); \
-		CC=$(CC) CFLAGS=$(CFLAGS) CXXFLAGS=$(CXXFLAGS) make;
+		CC=$(CC) CFLAGS=$(CFLAGS) CXXFLAGS=$(CXXFLAGS) $(NGINX_ENV) make;
 
 clean_nginx:
 	@echo "Cleaning Nginx..."
@@ -315,7 +336,7 @@ clean_nginx:
 configure_nginx:
 	@echo "Configuring Nginx..."
 	-cd sources/$(CURRENT)/nginx-$(CURRENT); \
-		./configure $(_nginx_config_mainflags) \
+		CC=$(CC) CFLAGS=$(CFLAGS) CXXFLAGS=$(CXXFLAGS) $(NGINX_ENV) ./configure $(_nginx_config_mainflags) \
 		cd ../../../;
 
 install_nginx:

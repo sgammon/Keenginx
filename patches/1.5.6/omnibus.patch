@@ -1,28 +1,58 @@
 diff -Naurdw sources/1.5.6/nginx-1.5.6/src/core/nginx.h workspace/core/nginx.h
---- sources/1.5.6/nginx-1.5.6/src/core/nginx.h	2013-10-01 06:44:51.000000000 -0700
-+++ workspace/core/nginx.h	2013-10-10 01:51:53.000000000 -0700
-@@ -10,8 +10,8 @@
- 
+--- sources/1.5.6/nginx-1.5.6/src/core/nginx.h	2013-10-10 18:21:12.000000000 -0700
++++ workspace/core/nginx.h	2013-10-10 18:23:54.000000000 -0700
+@@ -11,7 +11,7 @@
  
  #define nginx_version      1005006
--#define NGINX_VERSION      "1.5.6"
--#define NGINX_VER          "nginx/" NGINX_VERSION
-+#define NGINX_VERSION      "1.5x01-alpha0"
-+#define NGINX_VER          "Keen/" NGINX_VERSION
+ #define NGINX_VERSION      "1.5x01-alpha0"
+-#define NGINX_VER          "Keen/" NGINX_VERSION
++#define NGINX_VER          NGINX_VERSION
  
  #define NGINX_VAR          "NGINX"
  #define NGX_OLDPID_EXT     ".oldbin"
-diff -Naurdw sources/1.5.6/nginx-1.5.6/src/http/ngx_http_header_filter_module.c workspace/http/ngx_http_header_filter_module.c
---- sources/1.5.6/nginx-1.5.6/src/http/ngx_http_header_filter_module.c	2013-10-01 06:44:52.000000000 -0700
-+++ workspace/http/ngx_http_header_filter_module.c	2013-10-10 01:51:35.000000000 -0700
-@@ -46,8 +46,8 @@
- };
- 
- 
--static char ngx_http_server_string[] = "Server: nginx" CRLF;
--static char ngx_http_server_full_string[] = "Server: " NGINX_VER CRLF;
-+static char ngx_http_server_string[] = "Server: K9/" CRLF;
-+static char ngx_http_server_full_string[] = "Server: Keen/K9:D/" NGINX_VER CRLF;
- 
- 
- static ngx_str_t ngx_http_status_lines[] = {
+diff -Naurdw sources/1.5.6/nginx-1.5.6/src/core/nginx.h.rej workspace/core/nginx.h.rej
+--- sources/1.5.6/nginx-1.5.6/src/core/nginx.h.rej	2013-10-10 18:22:29.000000000 -0700
++++ workspace/core/nginx.h.rej	1969-12-31 16:00:00.000000000 -0800
+@@ -1,19 +0,0 @@
+-***************
+-*** 10,17 ****
+-  
+-  
+-  #define nginx_version      1005006
+-- #define NGINX_VERSION      "1.5.6"
+-- #define NGINX_VER          "nginx/" NGINX_VERSION
+-  
+-  #define NGINX_VAR          "NGINX"
+-  #define NGX_OLDPID_EXT     ".oldbin"
+---- 10,17 ----
+-  
+-  
+-  #define nginx_version      1005006
+-+ #define NGINX_VERSION      "1.5x01-alpha0"
+-+ #define NGINX_VER          "Keen/" NGINX_VERSION
+-  
+-  #define NGINX_VAR          "NGINX"
+-  #define NGX_OLDPID_EXT     ".oldbin"
+diff -Naurdw sources/1.5.6/nginx-1.5.6/src/http/ngx_http_header_filter_module.c.rej workspace/http/ngx_http_header_filter_module.c.rej
+--- sources/1.5.6/nginx-1.5.6/src/http/ngx_http_header_filter_module.c.rej	2013-10-10 18:22:29.000000000 -0700
++++ workspace/http/ngx_http_header_filter_module.c.rej	1969-12-31 16:00:00.000000000 -0800
+@@ -1,19 +0,0 @@
+-***************
+-*** 46,53 ****
+-  };
+-  
+-  
+-- static char ngx_http_server_string[] = "Server: nginx" CRLF;
+-- static char ngx_http_server_full_string[] = "Server: " NGINX_VER CRLF;
+-  
+-  
+-  static ngx_str_t ngx_http_status_lines[] = {
+---- 46,53 ----
+-  };
+-  
+-  
+-+ static char ngx_http_server_string[] = "Server: K9/" CRLF;
+-+ static char ngx_http_server_full_string[] = "Server: Keen/K9:D/" NGINX_VER CRLF;
+-  
+-  
+-  static ngx_str_t ngx_http_status_lines[] = {

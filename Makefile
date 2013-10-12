@@ -172,10 +172,11 @@ package: build
 	@echo "Packaging build..."
 	make install_nginx;
 	@mv sources/$(CURRENT)/nginx-$(CURRENT) ./nginx-$(CURRENT)/;
-	@mv pagespeed/$(PAGESPEED_VERSION) nginx-$(CURRENT)/pagespeed
+	@mv pagespeed/ nginx-$(CURRENT)/pagespeed
 
 	@echo "Packaging tarball..."
 	@tar -czvf nginx-$(CURRENT).tar.gz nginx-$(CURRENT)/
+	@mv nginx-$(CURRENT)/pagespeed ./pagespeed
 	@mv nginx-$(CURRENT)/ sources/$(CURRENT)/nginx-$(CURRENT);
 	@mv nginx-$(CURRENT).tar.gz build/;
 	@echo "=== Finished Keen-Nginx build. ==="

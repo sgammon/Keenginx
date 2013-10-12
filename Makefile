@@ -390,7 +390,7 @@ configure_nginx:
 		CC=$(CC) CFLAGS="$(_nginx_gccflags)" CXXFLAGS="$(CXXFLAGS)" ./configure $(_nginx_config_mainflags) --with-cc-opt="$(_nginx_gccflags)" \
 		cd ../../../;
 	@echo "Stamping configuration..."
-	@echo "CC=$(CC) CFLAGS=\"$(_nginx_gccflags)\" CXXFLAGS=\"$(CXXFLAGS)\" ./configure $(_nginx_config_mainflags) --with-cc-opt='$(_nginx_gccflags)'" > workspace/.build_cmd
+	@echo "CC=$(CC) CFLAGS=\"$(_nginx_gccflags)\" CXXFLAGS=\"$(CXXFLAGS)\" ./configure --with-cc-opt=\"$(_nginx_gccflags)\" $(_nginx_config_mainflags)" > workspace/.build_cmd
 	@echo "CC=$(CC) CFLAGS=\"$(_nginx_gccflags)\" CXXFLAGS=\"$(CXXFLAGS)\" $(NGINX_ENV) make ; sudo make install" > workspace/.make_cmd
 	@cp -f workspace/.build_cmd workspace/.make_cmd sources/$(CURRENT)/nginx-$(CURRENT)
 

@@ -105,6 +105,7 @@ endif
 # patch directories
 _common_patches = $(wildcard patches/common/*)
 _current_patches := $(wildcard patches/$(CURRENT)/*)
+_pagespeed_patches = $(wildcard patches/pagespeed/*)
 
 # do we compile-in pagespeed?
 ifeq ($(PAGESPEED),1)
@@ -160,8 +161,11 @@ seal:
 	@echo "Removing omnibus..."
 	@rm -f patches/$(CURRENT)/omnibus.patch.bk
 
-	@echo "Generating new patch..."
+	@echo "Generating new core patch..."
 	-diff -Naurdw sources/$(CURRENT)/nginx-$(CURRENT)/src/ workspace/ > patches/$(CURRENT)/omnibus.patch
+
+	@echo "Generating new pagespeed patch..."
+	-diff -Naurdw modules/pagespeed/$(PAGESPEED_VERSION)/ pagespeed/ > patches/pagespeed/omnibus.patch
 
 package: build
 	@echo "Packaging build..."
@@ -193,6 +197,8 @@ clean: clean_nginx
 	@rm -fr build/
 	@echo "    ... workspace."
 	@rm -fr workspace
+	@echo "    ... pagespeed."
+	@rm -fr pagespeed
 
 distclean: clean
 	@echo "    ... dependencies."
@@ -235,6 +241,13 @@ patch_common: $(_common_patches)
 patch_$(CURRENT): $(_current_patches)
 	@echo "Applying patch " $^ "..."
 	-@cd sources/$(CURRENT)/nginx-$(CURRENT)/src; \
+		patch -N -p1 < ../../../../$^; \
+		cd ../../../../;
+	@echo "Patch done."
+
+patch_pagespeed: $(_pagespeed_patches)
+	@echo "Applying patch " $^ "..."
+	-@cd modules/pagespeed/$(PAGESPEED_VERSION); \
 		patch -N -p1 < ../../../../$^; \
 		cd ../../../../;
 	@echo "Patch done."
@@ -323,6 +336,10 @@ modules/pagespeed: dependencies/depot_tools sources/pagespeed
 	#         AR.target="$(PROJECT)/sources/pagespeed/$(PAGESPEED_VERSION)/trunk/src/build/wrappers/ar.sh" \
 	#	     BUILDTYPE=$(PAGESPEED_RELEASE) \
 	#         all;
+
+	@echo "Mounting Pagespeed..."
+	@mkdir -p pagespeed/
+	@cp -fr sources/pagespeed/$(PAGESPEED_VERSION)/* pagespeed/
 
 sources/pagespeed:
 	@mkdir -p ./sources/pagespeed

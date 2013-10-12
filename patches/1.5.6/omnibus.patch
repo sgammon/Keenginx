@@ -8,7 +8,7 @@ diff -Naurdw sources/1.5.6/nginx-1.5.6/src/core/nginx.h workspace/core/nginx.h
 -#define NGINX_VERSION      "1.5.6"
 -#define NGINX_VER          "nginx/" NGINX_VERSION
 +#define NGINX_VERSION      "1.5x01-alpha0"
-+#define NGINX_VER          "Keen/" NGINX_VERSION
++#define NGINX_VER          NGINX_VERSION
  
  #define NGINX_VAR          "NGINX"
  #define NGX_OLDPID_EXT     ".oldbin"

@@ -99,7 +99,7 @@ endif
 
 # do we compile-in openssl?
 ifeq ($(OPENSSL),1)
-	EXTRA_FLAGS += --with-openssl=dependencies/openssl/latest --with-http_ssl_module --with-http_spdy_module #--with-openssl-opt="$(_nginx_gccflags)"
+	EXTRA_FLAGS += --with-openssl=dependencies/openssl/$(OPENSSL_VERSION)/openssl-$(OPENSSL_VERSION) --with-http_ssl_module --with-http_spdy_module #--with-openssl-opt="$(_nginx_gccflags)"
 endif
 
 
@@ -115,17 +115,17 @@ endif
 
 # do we compile-in our version of PCRE?
 ifeq ($(PCRE),1)
-	EXTRA_FLAGS += --with-pcre=dependencies/pcre/latest --with-pcre-jit #--with-pcre-opt="$(_nginx_gccflags)"
+	EXTRA_FLAGS += --with-pcre=dependencies/pcre/$(PCRE_VERSION)/pcre-$(PCRE_VERSION) --with-pcre-jit #--with-pcre-opt="$(_nginx_gccflags)"
 endif
 
 # do we compile-in our version of Zlib?
 ifeq ($(ZLIB),1)
-	EXTRA_FLAGS += --with-zlib=dependencies/zlib/latest #--with-zlib-opt="$(_nginx_gccflags)"
+	EXTRA_FLAGS += --with-zlib=dependencies/zlib/$(ZLIB_VERSION)/zlib-$(ZLIB_VERSION) #--with-zlib-opt="$(_nginx_gccflags)"
 endif
 
 # do we compile-in libatomic?
 ifeq ($(LIBATOMIC),1)
-	EXTRA_FLAGS += --with-libatomic=dependencies/libatomic/latest
+	EXTRA_FLAGS += --with-libatomic=dependencies/libatomic/7.2/libatomic_ops-7.2
 endif
 
 # do we override paths?

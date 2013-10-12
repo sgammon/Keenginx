@@ -27,17 +27,17 @@ supports 'ubuntu'
 attribute 'nginx/dir',
   :display_name => 'Nginx Directory',
   :description => 'Location of nginx configuration files',
-  :default => '/ns/keen/conf'
+  :default => '/etc/nginx'
 
 attribute 'nginx/log_dir',
   :display_name => 'Nginx Log Directory',
   :description => 'Location for nginx logs',
-  :default => '/data/logx/nginx'
+  :default => '/var/log/nginx'
 
 attribute 'nginx/user',
   :display_name => 'Nginx User',
   :description => 'User nginx will run as',
-  :default => 'nginx'
+  :default => 'www-data'
 
 attribute 'nginx/binary',
   :display_name => 'Nginx Binary',
@@ -57,7 +57,7 @@ attribute 'nginx/gzip_http_version',
 attribute 'nginx/gzip_comp_level',
   :display_name => 'Nginx Gzip Compression Level',
   :description => 'Amount of compression to use',
-  :default => '3'
+  :default => '4'
 
 attribute 'nginx/gzip_proxied',
   :display_name => 'Nginx Gzip Proxied',

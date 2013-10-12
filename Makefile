@@ -1,5 +1,7 @@
 ## == KEEN NGINX: makefile == ##
 
+## dependencies: gperf, unzip, subversion, build-essential tar
+
 ##### Configuration
 
 DEBUG ?= 1
@@ -47,7 +49,7 @@ NGINX_ROOT ?= /
 endif
 
 PSOL_ENV := PSOL_BINARY=$(PROJECT)/modules/pagespeed/$(PAGESPEED_VERSION)/psol/lib/$(PAGESPEED_RELEASE)/linux/x64/pagespeed_automatic.a
-PAGESPEED_ENV := $(PSOL_ENV) MOD_PAGESPEED_DIR=$(PROJECT)/modules/pagespeed/$(PAGESPEED_VERSION)/
+PAGESPEED_ENV := $(PSOL_ENV) MOD_PAGESPEED_DIR=$(PROJECT)/sources/pagespeed/$(PAGESPEED_VERSION)/trunk/src
 NGINX_ENV += $(PAGESPEED_ENV)
 
 ##### Runtime
@@ -58,6 +60,7 @@ CURRENT := $($(WORKSPACE))
 # flags for mac os x
 ifeq ($(OS),Darwin)
 	CC := clang
+	PAGESPEED = 0
 	ifeq ($(DEBUG),1)
 		CFLAGS += -g -O0
 	else
@@ -164,8 +167,13 @@ seal:
 	-diff -Naurdw sources/$(CURRENT)/nginx-$(CURRENT)/src/ workspace/ > patches/$(CURRENT)/omnibus.patch
 
 package: build
-	@echo "Packaging..."
+	@echo "Packaging build..."
 	make install_nginx;
+	@mv workspace/ nginx-$(CURRENT)/;
+	@echo "Packaging tarball..."
+	@tar -czvf nginx-$(CURRENT).tar.gz nginx-$(CURRENT)/
+	@mv nginx-$(CURRENT)/ workspace/;
+	@mv nginx-$(CURRENT).tar.gz build/;
 	@echo "=== Finished Keen-Nginx build. ==="
 
 build: patch
@@ -292,8 +300,22 @@ modules/pagespeed: dependencies/depot_tools sources/pagespeed
 	@echo "Preparing ngx_pagespeed..."
 	@mkdir -p ./modules/pagespeed
 
-	@mv ngx_pagespeed-release-$(PAGESPEED_VERSION)/ modules/pagespeed/$(PAGESPEED_VERSION)
-	@mv psol-$(PSOL_VERSION).tar.gz release-$(PAGESPEED_VERSION).zip sources/pagespeed/
+	-@mv ngx_pagespeed-release-$(PAGESPEED_VERSION)/ modules/pagespeed/$(PAGESPEED_VERSION)
+	-@mv psol-$(PSOL_VERSION).tar.gz release-$(PAGESPEED_VERSION).zip sources/pagespeed/
+
+	@echo "Building pagespeed core..."
+	-cd ./sources/pagespeed/$(PAGESPEED_VERSION)/trunk/src; \
+		make AR.host="$(PROJECT)/sources/pagespeed/$(PAGESPEED_VERSION)/trunk/src/build/wrappers/ar.sh" \
+	         AR.target="$(PROJECT)/sources/pagespeed/$(PAGESPEED_VERSION)/trunk/src/build/wrappers/ar.sh" \
+		     BUILDTYPE=$(PAGESPEED_RELEASE) \
+	         mod_pagespeed_test pagespeed_automatic_test;
+
+	@echo "Building PSOL sources..."
+	-cd ./sources/pagespeed/$(PAGESPEED_VERSION)/trunk/src/net/instaweb/automatic; \
+		make AR.host="$(PROJECT)/sources/pagespeed/$(PAGESPEED_VERSION)/trunk/src/build/wrappers/ar.sh" \
+	         AR.target="$(PROJECT)/sources/pagespeed/$(PAGESPEED_VERSION)/trunk/src/build/wrappers/ar.sh" \
+		     BUILDTYPE=$(PAGESPEED_RELEASE) \
+	         all;
 
 sources/pagespeed:
 	@mkdir -p ./sources/pagespeed
@@ -315,7 +337,7 @@ sources/pagespeed:
 	@mkdir -p sources/pagespeed/$(PAGESPEED_VERSION)/trunk;
 	cd sources/pagespeed/$(PAGESPEED_VERSION)/trunk; \
 		../../../../dependencies/depot_tools/gclient config http://modpagespeed.googlecode.com/svn/tags/$(PSOL_VERSION)/src; \
-		../../../../dependencies/depot_tools/gclient sync --force --jobs=1; \
+		../../../../dependencies/depot_tools/gclient sync --force --jobs=1;
 		cd ../../../../;
 
 

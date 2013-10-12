@@ -1,6 +1,6 @@
 name              'nginx'
-maintainer        'Opscode, Inc.'
-maintainer_email  'cookbooks@opscode.com'
+maintainer        'Keen IO'
+maintainer_email  'sam@keen.io'
 license           'Apache 2.0'
 description       'Installs and configures nginx'
 version           '2.0.1'
@@ -27,22 +27,22 @@ supports 'ubuntu'
 attribute 'nginx/dir',
   :display_name => 'Nginx Directory',
   :description => 'Location of nginx configuration files',
-  :default => '/etc/nginx'
+  :default => '/ns/keen/conf'
 
 attribute 'nginx/log_dir',
   :display_name => 'Nginx Log Directory',
   :description => 'Location for nginx logs',
-  :default => '/var/log/nginx'
+  :default => '/data/logx/nginx'
 
 attribute 'nginx/user',
   :display_name => 'Nginx User',
   :description => 'User nginx will run as',
-  :default => 'www-data'
+  :default => 'nginx'
 
 attribute 'nginx/binary',
   :display_name => 'Nginx Binary',
   :description => 'Location of the nginx server binary',
-  :default => '/usr/sbin/nginx'
+  :default => '/ns/keen/sbin/nginx'
 
 attribute 'nginx/gzip',
   :display_name => 'Nginx Gzip',
@@ -57,7 +57,7 @@ attribute 'nginx/gzip_http_version',
 attribute 'nginx/gzip_comp_level',
   :display_name => 'Nginx Gzip Compression Level',
   :description => 'Amount of compression to use',
-  :default => '2'
+  :default => '3'
 
 attribute 'nginx/gzip_proxied',
   :display_name => 'Nginx Gzip Proxied',
@@ -77,17 +77,17 @@ attribute 'nginx/keepalive',
 
 attribute 'nginx/keepalive_timeout',
   :display_name => 'Nginx Keepalive Timeout',
-  :default => '65'
+  :default => '100'
 
 attribute 'nginx/worker_processes',
   :display_name => 'Nginx Worker Processes',
   :description => 'Number of worker processes',
-  :default => '1'
+  :default => '4'
 
 attribute 'nginx/worker_connections',
   :display_name => 'Nginx Worker Connections',
   :description => 'Number of connections per worker',
-  :default => '1024'
+  :default => '2048'
 
 attribute 'nginx/server_names_hash_bucket_size',
   :display_name => 'Nginx Server Names Hash Bucket Size',

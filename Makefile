@@ -353,7 +353,7 @@ build_nginx:
 	@echo "Compiling Nginx..."
 	@mkdir -p build/ dist/
 	cd sources/$(CURRENT)/nginx-$(CURRENT); \
-		CC=$(CC) CFLAGS=\"$(_nginx_gccflags)\" CXXFLAGS=\"$(CXXFLAGS)\" $(NGINX_ENV) make;
+		CC=$(CC) CFLAGS="$(_nginx_gccflags)" CXXFLAGS="$(CXXFLAGS)" $(NGINX_ENV) make;
 
 clean_nginx:
 	@echo "Cleaning Nginx..."

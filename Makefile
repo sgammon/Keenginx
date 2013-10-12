@@ -165,7 +165,7 @@ seal:
 	-diff -Naurdw sources/$(CURRENT)/nginx-$(CURRENT)/src/ workspace/ > patches/$(CURRENT)/omnibus.patch
 
 	@echo "Generating new pagespeed patch..."
-	-diff -Naurdw modules/pagespeed/$(PAGESPEED_VERSION)/ pagespeed/ > patches/pagespeed/omnibus.patch
+	-diff -Naurdw sources/pagespeed/$(PAGESPEED_VERSION)/ pagespeed/ > patches/pagespeed/omnibus.patch
 
 package: build
 	@echo "Packaging build..."
@@ -185,7 +185,7 @@ build: patch
 	@mkdir -p build/cache/nginx/client build/cache/nginx/proxy
 	@echo "Finished building Nginx $(CURRENT)."
 
-patch: sources patch_common patch_$(CURRENT)
+patch: sources patch_common patch_$(CURRENT) patch_pagespeed
 	@echo "Patching complete."
 	@echo "Applied patches:"
 	@echo "  -- Common: " $(_common_patches)
@@ -248,8 +248,8 @@ patch_$(CURRENT): $(_current_patches)
 patch_pagespeed: $(_pagespeed_patches)
 	@echo "Applying patch " $^ "..."
 	-@cd modules/pagespeed/$(PAGESPEED_VERSION); \
-		patch -N -p1 < ../../../../$^; \
-		cd ../../../../;
+		patch -N -p1 < ../../../$^; \
+		cd ../../../;
 	@echo "Patch done."
 
 
@@ -323,21 +323,21 @@ modules/pagespeed: dependencies/depot_tools sources/pagespeed
 	-@mv ngx_pagespeed-release-$(PAGESPEED_VERSION)/ modules/pagespeed/$(PAGESPEED_VERSION)
 	-@mv psol-$(PSOL_VERSION).tar.gz release-$(PAGESPEED_VERSION).zip sources/pagespeed/
 
-	#@echo "Building pagespeed core..."
-	#-cd ./sources/pagespeed/$(PAGESPEED_VERSION)/trunk/src; \
-	#	make AR.host="$(PROJECT)/sources/pagespeed/$(PAGESPEED_VERSION)/trunk/src/build/wrappers/ar.sh" \
-	#         AR.target="$(PROJECT)/sources/pagespeed/$(PAGESPEED_VERSION)/trunk/src/build/wrappers/ar.sh" \
-	#	     BUILDTYPE=$(PAGESPEED_RELEASE) \
-	#         mod_pagespeed_test pagespeed_automatic_test;
+	@echo "Building pagespeed core..."
+	-cd ./sources/pagespeed/$(PAGESPEED_VERSION)/trunk/src; \
+		make AR.host="$(PROJECT)/sources/pagespeed/$(PAGESPEED_VERSION)/trunk/src/build/wrappers/ar.sh" \
+	         AR.target="$(PROJECT)/sources/pagespeed/$(PAGESPEED_VERSION)/trunk/src/build/wrappers/ar.sh" \
+		     BUILDTYPE=$(PAGESPEED_RELEASE) \
+	         mod_pagespeed_test pagespeed_automatic_test;
 
-	#@echo "Building PSOL sources..."
-	#-cd ./sources/pagespeed/$(PAGESPEED_VERSION)/trunk/src/net/instaweb/automatic; \
-	#	make AR.host="$(PROJECT)/sources/pagespeed/$(PAGESPEED_VERSION)/trunk/src/build/wrappers/ar.sh" \
-	#         AR.target="$(PROJECT)/sources/pagespeed/$(PAGESPEED_VERSION)/trunk/src/build/wrappers/ar.sh" \
-	#	     BUILDTYPE=$(PAGESPEED_RELEASE) \
-	#         all;
+	@echo "Building PSOL sources..."
+	-cd ./sources/pagespeed/$(PAGESPEED_VERSION)/trunk/src/net/instaweb/automatic; \
+		make AR.host="$(PROJECT)/sources/pagespeed/$(PAGESPEED_VERSION)/trunk/src/build/wrappers/ar.sh" \
+	         AR.target="$(PROJECT)/sources/pagespeed/$(PAGESPEED_VERSION)/trunk/src/build/wrappers/ar.sh" \
+		     BUILDTYPE=$(PAGESPEED_RELEASE) \
+	         all;
 
-	@echo "Mounting Pagespeed..."
+	@echo "Mounting Pagespeed sources..."
 	@mkdir -p pagespeed/
 	@cp -fr sources/pagespeed/$(PAGESPEED_VERSION)/* pagespeed/
 

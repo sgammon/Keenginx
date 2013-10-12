@@ -204,7 +204,7 @@ distclean: clean
 	@echo "Resetting codebase..."
 	@git reset --hard
 
-sources: dependencies modules
+sources: dependencies
 	@echo "Finished acquiring sources."
 
 modules: modules/pagespeed

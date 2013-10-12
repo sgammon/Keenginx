@@ -22,6 +22,10 @@ PAGESPEED_EXTRA_ENV ?=
 PCRE ?= 1
 PCRE_VERSION ?= 8.33
 
+# pcre config
+ZLIB ?= 1
+ZLIB_VERSION ?= 1.2.8
+
 # openssl config
 OPENSSL ?= 1
 OPENSSL_VERSION ?= 1.0.1e
@@ -125,6 +129,11 @@ ifeq ($(PCRE),1)
 	EXTRA_FLAGS += --with-pcre=../../../dependencies/pcre/latest --with-pcre-jit --with-pcre-opt="$(CFLAGS)"
 endif
 
+# do we compile-in our version of Zlib?
+ifeq ($(ZLIB),1)
+	EXTRA_FLAGS += --with-zlib=../../../dependencies/zlib/latest
+endif
+
 # do we compile-in libatomic?
 ifeq ($(LIBATOMIC),1)
 	EXTRA_FLAGS += --with-libatomic=../../../dependencies/libatomic/latest
@@ -152,7 +161,6 @@ _nginx_config_mainflags := --prefix=$(NGINX_ROOT)$(NGINX_BASEPATH) \
 						   --http-client-body-temp-path=$(NGINX_ROOT)$(NGINX_TEMPPATH)/client \
 						   --with-md5-asm \
 						   --with-sha1-asm \
-						   --with-zlib-asm=pentiumpro \
 						   $(EXTRA_FLAGS) ;
 
 
@@ -213,7 +221,7 @@ sources: dependencies modules
 modules: modules/pagespeed
 	@echo "Downloaded module sources."
 
-dependencies: dependencies/pcre dependencies/openssl dependencies/libatomic dependencies/depot_tools
+dependencies: dependencies/pcre dependencies/zlib dependencies/openssl dependencies/libatomic dependencies/depot_tools
 	@echo "Finished fetching dependency sources."
 
 
@@ -267,6 +275,16 @@ dependencies/pcre:
 	@tar -xvf pcre-$(PCRE_VERSION).tar.gz
 	@mv pcre-$(PCRE_VERSION)/ pcre-$(PCRE_VERSION).tar.gz dependencies/pcre/$(PCRE_VERSION)/
 	@ln -s $(PCRE_VERSION)/pcre-$(PCRE_VERSION) dependencies/pcre/latest
+
+dependencies/zlib:
+	@echo "Fetching Zlib..."
+	@mkdir -p dependencies/zlib/$(ZLIB_VERSION)
+	@curl --progress-bar http://zlib.net/zlib-$(ZLIB_VERSION).tar.gz > zlib-$(ZLIB_VERSION).tar.gz
+
+	@echo "Extracting Zlib..."
+	@tar -xvf zlib-$(ZLIB_VERSION).tar.gz
+	@mv zlib-$(ZLIB_VERSION)/ zlib-$(ZLIB_VERSION).tar.gz dependencies/zlib/$(ZLIB_VERSION)/
+	@ln -s $(ZLIB_VERSION)/zlib-$(ZLIB_VERSION) dependencies/zlib/latest
 
 dependencies/openssl:
 	@echo "Fetching OpenSSL..."

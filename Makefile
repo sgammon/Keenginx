@@ -98,7 +98,7 @@ ifeq ($(OS),Linux)
 
 	# do we compile-in openssl?
 	ifeq ($(OPENSSL),1)
-		EXTRA_FLAGS += --with-openssl=../../../dependencies/openssl/latest --with-http_ssl_module --with-http_spdy_module --with-openssl-opt="$(_nginx_gccflags)"
+		EXTRA_FLAGS += --with-openssl=../../../dependencies/openssl/latest --with-http_ssl_module --with-http_spdy_module #--with-openssl-opt="$(_nginx_gccflags)"
 	endif
 endif
 
@@ -113,12 +113,12 @@ endif
 
 # do we compile-in our version of PCRE?
 ifeq ($(PCRE),1)
-	EXTRA_FLAGS += --with-pcre=../../../dependencies/pcre/latest --with-pcre-jit --with-pcre-opt="$(_nginx_gccflags)"
+	EXTRA_FLAGS += --with-pcre=../../../dependencies/pcre/latest --with-pcre-jit #--with-pcre-opt="$(_nginx_gccflags)"
 endif
 
 # do we compile-in our version of Zlib?
 ifeq ($(ZLIB),1)
-	EXTRA_FLAGS += --with-zlib=../../../dependencies/zlib/latest --with-zlib-opt="$(_nginx_gccflags)"
+	EXTRA_FLAGS += --with-zlib=../../../dependencies/zlib/latest #--with-zlib-opt="$(_nginx_gccflags)"
 endif
 
 # do we compile-in libatomic?
@@ -352,7 +352,7 @@ sources/pagespeed:
 build_nginx:
 	@echo "Compiling Nginx..."
 	@mkdir -p build/ dist/
-	@cd sources/$(CURRENT)/nginx-$(CURRENT); \
+	cd sources/$(CURRENT)/nginx-$(CURRENT); \
 		CC=$(CC) CFLAGS=\"$(_nginx_gccflags)\" CXXFLAGS=\"$(CXXFLAGS)\" $(NGINX_ENV) make;
 
 clean_nginx:

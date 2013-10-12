@@ -95,12 +95,13 @@ ifeq ($(OS),Linux)
 	else
 		_nginx_gccflags = $(_nginx_gccflags) -w -fomit-frame-pointer -fno-stack-protector -flto
 	endif
-
-	# do we compile-in openssl?
-	ifeq ($(OPENSSL),1)
-		EXTRA_FLAGS += --with-openssl=../../../dependencies/openssl/latest --with-http_ssl_module --with-http_spdy_module #--with-openssl-opt="$(_nginx_gccflags)"
-	endif
 endif
+
+# do we compile-in openssl?
+ifeq ($(OPENSSL),1)
+	EXTRA_FLAGS += --with-openssl=../../../dependencies/openssl/latest --with-http_ssl_module --with-http_spdy_module #--with-openssl-opt="$(_nginx_gccflags)"
+endif
+
 
 # patch directories
 _common_patches = $(wildcard patches/common/*)

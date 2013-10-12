@@ -382,10 +382,10 @@ clean_nginx:
 configure_nginx:
 	@echo "Configuring Nginx..."
 	-cd sources/$(CURRENT)/nginx-$(CURRENT); \
-		CC=$(CC) CFLAGS="$(_nginx_gccflags)" CXXFLAGS="$(CXXFLAGS)" $(NGINX_ENV) ./configure $(_nginx_config_mainflags) \
+		CC=$(CC) CFLAGS="$(_nginx_gccflags)" CXXFLAGS="$(CXXFLAGS)" ./configure $(_nginx_config_mainflags) \
 		cd ../../../;
 	@echo "Stamping configuration..."
-	@echo "CC=$(CC) CFLAGS=\"$(_nginx_gccflags)\" CXXFLAGS=\"$(CXXFLAGS)\" $(NGINX_ENV) ./configure $(_nginx_config_mainflags); CC=$(CC) CFLAGS=\"$(_nginx_gccflags)\" CXXFLAGS=\"$(CXXFLAGS)\" $(NGINX_ENV) make ; sudo make install" > workspace/.build_cmd
+	@echo "CC=$(CC) CFLAGS=\"$(_nginx_gccflags)\" CXXFLAGS=\"$(CXXFLAGS)\" ./configure $(_nginx_config_mainflags); CC=$(CC) CFLAGS=\"$(_nginx_gccflags)\" CXXFLAGS=\"$(CXXFLAGS)\" $(NGINX_ENV) make ; sudo make install" > workspace/.build_cmd
 
 install_nginx:
 	@echo "Installing Nginx..."

@@ -74,12 +74,12 @@ endif
 
 
 ##### Runtime
-OS := `uname`
+OSNAME := `uname`
 PATCH ?= omnibus
 CURRENT := $($(WORKSPACE))
 
 # flags for mac os x
-ifeq ($(OS),Darwin)
+ifeq ($(OSNAME),Darwin)
 	CC := clang
 	PAGESPEED = 0
 	ifeq ($(DEBUG),0)
@@ -87,7 +87,7 @@ ifeq ($(OS),Darwin)
 	endif
 endif
 
-ifeq ($(OS),Linux)
+ifeq ($(OSNAME),Linux)
 	CC := gcc
 	EXTRA_FLAGS += --with-file-aio
 	ifeq ($(DEBUG),1)
@@ -99,7 +99,7 @@ endif
 
 # do we compile-in openssl?
 ifeq ($(OPENSSL),1)
-	EXTRA_FLAGS += --with-openssl=../../../dependencies/openssl/latest --with-http_ssl_module --with-http_spdy_module #--with-openssl-opt="$(_nginx_gccflags)"
+	EXTRA_FLAGS += --with-openssl=dependencies/openssl/latest --with-http_ssl_module --with-http_spdy_module #--with-openssl-opt="$(_nginx_gccflags)"
 endif
 
 
@@ -110,22 +110,22 @@ _pagespeed_patches = $(wildcard patches/pagespeed/*)
 
 # do we compile-in pagespeed?
 ifeq ($(PAGESPEED),1)
-	EXTRA_FLAGS += --add-module=../../../modules/pagespeed/$(PAGESPEED_VERSION)
+	EXTRA_FLAGS += --add-module=modules/pagespeed/$(PAGESPEED_VERSION)
 endif
 
 # do we compile-in our version of PCRE?
 ifeq ($(PCRE),1)
-	EXTRA_FLAGS += --with-pcre=../../../dependencies/pcre/latest --with-pcre-jit #--with-pcre-opt="$(_nginx_gccflags)"
+	EXTRA_FLAGS += --with-pcre=dependencies/pcre/latest --with-pcre-jit #--with-pcre-opt="$(_nginx_gccflags)"
 endif
 
 # do we compile-in our version of Zlib?
 ifeq ($(ZLIB),1)
-	EXTRA_FLAGS += --with-zlib=../../../dependencies/zlib/latest #--with-zlib-opt="$(_nginx_gccflags)"
+	EXTRA_FLAGS += --with-zlib=dependencies/zlib/latest #--with-zlib-opt="$(_nginx_gccflags)"
 endif
 
 # do we compile-in libatomic?
 ifeq ($(LIBATOMIC),1)
-	EXTRA_FLAGS += --with-libatomic=../../../dependencies/libatomic/latest
+	EXTRA_FLAGS += --with-libatomic=dependencies/libatomic/latest
 endif
 
 # do we override paths?
@@ -171,12 +171,12 @@ seal:
 package: build
 	@echo "Packaging build..."
 	make install_nginx;
-	@mv workspace/ nginx-$(CURRENT)/;
+	@mv sources/$(CURRENT)/nginx-$(CURRENT) ./nginx-$(CURRENT)/;
 	@mv pagespeed/$(PAGESPEED_VERSION) nginx-$(CURRENT)/pagespeed
+
 	@echo "Packaging tarball..."
 	@tar -czvf nginx-$(CURRENT).tar.gz nginx-$(CURRENT)/
-	@mv nginx-$(CURRENT)/pagespeed pagespeed/$(PAGESPEED_VERSION)
-	@mv nginx-$(CURRENT)/ workspace/;
+	@mv nginx-$(CURRENT)/ sources/$(CURRENT)/nginx-$(CURRENT);
 	@mv nginx-$(CURRENT).tar.gz build/;
 	@echo "=== Finished Keen-Nginx build. ==="
 
@@ -313,9 +313,9 @@ dependencies/libatomic:
 
 dependencies/depot_tools:
 	@echo "Fetching depot_tools..."
-	@cd dependencies/; \
-		svn co http://src.chromium.org/svn/trunk/tools/depot_tools; \
-		cd ../;
+	#@cd dependencies/; \
+	#	svn co http://src.chromium.org/svn/trunk/tools/depot_tools; \
+	#	cd ../;
 
 
 #### ==== NGX PAGESPEED ==== ####
@@ -384,11 +384,13 @@ clean_nginx:
 
 configure_nginx:
 	@echo "Configuring Nginx..."
-	-cd sources/$(CURRENT)/nginx-$(CURRENT); \
+	-cp -fr modules dependencies sources/$(CURRENT)/nginx-$(CURRENT); \
+		cd sources/$(CURRENT)/nginx-$(CURRENT); \
 		CC=$(CC) CFLAGS="$(_nginx_gccflags)" CXXFLAGS="$(CXXFLAGS)" ./configure $(_nginx_config_mainflags) \
 		cd ../../../;
 	@echo "Stamping configuration..."
-	@echo "CC=$(CC) CFLAGS=\"$(_nginx_gccflags)\" CXXFLAGS=\"$(CXXFLAGS)\" ./configure $(_nginx_config_mainflags); CC=$(CC) CFLAGS=\"$(_nginx_gccflags)\" CXXFLAGS=\"$(CXXFLAGS)\" $(NGINX_ENV) make ; sudo make install" > workspace/.build_cmd
+	@echo "CC=$(CC) CFLAGS=\"$(_nginx_gccflags)\" CXXFLAGS=\"$(CXXFLAGS)\" ./configure $(_nginx_config_mainflags);" > workspace/.build_cmd
+	@echo "CC=$(CC) CFLAGS=\"$(_nginx_gccflags)\" CXXFLAGS=\"$(CXXFLAGS)\" $(NGINX_ENV) make ; sudo make install" > workspace/.make_cmd
 
 install_nginx:
 	@echo "Installing Nginx..."

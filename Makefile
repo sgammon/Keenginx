@@ -58,45 +58,8 @@ PSOL_ENV := PSOL_BINARY=$(PROJECT)/modules/pagespeed/$(PAGESPEED_VERSION)/psol/l
 PAGESPEED_ENV := $(PSOL_ENV) MOD_PAGESPEED_DIR=$(PROJECT)/sources/pagespeed/$(PAGESPEED_VERSION)/trunk/src
 NGINX_ENV += $(PAGESPEED_ENV)
 
-##### Runtime
-OS := `uname`
-PATCH ?= omnibus
-CURRENT := $($(WORKSPACE))
-
-# flags for mac os x
-ifeq ($(OS),Darwin)
-	CC := clang
-	PAGESPEED = 0
-	ifeq ($(DEBUG),1)
-		CFLAGS += -g -O0
-	else
-		CFLAGS += -O3 -mtune=native -mssse3 -march=native -flto
-	endif
-endif
-
-ifeq ($(OS),Linux)
-	CC := gcc
-	EXTRA_FLAGS += --with-file-aio
-	ifeq ($(DEBUG),1)
-		CFLAGS += -g -O0 -fno-stack-protector
-	else
-		CFLAGS += -O3 -mtune=native -march=native -w -fomit-frame-pointer -fno-stack-protector -flto
-	endif
-
-	# do we compile-in openssl?
-	ifeq ($(OPENSSL),1)
-		EXTRA_FLAGS += --with-openssl=../../../dependencies/openssl/latest --with-http_ssl_module --with-http_spdy_module --with-openssl-opt="$(CFLAGS)"
-	endif
-endif
-
-# commands
-
-# patch directories
-_common_patches = $(wildcard patches/common/*)
-_current_patches := $(wildcard patches/$(CURRENT)/*)
-
 # configure vars
-_nginx_debug_cpuflags = -O0
+_nginx_debug_cpuflags = -g -O0
 _nginx_release_cpuflags = -O3 -mtune=native -march=native
 
 ifeq ($(DEBUG),0)
@@ -109,17 +72,39 @@ else
 	_nginx_gccflags = $(_nginx_debug_cpuflags)
 endif
 
-_pcre_config := --enable-shared \
-				--enable-static \
-				--enable-pcre16 \
-				--enable-pcre32 \
-				--enable-jit \
-				--enable-utf \
-				--enable-unicode-properties \
-				--enable-newline-is-any \
-				--enable-pcregrep-libz \
-				--enable-pcregrep-libbz2 \
-				--with-pic
+
+##### Runtime
+OS := `uname`
+PATCH ?= omnibus
+CURRENT := $($(WORKSPACE))
+
+# flags for mac os x
+ifeq ($(OS),Darwin)
+	CC := clang
+	PAGESPEED = 0
+	ifeq ($(DEBUG),0)
+		_nginx_gccflags = $(_nginx_gccflags) -mssse3 -flto
+	endif
+endif
+
+ifeq ($(OS),Linux)
+	CC := gcc
+	EXTRA_FLAGS += --with-file-aio
+	ifeq ($(DEBUG),1)
+		_nginx_gccflags = $(_nginx_gccflags) -fno-stack-protector
+	else
+		_nginx_gccflags = $(_nginx_gccflags) -w -fomit-frame-pointer -fno-stack-protector -flto
+	endif
+
+	# do we compile-in openssl?
+	ifeq ($(OPENSSL),1)
+		EXTRA_FLAGS += --with-openssl=../../../dependencies/openssl/latest --with-http_ssl_module --with-http_spdy_module --with-openssl-opt="$(_nginx_gccflags)"
+	endif
+endif
+
+# patch directories
+_common_patches = $(wildcard patches/common/*)
+_current_patches := $(wildcard patches/$(CURRENT)/*)
 
 # do we compile-in pagespeed?
 ifeq ($(PAGESPEED),1)
@@ -128,12 +113,12 @@ endif
 
 # do we compile-in our version of PCRE?
 ifeq ($(PCRE),1)
-	EXTRA_FLAGS += --with-pcre=../../../dependencies/pcre/latest --with-pcre-jit --with-pcre-opt="$(CFLAGS)"
+	EXTRA_FLAGS += --with-pcre=../../../dependencies/pcre/latest --with-pcre-jit --with-pcre-opt="$(_nginx_gccflags)"
 endif
 
 # do we compile-in our version of Zlib?
 ifeq ($(ZLIB),1)
-	EXTRA_FLAGS += --with-zlib=../../../dependencies/zlib/latest --with-zlib-opt="$(CFLAGS)"
+	EXTRA_FLAGS += --with-zlib=../../../dependencies/zlib/latest --with-zlib-opt="$(_nginx_gccflags)"
 endif
 
 # do we compile-in libatomic?
@@ -152,8 +137,6 @@ ifeq ($(OVERRIDE_PATHS),1)
 				   --http-fastcgi-temp-path=$(NGINX_ROOT)$(NGINX_TEMPPATH)/fastcgi \
 				   --http-client-body-temp-path=$(NGINX_ROOT)$(NGINX_TEMPPATH)/client
 endif
-
-_openssl_config := threads zlib
 
 _nginx_config_mainflags := --user=$(NGINX_USER) \
 						   --group=$(NGINX_GROUP) \
@@ -370,7 +353,7 @@ build_nginx:
 	@echo "Compiling Nginx..."
 	@mkdir -p build/ dist/
 	@cd sources/$(CURRENT)/nginx-$(CURRENT); \
-		CC=$(CC) CFLAGS=$(CFLAGS) CXXFLAGS=$(CXXFLAGS) $(NGINX_ENV) make;
+		CC=$(CC) CFLAGS=$(_nginx_gccflags) CXXFLAGS=$(CXXFLAGS) $(NGINX_ENV) make;
 
 clean_nginx:
 	@echo "Cleaning Nginx..."
@@ -382,10 +365,10 @@ clean_nginx:
 configure_nginx:
 	@echo "Configuring Nginx..."
 	-cd sources/$(CURRENT)/nginx-$(CURRENT); \
-		CC=$(CC) CFLAGS=$(CFLAGS) CXXFLAGS=$(CXXFLAGS) $(NGINX_ENV) ./configure $(_nginx_config_mainflags) \
+		CC=$(CC) CFLAGS=$(_nginx_gccflags) CXXFLAGS=$(CXXFLAGS) $(NGINX_ENV) ./configure $(_nginx_config_mainflags) \
 		cd ../../../;
 	@echo "Stamping configuration..."
-	@echo "CC=$(CC) CFLAGS=$(CFLAGS) CXXFLAGS=$(CXXFLAGS) $(NGINX_ENV) ./configure $(_nginx_config_mainflags); CC=$(CC) CFLAGS=$(CFLAGS) CXXFLAGS=$(CXXFLAGS) $(NGINX_ENV) make ; sudo make install" > workspace/.build_cmd
+	@echo "CC=$(CC) CFLAGS=$(_nginx_gccflags) CXXFLAGS=$(CXXFLAGS) $(NGINX_ENV) ./configure $(_nginx_config_mainflags); CC=$(CC) CFLAGS=$(_nginx_gccflags) CXXFLAGS=$(CXXFLAGS) $(NGINX_ENV) make ; sudo make install" > workspace/.build_cmd
 
 install_nginx:
 	@echo "Installing Nginx..."

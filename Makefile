@@ -216,7 +216,7 @@ distclean: clean
 sources: dependencies
 	@echo "Finished acquiring sources."
 
-modules: modules/pagespeed
+modules: pagespeed
 	@echo "Downloaded module sources."
 
 dependencies: dependencies/pcre dependencies/zlib dependencies/openssl dependencies/libatomic dependencies/depot_tools
@@ -319,6 +319,11 @@ dependencies/depot_tools:
 
 
 #### ==== NGX PAGESPEED ==== ####
+pagespeed: sources/pagespeed
+	@echo "Mounting Pagespeed sources..."
+	@mkdir -p pagespeed/
+	@cp -fr sources/pagespeed/$(PAGESPEED_VERSION)/* pagespeed/
+
 modules/pagespeed: dependencies/depot_tools sources/pagespeed
 	@echo "Preparing ngx_pagespeed..."
 	@mkdir -p ./modules/pagespeed
@@ -339,10 +344,6 @@ modules/pagespeed: dependencies/depot_tools sources/pagespeed
 	#         AR.target="$(PROJECT)/sources/pagespeed/$(PAGESPEED_VERSION)/trunk/src/build/wrappers/ar.sh" \
 	#	     BUILDTYPE=$(PAGESPEED_RELEASE) \
 	#         all;
-
-	@echo "Mounting Pagespeed sources..."
-	@mkdir -p pagespeed/
-	@cp -fr sources/pagespeed/$(PAGESPEED_VERSION)/* pagespeed/
 
 sources/pagespeed:
 	@mkdir -p ./sources/pagespeed

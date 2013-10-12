@@ -41,11 +41,13 @@ NGINX_TEMPPATH ?= cache/nginx
 NGINX_PERFTOOLS ?= 0
 
 ifeq ($(DEBUG),1)
+OVERRIDE_PATHS ?= 1
 PAGESPEED_RELEASE ?= Debug
 NGINX_USER ?= $(shell whoami)
 NGINX_GROUP ?= $(shell id -g -n $(NGINX_USER))
 NGINX_ROOT ?= $(PROJECT)/build/
 else
+OVERRIDE_PATHS ?= 0
 PAGESPEED_RELEASE ?= Release
 NGINX_USER ?= nginx
 NGINX_GROUP ?= keen
@@ -131,7 +133,7 @@ endif
 
 # do we compile-in our version of Zlib?
 ifeq ($(ZLIB),1)
-	EXTRA_FLAGS += --with-zlib=../../../dependencies/zlib/latest
+	EXTRA_FLAGS += --with-zlib=../../../dependencies/zlib/latest --with-zlib-opt="$(CFLAGS)"
 endif
 
 # do we compile-in libatomic?
@@ -139,10 +141,21 @@ ifeq ($(LIBATOMIC),1)
 	EXTRA_FLAGS += --with-libatomic=../../../dependencies/libatomic/latest
 endif
 
+# do we override paths?
+ifeq ($(OVERRIDE_PATHS),1)
+	EXTRA_FLAGS += --prefix=$(NGINX_ROOT)$(NGINX_BASEPATH) \
+				   --http-log-path=$(NGINX_ROOT)$(NGINX_LOGPATH)/access.log \
+				   --error-log-path=$(NGINX_ROOT)$(NGINX_LOGPATH)/error.log \
+				   --http-scgi-temp-path=$(NGINX_ROOT)$(NGINX_TEMPPATH)/scgi \
+				   --http-proxy-temp-path=$(NGINX_ROOT)$(NGINX_TEMPPATH)/proxy \
+				   --http-uwsgi-temp-path=$(NGINX_ROOT)$(NGINX_TEMPPATH)/uwsgi \
+				   --http-fastcgi-temp-path=$(NGINX_ROOT)$(NGINX_TEMPPATH)/fastcgi \
+				   --http-client-body-temp-path=$(NGINX_ROOT)$(NGINX_TEMPPATH)/client
+endif
+
 _openssl_config := threads zlib
 
-_nginx_config_mainflags := --prefix=$(NGINX_ROOT)$(NGINX_BASEPATH) \
-						   --user=$(NGINX_USER) \
+_nginx_config_mainflags := --user=$(NGINX_USER) \
 						   --group=$(NGINX_GROUP) \
 						   --with-ipv6 \
 						   --with-poll_module \
@@ -151,14 +164,7 @@ _nginx_config_mainflags := --prefix=$(NGINX_ROOT)$(NGINX_BASEPATH) \
 						   --with-http_gunzip_module \
 						   --with-http_gzip_static_module \
 						   --with-http_secure_link_module \
-						   --http-log-path=$(NGINX_ROOT)$(NGINX_LOGPATH)/access.log \
-						   --error-log-path=$(NGINX_ROOT)$(NGINX_LOGPATH)/error.log \
 						   --with-cc-opt="$(_nginx_gccflags)" \
-						   --http-scgi-temp-path=$(NGINX_ROOT)$(NGINX_TEMPPATH)/scgi \
-						   --http-proxy-temp-path=$(NGINX_ROOT)$(NGINX_TEMPPATH)/proxy \
-						   --http-uwsgi-temp-path=$(NGINX_ROOT)$(NGINX_TEMPPATH)/uwsgi \
-						   --http-fastcgi-temp-path=$(NGINX_ROOT)$(NGINX_TEMPPATH)/fastcgi \
-						   --http-client-body-temp-path=$(NGINX_ROOT)$(NGINX_TEMPPATH)/client \
 						   --with-md5-asm \
 						   --with-sha1-asm \
 						   $(EXTRA_FLAGS) ;
@@ -378,6 +384,8 @@ configure_nginx:
 	-cd sources/$(CURRENT)/nginx-$(CURRENT); \
 		CC=$(CC) CFLAGS=$(CFLAGS) CXXFLAGS=$(CXXFLAGS) $(NGINX_ENV) ./configure $(_nginx_config_mainflags) \
 		cd ../../../;
+	@echo "Stamping configuration..."
+	@echo "CC=$(CC) CFLAGS=$(CFLAGS) CXXFLAGS=$(CXXFLAGS) $(NGINX_ENV) ./configure $(_nginx_config_mainflags); CC=$(CC) CFLAGS=$(CFLAGS) CXXFLAGS=$(CXXFLAGS) $(NGINX_ENV) make ; sudo make install" > workspace/.build_cmd
 
 install_nginx:
 	@echo "Installing Nginx..."

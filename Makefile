@@ -151,7 +151,7 @@ _nginx_config_mainflags := --user=$(NGINX_USER) \
 						   --with-http_secure_link_module \
 						   --with-md5-asm \
 						   --with-sha1-asm \
-						   $(EXTRA_FLAGS) ;
+						   $(EXTRA_FLAGS)
 
 
 #### ==== TOP-LEVEL RULES ==== ####
@@ -390,7 +390,7 @@ configure_nginx:
 		CC=$(CC) CFLAGS="$(_nginx_gccflags)" CXXFLAGS="$(CXXFLAGS)" ./configure $(_nginx_config_mainflags) --with-cc-opt="$(_nginx_gccflags)" \
 		cd ../../../;
 	@echo "Stamping configuration..."
-	@echo "CC=$(CC) CFLAGS=\"$(_nginx_gccflags)\" CXXFLAGS=\"$(CXXFLAGS)\" ./configure $(_nginx_config_mainflags) --with-cc-opt='$(_nginx_gccflags)';" > workspace/.build_cmd
+	@echo "CC=$(CC) CFLAGS=\"$(_nginx_gccflags)\" CXXFLAGS=\"$(CXXFLAGS)\" ./configure $(_nginx_config_mainflags) --with-cc-opt='$(_nginx_gccflags)'" > workspace/.build_cmd
 	@echo "CC=$(CC) CFLAGS=\"$(_nginx_gccflags)\" CXXFLAGS=\"$(CXXFLAGS)\" $(NGINX_ENV) make ; sudo make install" > workspace/.make_cmd
 	@cp -f workspace/.build_cmd workspace/.make_cmd sources/$(CURRENT)/nginx-$(CURRENT)
 

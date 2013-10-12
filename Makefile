@@ -154,7 +154,7 @@ _nginx_config_mainflags := --user=$(NGINX_USER) \
 
 
 #### ==== TOP-LEVEL RULES ==== ####
-all: sources workspace package
+all: sources modules workspace package
 
 seal:
 	@echo "Removing omnibus..."

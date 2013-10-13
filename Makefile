@@ -5,6 +5,7 @@
 ##### Configuration
 
 DEBUG ?= 1
+STAMP = 1.5x20-alpha2
 WORKSPACE ?= latest
 PROJECT ?= $(shell pwd)
 

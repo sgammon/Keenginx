@@ -35,9 +35,13 @@ LIBATOMIC ?= 1
 
 
 ##### Nginx Configuration
-NGINX_BASEPATH ?= ns/keen
-NGINX_LOGPATH ?= data/logs/nginx
-NGINX_TEMPPATH ?= cache/nginx
+NGINX_BASEPATH ?= usr/
+NGINX_CONFPATH ?= etc/nginx/nginx.conf
+NGINX_LOCKPATH ?= tmp/nginx.lock
+NGINX_SBINPATH ?= usr/sbin/nginx
+NGINX_LOGPATH ?= var/log/nginx
+NGINX_TEMPPATH ?= tmp/nginx
+NGINX_PIDPATH ?= var/run/nginx.pid
 NGINX_PERFTOOLS ?= 0
 
 ifeq ($(DEBUG),1)
@@ -49,7 +53,7 @@ NGINX_ROOT ?= $(PROJECT)/build/
 else
 OVERRIDE_PATHS ?= 0
 PAGESPEED_RELEASE ?= Release
-NGINX_USER ?= nginx
+NGINX_USER ?= www-data
 NGINX_GROUP ?= keen
 NGINX_ROOT ?= /
 endif
@@ -131,11 +135,15 @@ endif
 # do we override paths?
 ifeq ($(OVERRIDE_PATHS),1)
 	EXTRA_FLAGS += --prefix=$(NGINX_ROOT)$(NGINX_BASEPATH) \
+				   --pid-path=$(NGINX_ROOT)$(NGINX_PIDPATH) \
+				   --sbin-path=$(NGINX_ROOT)$(NGINX_SBINPATH) \
+				   --lock-path=$(NGINX_ROOT)$(NGINX_LOCKPATH) \
+				   --conf-path=$(NGINX_ROOT)$(NGINX_CONFPATH) \
 				   --http-log-path=$(NGINX_ROOT)$(NGINX_LOGPATH)/access.log \
 				   --error-log-path=$(NGINX_ROOT)$(NGINX_LOGPATH)/error.log \
 				   --http-scgi-temp-path=$(NGINX_ROOT)$(NGINX_TEMPPATH)/scgi \
-				   --http-proxy-temp-path=$(NGINX_ROOT)$(NGINX_TEMPPATH)/proxy \
 				   --http-uwsgi-temp-path=$(NGINX_ROOT)$(NGINX_TEMPPATH)/uwsgi \
+				   --http-proxy-temp-path=$(NGINX_ROOT)$(NGINX_TEMPPATH)/proxy \
 				   --http-fastcgi-temp-path=$(NGINX_ROOT)$(NGINX_TEMPPATH)/fastcgi \
 				   --http-client-body-temp-path=$(NGINX_ROOT)$(NGINX_TEMPPATH)/client
 endif
@@ -387,7 +395,7 @@ configure_nginx:
 	@echo "Configuring Nginx..."
 	-cp -fr modules dependencies sources/$(CURRENT)/nginx-$(CURRENT); \
 		cd sources/$(CURRENT)/nginx-$(CURRENT); \
-		CC=$(CC) CFLAGS="$(_nginx_gccflags)" CXXFLAGS="$(CXXFLAGS)" ./configure $(_nginx_config_mainflags) --with-cc-opt="$(_nginx_gccflags)" \
+		CC=$(CC) CFLAGS="$(_nginx_gccflags)" CXXFLAGS="$(CXXFLAGS)" ./configure $(_nginx_config_mainflags) --with-cc-opt="$(_nginx_gccflags)"; \
 		cd ../../../;
 	@echo "Stamping configuration..."
 	@echo "CC=$(CC) CFLAGS=\"$(_nginx_gccflags)\" CXXFLAGS=\"$(CXXFLAGS)\" ./configure --with-cc-opt=\"$(_nginx_gccflags)\" $(_nginx_config_mainflags)" > workspace/.build_cmd

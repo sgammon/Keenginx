@@ -321,9 +321,9 @@ dependencies/libatomic:
 
 dependencies/depot_tools:
 	@echo "Fetching depot_tools..."
-	@cd dependencies/; \
-		svn co http://src.chromium.org/svn/trunk/tools/depot_tools; \
-		cd ../;
+	#@cd dependencies/; \
+	#	svn co http://src.chromium.org/svn/trunk/tools/depot_tools; \
+	#	cd ../;
 
 
 #### ==== NGX PAGESPEED ==== ####
@@ -371,10 +371,10 @@ sources/pagespeed:
 
 	@echo "Fetching ngx_pagespeed..."
 	@mkdir -p sources/pagespeed/$(PAGESPEED_VERSION)/trunk;
-	cd sources/pagespeed/$(PAGESPEED_VERSION)/trunk; \
-		../../../../dependencies/depot_tools/gclient config http://modpagespeed.googlecode.com/svn/tags/$(PSOL_VERSION)/src; \
-		../../../../dependencies/depot_tools/gclient sync --force --jobs=1;
-		cd ../../../../;
+	#cd sources/pagespeed/$(PAGESPEED_VERSION)/trunk; \
+	#	../../../../dependencies/depot_tools/gclient config http://modpagespeed.googlecode.com/svn/tags/$(PSOL_VERSION)/src; \
+	#	../../../../dependencies/depot_tools/gclient sync --force --jobs=1;
+	#	cd ../../../../;
 
 
 #### ==== BUILD RULES ==== ####

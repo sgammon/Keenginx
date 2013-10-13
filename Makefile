@@ -40,7 +40,7 @@ NGINX_CONFPATH ?= etc/nginx/nginx.conf
 NGINX_LOCKPATH ?= tmp/nginx.lock
 NGINX_SBINPATH ?= usr/sbin/nginx
 NGINX_LOGPATH ?= var/log/nginx
-NGINX_TEMPPATH ?= tmp/nginx
+NGINX_TEMPPATH ?= tmp/
 NGINX_PIDPATH ?= var/run/nginx.pid
 NGINX_PERFTOOLS ?= 0
 

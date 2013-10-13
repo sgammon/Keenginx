@@ -92,14 +92,17 @@ end
 configure_flags       = node.run_state['nginx_configure_flags']
 nginx_force_recompile = node.run_state['nginx_force_recompile']
 
+#### ==== old compile / make code ==== ####
+#./configure #{node.run_state['nginx_configure_flags'].join(" ")} &&
+#make && make install
+#### ==== this is replaced below by keenginx ==== ####
+
 bash 'compile_nginx_source' do
   cwd  ::File.dirname(src_filepath)
   code <<-EOH
     cd nginx-#{node['nginx']['source']['version']} &&
     bash -c "`cat ./.build_cmd`";
     bash -c "`cat ./.make_cmd";
-    ./configure #{node.run_state['nginx_configure_flags'].join(" ")} &&
-    make && make install
   EOH
 
   not_if do

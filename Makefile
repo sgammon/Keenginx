@@ -321,9 +321,9 @@ dependencies/libatomic:
 
 dependencies/depot_tools:
 	@echo "Fetching depot_tools..."
-	#@cd dependencies/; \
-	#	svn co http://src.chromium.org/svn/trunk/tools/depot_tools; \
-	#	cd ../;
+	@cd dependencies/; \
+		svn co http://src.chromium.org/svn/trunk/tools/depot_tools; \
+		cd ../;
 
 
 #### ==== NGX PAGESPEED ==== ####
@@ -339,19 +339,19 @@ modules/pagespeed: dependencies/depot_tools sources/pagespeed
 	-@mv ngx_pagespeed-release-$(PAGESPEED_VERSION)/ modules/pagespeed/$(PAGESPEED_VERSION)
 	-@mv psol-$(PSOL_VERSION).tar.gz release-$(PAGESPEED_VERSION).zip sources/pagespeed/
 
-	#@echo "Building pagespeed core..."
-	#-cd ./sources/pagespeed/$(PAGESPEED_VERSION)/trunk/src; \
-	#	make AR.host="$(PROJECT)/sources/pagespeed/$(PAGESPEED_VERSION)/trunk/src/build/wrappers/ar.sh" \
-	#         AR.target="$(PROJECT)/sources/pagespeed/$(PAGESPEED_VERSION)/trunk/src/build/wrappers/ar.sh" \
-	#	     BUILDTYPE=$(PAGESPEED_RELEASE) \
-	#         mod_pagespeed_test pagespeed_automatic_test;
+	@echo "Building pagespeed core..."
+	-cd ./sources/pagespeed/$(PAGESPEED_VERSION)/trunk/src; \
+		make AR.host="$(PROJECT)/sources/pagespeed/$(PAGESPEED_VERSION)/trunk/src/build/wrappers/ar.sh" \
+	         AR.target="$(PROJECT)/sources/pagespeed/$(PAGESPEED_VERSION)/trunk/src/build/wrappers/ar.sh" \
+		     BUILDTYPE=$(PAGESPEED_RELEASE) \
+	         mod_pagespeed_test pagespeed_automatic_test;
 
-	#@echo "Building PSOL sources..."
-	#-cd ./sources/pagespeed/$(PAGESPEED_VERSION)/trunk/src/net/instaweb/automatic; \
-	#	make AR.host="$(PROJECT)/sources/pagespeed/$(PAGESPEED_VERSION)/trunk/src/build/wrappers/ar.sh" \
-	#         AR.target="$(PROJECT)/sources/pagespeed/$(PAGESPEED_VERSION)/trunk/src/build/wrappers/ar.sh" \
-	#	     BUILDTYPE=$(PAGESPEED_RELEASE) \
-	#         all;
+	@echo "Building PSOL sources..."
+	-cd ./sources/pagespeed/$(PAGESPEED_VERSION)/trunk/src/net/instaweb/automatic; \
+		make AR.host="$(PROJECT)/sources/pagespeed/$(PAGESPEED_VERSION)/trunk/src/build/wrappers/ar.sh" \
+	         AR.target="$(PROJECT)/sources/pagespeed/$(PAGESPEED_VERSION)/trunk/src/build/wrappers/ar.sh" \
+		     BUILDTYPE=$(PAGESPEED_RELEASE) \
+	         all;
 
 sources/pagespeed:
 	@mkdir -p ./sources/pagespeed
@@ -371,10 +371,10 @@ sources/pagespeed:
 
 	@echo "Fetching ngx_pagespeed..."
 	@mkdir -p sources/pagespeed/$(PAGESPEED_VERSION)/trunk;
-	#cd sources/pagespeed/$(PAGESPEED_VERSION)/trunk; \
-	#	../../../../dependencies/depot_tools/gclient config http://modpagespeed.googlecode.com/svn/tags/$(PSOL_VERSION)/src; \
-	#	../../../../dependencies/depot_tools/gclient sync --force --jobs=1;
-	#	cd ../../../../;
+	cd sources/pagespeed/$(PAGESPEED_VERSION)/trunk; \
+		../../../../dependencies/depot_tools/gclient config http://modpagespeed.googlecode.com/svn/tags/$(PSOL_VERSION)/src; \
+		../../../../dependencies/depot_tools/gclient sync --force --jobs=1;
+		cd ../../../../;
 
 
 #### ==== BUILD RULES ==== ####

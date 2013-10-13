@@ -33,7 +33,7 @@ default['nginx']['binary']       = '/usr/sbin/nginx'
 case node['platform_family']
 when 'debian'
   default['nginx']['user']       = 'www-data'
-  default['nginx']['init_style'] = 'runit'
+  default['nginx']['init_style'] = 'init'
 when 'rhel', 'fedora'
   default['nginx']['user']        = 'nginx'
   default['nginx']['init_style']  = 'init'

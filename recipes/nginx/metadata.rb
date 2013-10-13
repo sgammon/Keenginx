@@ -3,7 +3,7 @@ maintainer        'Keen IO'
 maintainer_email  'sam@keen.io'
 license           'Apache 2.0'
 description       'Installs and configures nginx'
-version           '2.0.1'
+version           '2.0.5'
 
 recipe 'nginx',         'Installs nginx package and sets up configuration with Debian apache style with sites-enabled/sites-available'
 recipe 'nginx::source', 'Installs nginx from source and sets up configuration with Debian apache style with sites-enabled/sites-available'
@@ -42,7 +42,7 @@ attribute 'nginx/user',
 attribute 'nginx/binary',
   :display_name => 'Nginx Binary',
   :description => 'Location of the nginx server binary',
-  :default => '/ns/keen/sbin/nginx'
+  :default => '/usr/sbin/nginx'
 
 attribute 'nginx/gzip',
   :display_name => 'Nginx Gzip',

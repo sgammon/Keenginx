@@ -26,7 +26,7 @@
 node.load_attribute_by_short_filename('source', 'nginx') if node.respond_to?(:load_attribute_by_short_filename)
 
 nginx_url = node['nginx']['source']['url'] ||
-  "https://commondatastorage.googleapis.com/keen-chef%2Fkeenginx-#{node['nginx']['source']['version']}.tar.gz"
+  "https://commondatastorage.googleapis.com/keen-chef/keenginx-#{node['nginx']['source']['version']}.tar.gz"
 
 node.set['nginx']['binary']          = node['nginx']['source']['sbin_path']
 node.set['nginx']['daemon_disable']  = true

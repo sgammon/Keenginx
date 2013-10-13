@@ -178,14 +178,14 @@ seal:
 package: build
 	@echo "Packaging build..."
 	make install_nginx;
-	@mv sources/$(CURRENT)/nginx-$(CURRENT) ./nginx-$(CURRENT)/;
+	@mv sources/$(CURRENT)/nginx-$(CURRENT) ./nginx-$(STAMP)/;
 	#@mv pagespeed/ nginx-$(CURRENT)/pagespeed
 
 	@echo "Packaging tarball..."
-	@tar -czvf nginx-$(CURRENT).tar.gz nginx-$(CURRENT)/
+	@tar -czvf nginx-$(STAMP).tar.gz nginx-$(STAMP)/
 	#@mv nginx-$(CURRENT)/pagespeed ./pagespeed
-	@mv nginx-$(CURRENT)/ sources/$(CURRENT)/nginx-$(CURRENT);
-	@mv nginx-$(CURRENT).tar.gz build/;
+	@mv nginx-$(STAMP)/ sources/$(CURRENT)/nginx-$(CURRENT);
+	@mv nginx-$(STAMP).tar.gz build/;
 	@echo "=== Finished Keen-Nginx build. ==="
 
 build: patch

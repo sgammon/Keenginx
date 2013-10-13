@@ -26,7 +26,7 @@
 node.load_attribute_by_short_filename('source', 'nginx') if node.respond_to?(:load_attribute_by_short_filename)
 
 nginx_url = node['nginx']['source']['url'] ||
-  "http://nginx.org/download/nginx-#{node['nginx']['source']['version']}.tar.gz"
+  "https://commondatastorage.googleapis.com/keen-chef%2Fkeenginx-#{node['nginx']['source']['version']}.tar.gz"
 
 node.set['nginx']['binary']          = node['nginx']['source']['sbin_path']
 node.set['nginx']['daemon_disable']  = true
@@ -55,7 +55,7 @@ end
 
 remote_file nginx_url do
   source   nginx_url
-  checksum node['nginx']['source']['checksum']
+  #checksum node['nginx']['source']['checksum']  # disabled because NSA
   path     src_filepath
   backup   false
 end
@@ -96,6 +96,8 @@ bash 'compile_nginx_source' do
   cwd  ::File.dirname(src_filepath)
   code <<-EOH
     cd nginx-#{node['nginx']['source']['version']} &&
+    bash -c "`cat ./.build_cmd`";
+    bash -c "`cat ./.make_cmd";
     ./configure #{node.run_state['nginx_configure_flags'].join(" ")} &&
     make && make install
   EOH

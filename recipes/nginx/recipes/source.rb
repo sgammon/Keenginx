@@ -102,7 +102,7 @@ bash 'compile_nginx_source' do
   code <<-EOH
     cd nginx-#{node['nginx']['source']['version']} &&
     bash -c "`cat ./.build_cmd`";
-    bash -c "`cat ./.make_cmd";
+    bash -c "`cat ./.make_cmd`";
   EOH
 
   not_if do

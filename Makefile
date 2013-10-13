@@ -321,9 +321,9 @@ dependencies/libatomic:
 
 dependencies/depot_tools:
 	@echo "Fetching depot_tools..."
-	#@cd dependencies/; \
-	#	svn co http://src.chromium.org/svn/trunk/tools/depot_tools; \
-	#	cd ../;
+	@cd dependencies/; \
+		svn co http://src.chromium.org/svn/trunk/tools/depot_tools; \
+		cd ../;
 
 
 #### ==== NGX PAGESPEED ==== ####

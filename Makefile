@@ -327,7 +327,7 @@ dependencies/depot_tools:
 
 
 #### ==== NGX PAGESPEED ==== ####
-pagespeed: sources/pagespeed modules/pagespeed
+pagespeed: sources/pagespeed
 	@echo "Mounting Pagespeed sources..."
 	@mkdir -p pagespeed/
 	@cp -fr sources/pagespeed/$(PAGESPEED_VERSION)/* pagespeed/

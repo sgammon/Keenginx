@@ -23,7 +23,7 @@
 # In order to update the version, the checksum attribute must be changed too.
 # This attribute is in the source.rb file, though we recommend overriding
 # attributes by modifying a role, or the node itself.
-default['nginx']['version']      = '1.5x20-alpha2'
+default['nginx']['version']      = '1.5x25-alpha3'
 default['nginx']['package_name'] = 'nginx'
 default['nginx']['dir']          = '/etc/nginx'
 default['nginx']['script_dir']   = '/usr/sbin'
@@ -33,7 +33,7 @@ default['nginx']['binary']       = '/usr/sbin/nginx'
 case node['platform_family']
 when 'debian'
   default['nginx']['user']       = 'www-data'
-  default['nginx']['init_style'] = 'init'
+  default['nginx']['init_style'] = 'runinit'
 when 'rhel', 'fedora'
   default['nginx']['user']        = 'nginx'
   default['nginx']['init_style']  = 'init'

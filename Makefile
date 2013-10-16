@@ -5,7 +5,7 @@
 ##### Configuration
 
 DEBUG ?= 1
-STAMP = 1.5x20-alpha2
+STAMP = 1.5x25-alpha3
 WORKSPACE ?= latest
 PROJECT ?= $(shell pwd)
 
@@ -65,7 +65,7 @@ NGINX_ENV += $(PAGESPEED_ENV)
 
 # configure vars
 _nginx_debug_cpuflags = -g -O0
-_nginx_release_cpuflags = -O3 -mtune=native -march=native
+_nginx_release_cpuflags = -Ofast -mtune=native -march=native -flto -msse4 -fwhole-program -fexpensive-optimizations -fomit-frame-pointer -fno-stack-protector -funsafe-loop-optimizations -funsafe-math-optimizations
 
 ifeq ($(DEBUG),0)
 	_nginx_gccflags = $(_nginx_release_cpuflags)
@@ -98,7 +98,7 @@ ifeq ($(OSNAME),Linux)
 	ifeq ($(DEBUG),1)
 		_nginx_gccflags = $(_nginx_gccflags) -fno-stack-protector
 	else
-		_nginx_gccflags = $(_nginx_gccflags) -w -fomit-frame-pointer -fno-stack-protector -flto
+		_nginx_gccflags = $(_nginx_gccflags) -w
 	endif
 endif
 
@@ -400,7 +400,7 @@ configure_nginx:
 		cd ../../../;
 	@echo "Stamping configuration..."
 	@echo "CC=$(CC) CFLAGS=\"$(_nginx_gccflags)\" CXXFLAGS=\"$(CXXFLAGS)\" ./configure --with-cc-opt=\"$(_nginx_gccflags)\" $(_nginx_config_mainflags)" > workspace/.build_cmd
-	@echo "CC=$(CC) CFLAGS=\"$(_nginx_gccflags)\" CXXFLAGS=\"$(CXXFLAGS)\" $(NGINX_ENV) make ; sudo make install" > workspace/.make_cmd
+	@echo "CC=$(CC) CFLAGS=\"$(_nginx_gccflags)\" CXXFLAGS=\"$(CXXFLAGS)\" $(NGINX_ENV) make ;" > workspace/.make_cmd
 	@cp -f workspace/.build_cmd workspace/.make_cmd sources/$(CURRENT)/nginx-$(CURRENT)
 
 install_nginx:

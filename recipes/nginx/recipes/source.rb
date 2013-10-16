@@ -43,15 +43,17 @@ include_recipe 'nginx::commons_script'
 include_recipe 'build-essential::default'
 
 src_filepath  = "#{Chef::Config['file_cache_path'] || '/tmp'}/nginx-#{node['nginx']['source']['version']}.tar.gz"
-packages = value_for_platform_family(
-  %w[rhel fedora] => %w[pcre-devel openssl-devel],
-  %w[gentoo]      => [],
-  %w[default]     => %w[libpcre3 libpcre3-dev libssl-dev]
-)
 
-packages.each do |name|
-  package name
-end
+### === disabled because custom deps are now bundled with keenginx
+#packages = value_for_platform_family(
+#  %w[rhel fedora] => %w[pcre-devel openssl-devel],
+#  %w[gentoo]      => [],
+#  %w[default]     => %w[libpcre3 libpcre3-dev libssl-dev]
+#)
+
+#packages.each do |name|
+#  package name
+#end
 
 remote_file nginx_url do
   source   nginx_url
@@ -85,9 +87,10 @@ bash 'unarchive_source' do
   not_if { ::File.directory?("#{Chef::Config['file_cache_path'] || '/tmp'}/nginx-#{node['nginx']['source']['version']}") }
 end
 
-node['nginx']['source']['modules'].each do |ngx_module|
-  include_recipe ngx_module
-end
+## this is not even used, so...
+#node['nginx']['source']['modules'].each do |ngx_module|
+#  include_recipe ngx_module
+#end
 
 configure_flags       = node.run_state['nginx_configure_flags']
 nginx_force_recompile = node.run_state['nginx_force_recompile']
@@ -97,12 +100,14 @@ nginx_force_recompile = node.run_state['nginx_force_recompile']
 #make && make install
 #### ==== this is replaced below by keenginx ==== ####
 
+# patched not to build while root like an amateur (opscode i </3 u)
 bash 'compile_nginx_source' do
   cwd  ::File.dirname(src_filepath)
   code <<-EOH
     cd nginx-#{node['nginx']['source']['version']} &&
-    bash -c "`cat ./.build_cmd`";
+    sudo -u #{node['nginx']['user']} bash -c "`cat ./.build_cmd`";
     bash -c "`cat ./.make_cmd`";
+    make install;
   EOH
 
   not_if do

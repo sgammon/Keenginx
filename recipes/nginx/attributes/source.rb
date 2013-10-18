@@ -23,8 +23,8 @@ include_attribute 'nginx::default'
 
 default['nginx']['source']['version']                 = node['nginx']['version']
 default['nginx']['source']['prefix']                  = "/opt/keenginx-#{node['nginx']['source']['version']}"
-default['nginx']['source']['conf_path']               = "#{node['nginx']['dir']}/nginx.conf"
-default['nginx']['source']['sbin_path']               = "#{node['nginx']['source']['prefix']}/sbin/nginx"
+default['nginx']['source']['conf_path']               = "/etc/nginx/nginx.conf"
+default['nginx']['source']['sbin_path']               = "/usr/sbin/nginx"
 default['nginx']['source']['default_configure_flags'] = %W[
                                                           --prefix=#{node['nginx']['source']['prefix']}
                                                           --conf-path=#{node['nginx']['dir']}/nginx.conf

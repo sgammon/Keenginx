@@ -55,6 +55,8 @@ src_filepath  = "#{Chef::Config['file_cache_path'] || '/tmp'}/nginx-#{node['ngin
 #  package name
 #end
 
+
+
 remote_file nginx_url do
   source   nginx_url
   #checksum node['nginx']['source']['checksum']  # disabled because NSA

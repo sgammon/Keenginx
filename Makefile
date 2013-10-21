@@ -36,12 +36,12 @@ LIBATOMIC ?= 1
 
 
 ##### Nginx Configuration
-NGINX_BASEPATH ?= usr/
+NGINX_BASEPATH ?= opt/keenginx-1.5x25-alpha3
 NGINX_CONFPATH ?= etc/nginx/nginx.conf
 NGINX_LOCKPATH ?= tmp/nginx.lock
 NGINX_SBINPATH ?= usr/sbin/nginx
 NGINX_LOGPATH ?= var/log/nginx
-NGINX_TEMPPATH ?= tmp/
+NGINX_TEMPPATH ?= tmp
 NGINX_PIDPATH ?= var/run/nginx.pid
 NGINX_PERFTOOLS ?= 0
 
@@ -65,7 +65,7 @@ NGINX_ENV += $(PAGESPEED_ENV)
 
 # configure vars
 _nginx_debug_cpuflags = -g -O0
-_nginx_release_cpuflags = -Ofast -mtune=native -march=native -flto -msse4 -fwhole-program -fexpensive-optimizations -fomit-frame-pointer -fno-stack-protector -funsafe-loop-optimizations -funsafe-math-optimizations
+_nginx_release_cpuflags = -Ofast -mtune=native -march=native -flto -fwhole-program -fexpensive-optimizations -fomit-frame-pointer
 
 ifeq ($(DEBUG),0)
 	_nginx_gccflags = $(_nginx_release_cpuflags)

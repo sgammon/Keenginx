@@ -55,12 +55,12 @@ src_filepath  = "#{Chef::Config['file_cache_path'] || '/tmp'}/nginx-#{node['ngin
 #  package name
 #end
 
-directory "/opt/keenginx-#{node['nginx']['source']['version']}/sbin" do
-  owner     'www-data'
-  group     'keen'
-  mode      '0755'
-  recursive true
-end
+#directory "/opt/keenginx-#{node['nginx']['source']['version']}/sbin" do
+#  owner     'www-data'
+#  group     'keen'
+#  mode      '0755'
+#  recursive true
+#end
 
 remote_file nginx_url do
   source   nginx_url
@@ -115,8 +115,9 @@ bash 'compile_nginx_source' do
     sudo -u #{node['nginx']['user']} bash -c "`cat ./.build_cmd`";
     bash -c "`cat ./.make_cmd`";
     make install;
-    ln -s /usr/sbin/nginx /opt/keenginx-#{node['nginx']['source']['version']}/sbin/nginx;
   EOH
+
+  # ln -s /usr/sbin/nginx /opt/keenginx-#{node['nginx']['source']['version']}/sbin/nginx;  <-- was breaking things
 
   not_if do
     nginx_force_recompile == false &&

@@ -60,7 +60,7 @@ NGINX_ROOT ?= /
 endif
 
 
-NGINX_PREFIX:=$(NGINX_ROOT)/$(NGINX_BASEPATH)
+NGINX_PREFIX:=$(NGINX_ROOT)$(NGINX_BASEPATH)
 
 
 PSOL_ENV := PSOL_BINARY=$(PROJECT)/modules/pagespeed/$(PAGESPEED_VERSION)/psol/lib/$(PAGESPEED_RELEASE)/linux/x64/pagespeed_automatic.a

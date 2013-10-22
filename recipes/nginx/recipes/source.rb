@@ -115,9 +115,8 @@ bash 'compile_nginx_source' do
     sudo -u #{node['nginx']['user']} bash -c "`cat ./.build_cmd`";
     bash -c "`cat ./.make_cmd`";
     make install;
+    ln -s /usr/sbin/nginx /opt/keenginx-#{node['nginx']['source']['version']}/sbin/nginx;
   EOH
-
-  # ln -s /usr/sbin/nginx /opt/keenginx-#{node['nginx']['source']['version']}/sbin/nginx;  <-- was breaking things
 
   not_if do
     nginx_force_recompile == false &&

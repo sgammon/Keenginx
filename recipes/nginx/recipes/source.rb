@@ -115,7 +115,6 @@ bash 'compile_nginx_source' do
     sudo -u #{node['nginx']['user']} bash -c "`cat ./.build_cmd`";
     bash -c "`cat ./.make_cmd`";
     make install;
-    ln -s /opt/keenginx-#{node['nginx']['source']['version']}/sbin/nginx /usr/sbin/nginx;
   EOH
 
   not_if do
@@ -128,6 +127,11 @@ bash 'compile_nginx_source' do
   notifies :restart, 'service[nginx]'
   notifies :reload,  'ohai[reload_nginx]', :immediately
 end
+
+link "/usr/sbin/nginx" do
+  to "/opt/keenginx-#{node['nginx']['source']['version']}/sbin/nginx" 
+end
+
 
 case node['nginx']['init_style']
 when 'runit'

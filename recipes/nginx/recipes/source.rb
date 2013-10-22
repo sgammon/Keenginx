@@ -128,6 +128,7 @@ bash 'compile_nginx_source' do
   notifies :reload,  'ohai[reload_nginx]', :immediately
 end
 
+
 link "/usr/sbin/nginx" do
   to "/opt/keenginx-#{node['nginx']['source']['version']}/sbin/nginx" 
 end

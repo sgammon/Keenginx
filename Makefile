@@ -187,7 +187,7 @@ package: build
 	#@mv pagespeed/ nginx-$(CURRENT)/pagespeed
 
 	@echo "Packaging tarball..."
-	@tar -czvf nginx-$(STAMP).tar.gz nginx-$(STAMP)/
+	@tar -czvf keenginx-$(STAMP).tar.gz nginx-$(STAMP)/
 	#@mv nginx-$(CURRENT)/pagespeed ./pagespeed
 	@mv nginx-$(STAMP)/ sources/$(CURRENT)/nginx-$(CURRENT);
 	@mv nginx-$(STAMP).tar.gz build/;

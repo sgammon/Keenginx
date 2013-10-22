@@ -190,7 +190,7 @@ package: build
 	@tar -czvf keenginx-$(STAMP).tar.gz nginx-$(STAMP)/
 	#@mv nginx-$(CURRENT)/pagespeed ./pagespeed
 	@mv nginx-$(STAMP)/ sources/$(CURRENT)/nginx-$(CURRENT);
-	@mv nginx-$(STAMP).tar.gz build/;
+	@mv keenginx-$(STAMP).tar.gz build/;
 	@echo "=== Finished Keen-Nginx build. ==="
 
 build: patch

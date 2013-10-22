@@ -108,7 +108,7 @@ endif
 
 # do we compile-in openssl?
 ifeq ($(OPENSSL),1)
-	EXTRA_FLAGS += --with-openssl=dependencies/openssl/$(OPENSSL_VERSION)/openssl-$(OPENSSL_VERSION) --with-http_ssl_module --with-http_spdy_module #--with-openssl-opt="$(_nginx_gccflags)"
+	EXTRA_FLAGS += --with-openssl=dependencies/openssl/$(OPENSSL_VERSION)/openssl-$(OPENSSL_VERSION) --with-http_ssl_module --with-http_spdy_module  #--with-openssl-opt="$(_nginx_gccflags)"
 endif
 
 
@@ -141,7 +141,7 @@ endif
 ifeq ($(OVERRIDE_PATHS),1)
 	EXTRA_FLAGS += --prefix=$(NGINX_PREFIX) \
 				   --pid-path=$(NGINX_PREFIX)/$(NGINX_PIDPATH) \
-				   --sbin-path=$(NGINX_PREFIX)/$(NGINX_SBINPATH) \
+				   --sbin-path=$(NGINX_SBINPATH) \
 				   --lock-path=$(NGINX_PREFIX)/$(NGINX_LOCKPATH) \
 				   --conf-path=$(NGINX_PREFIX)/$(NGINX_CONFPATH) \
 				   --http-log-path=$(NGINX_ROOT)$(NGINX_LOGPATH)/access.log \

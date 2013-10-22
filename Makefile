@@ -36,10 +36,10 @@ LIBATOMIC ?= 1
 
 
 ##### Nginx Configuration
-NGINX_BASEPATH ?= opt/keenginx-1.5x25-alpha3
+NGINX_BASEPATH ?= opt/keenginx-$(STAMP)
 NGINX_CONFPATH ?= etc/nginx/nginx.conf
 NGINX_LOCKPATH ?= tmp/nginx.lock
-NGINX_SBINPATH ?= usr/sbin/nginx
+NGINX_SBINPATH ?= $(NGINX_BASEPATH)/sbin/nginx
 NGINX_LOGPATH ?= var/log/nginx
 NGINX_TEMPPATH ?= tmp
 NGINX_PIDPATH ?= var/run/nginx.pid
@@ -58,6 +58,10 @@ NGINX_USER ?= www-data
 NGINX_GROUP ?= keen
 NGINX_ROOT ?= /
 endif
+
+
+NGINX_PREFIX:=$(NGINX_ROOT)/$(NGINX_BASEPATH)
+
 
 PSOL_ENV := PSOL_BINARY=$(PROJECT)/modules/pagespeed/$(PAGESPEED_VERSION)/psol/lib/$(PAGESPEED_RELEASE)/linux/x64/pagespeed_automatic.a
 PAGESPEED_ENV := $(PSOL_ENV) MOD_PAGESPEED_DIR=$(PROJECT)/sources/pagespeed/$(PAGESPEED_VERSION)/trunk/src
@@ -135,11 +139,11 @@ endif
 
 # do we override paths?
 ifeq ($(OVERRIDE_PATHS),1)
-	EXTRA_FLAGS += --prefix=$(NGINX_ROOT)$(NGINX_BASEPATH) \
-				   --pid-path=$(NGINX_ROOT)$(NGINX_PIDPATH) \
-				   --sbin-path=$(NGINX_ROOT)$(NGINX_SBINPATH) \
-				   --lock-path=$(NGINX_ROOT)$(NGINX_LOCKPATH) \
-				   --conf-path=$(NGINX_ROOT)$(NGINX_CONFPATH) \
+	EXTRA_FLAGS += --prefix=$(NGINX_PREFIX) \
+				   --pid-path=$(NGINX_PREFIX)/$(NGINX_PIDPATH) \
+				   --sbin-path=$(NGINX_PREFIX)/$(NGINX_SBINPATH) \
+				   --lock-path=$(NGINX_PREFIX)/$(NGINX_LOCKPATH) \
+				   --conf-path=$(NGINX_PREFIX)/$(NGINX_CONFPATH) \
 				   --http-log-path=$(NGINX_ROOT)$(NGINX_LOGPATH)/access.log \
 				   --error-log-path=$(NGINX_ROOT)$(NGINX_LOGPATH)/error.log \
 				   --http-scgi-temp-path=$(NGINX_ROOT)$(NGINX_TEMPPATH)/scgi \

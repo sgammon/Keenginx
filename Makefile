@@ -69,7 +69,7 @@ NGINX_ENV += $(PAGESPEED_ENV)
 
 # configure vars
 _nginx_debug_cpuflags = -g -O0
-_nginx_release_cpuflags = -Ofast -mtune=native -march=native -flto -fwhole-program -fexpensive-optimizations -fomit-frame-pointer
+_nginx_release_cpuflags = -Ofast -mtune=native -march=native -fwhole-program -fexpensive-optimizations -fomit-frame-pointer
 
 ifeq ($(DEBUG),0)
 	_nginx_gccflags = $(_nginx_release_cpuflags)
@@ -92,7 +92,7 @@ ifeq ($(OSNAME),Darwin)
 	CC := clang
 	PAGESPEED = 0
 	ifeq ($(DEBUG),0)
-		_nginx_gccflags = $(_nginx_gccflags) -mssse3 -flto
+		_nginx_gccflags = $(_nginx_gccflags) -mssse3
 	endif
 endif
 

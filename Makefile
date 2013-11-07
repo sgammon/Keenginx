@@ -5,7 +5,7 @@
 ##### Configuration
 
 DEBUG ?= 1
-STAMP = 1.5x25-alpha3
+STAMP = 1.5x40-alpha4
 WORKSPACE ?= latest
 PROJECT ?= $(shell pwd)
 
@@ -140,6 +140,7 @@ endif
 # do we override paths?
 ifeq ($(OVERRIDE_PATHS),1)
 	EXTRA_FLAGS += --prefix=$(NGINX_PREFIX) \
+				   --with-file-aio \
 				   --pid-path=$(NGINX_PREFIX)/$(NGINX_PIDPATH) \
 				   --sbin-path=$(NGINX_SBINPATH) \
 				   --lock-path=$(NGINX_PREFIX)/$(NGINX_LOCKPATH) \

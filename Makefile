@@ -5,7 +5,7 @@
 ##### Configuration
 
 DEBUG ?= 1
-STAMP = 1.5x40-alpha4
+STAMP = 1.5x45-alpha4
 WORKSPACE ?= latest
 PROJECT ?= $(shell pwd)
 
@@ -15,8 +15,8 @@ latest ?= 1.5.6
 
 # pagespeed config
 PAGESPEED ?= 0
-PSOL_VERSION ?= 1.6.29.5
-PAGESPEED_VERSION ?= 1.6.29.5-beta
+PSOL_VERSION ?= 1.7.30.1
+PAGESPEED_VERSION ?= 1.7.30.1-beta
 PAGESPEED_EXTRA_ENV ?=
 
 # pcre config

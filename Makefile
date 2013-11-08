@@ -1,6 +1,6 @@
 ## == KEEN NGINX: makefile == ##
 
-## dependencies: gperf, unzip, subversion, build-essential tar
+## dependencies: gperf unzip subversion build-essential tar
 
 ##### Configuration
 
@@ -156,6 +156,7 @@ endif
 
 _nginx_config_mainflags := --user=$(NGINX_USER) \
 						   --group=$(NGINX_GROUP) \
+						   --with-file-aio \
 						   --with-ipv6 \
 						   --with-poll_module \
 						   --with-rtsig_module \

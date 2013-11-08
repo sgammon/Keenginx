@@ -166,6 +166,7 @@ _nginx_config_mainflags := --user=$(NGINX_USER) \
 						   --with-http_secure_link_module \
 						   --with-md5-asm \
 						   --with-sha1-asm \
+						   --with-openssl-opt="-DOPENSSL_EC_NISTP_64_GCC_128 -DOPENSSL_USE_GMP -lgmp -DOPENSSL_RC5" \
 						   $(EXTRA_FLAGS)
 
 

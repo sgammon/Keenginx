@@ -298,7 +298,7 @@ dependencies/pcre:
 dependencies/zlib:
 	@echo "Fetching Zlib..."
 	@mkdir -p dependencies/zlib/$(ZLIB_VERSION)
-	@curl --progress-bar http://zlib.net/zlib-$(ZLIB_VERSION).tar.gz > zlib-$(ZLIB_VERSION).tar.gz
+	@curl --progress-bar http://commondatastorage.googleapis.com/keen-static/dependencies/zlib/zlib-$(ZLIB_VERSION).tar.gz > zlib-$(ZLIB_VERSION).tar.gz
 
 	@echo "Extracting Zlib..."
 	@tar -xvf zlib-$(ZLIB_VERSION).tar.gz

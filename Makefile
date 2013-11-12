@@ -5,7 +5,7 @@
 ##### Configuration
 
 DEBUG ?= 1
-STAMP = 1.5x45-alpha4
+STAMP = 1.5x50-alpha5
 WORKSPACE ?= latest
 PROJECT ?= $(shell pwd)
 
@@ -21,15 +21,15 @@ PAGESPEED_EXTRA_ENV ?=
 
 # pcre config
 PCRE ?= 1
-PCRE_VERSION ?= 8.33
+PCRE_VERSION ?= 8.32
 
 # pcre config
 ZLIB ?= 1
-ZLIB_VERSION ?= 1.2.8
+ZLIB_VERSION ?= 1.2.7
 
 # openssl config
 OPENSSL ?= 1
-OPENSSL_VERSION ?= 1.0.1e
+OPENSSL_VERSION ?= SNAP-20131112
 
 # libatomic config
 LIBATOMIC ?= 1
@@ -108,7 +108,7 @@ endif
 
 # do we compile-in openssl?
 ifeq ($(OPENSSL),1)
-	EXTRA_FLAGS += --with-openssl=dependencies/openssl/$(OPENSSL_VERSION)/openssl-$(OPENSSL_VERSION) --with-http_ssl_module --with-http_spdy_module  #--with-openssl-opt="$(_nginx_gccflags)"
+	EXTRA_FLAGS += --with-openssl=dependencies/openssl/$(OPENSSL_VERSION)/openssl-$(OPENSSL_VERSION) --with-http_ssl_module --with-http_spdy_module --with-openssl-opt="-DOPENSSL_EC_NISTP_64_GCC_128 -DOPENSSL_USE_GMP -lgmp -DOPENSSL_RC5"
 endif
 
 
@@ -140,7 +140,6 @@ endif
 # do we override paths?
 ifeq ($(OVERRIDE_PATHS),1)
 	EXTRA_FLAGS += --prefix=$(NGINX_PREFIX) \
-				   --with-file-aio \
 				   --pid-path=$(NGINX_PREFIX)/$(NGINX_PIDPATH) \
 				   --sbin-path=$(NGINX_SBINPATH) \
 				   --lock-path=$(NGINX_PREFIX)/$(NGINX_LOCKPATH) \
@@ -166,7 +165,6 @@ _nginx_config_mainflags := --user=$(NGINX_USER) \
 						   --with-http_secure_link_module \
 						   --with-md5-asm \
 						   --with-sha1-asm \
-						   --with-openssl-opt="-DOPENSSL_EC_NISTP_64_GCC_128 -DOPENSSL_USE_GMP -lgmp -DOPENSSL_RC5" \
 						   $(EXTRA_FLAGS)
 
 
@@ -310,7 +308,7 @@ dependencies/zlib:
 dependencies/openssl:
 	@echo "Fetching OpenSSL..."
 	@mkdir -p dependencies/openssl/$(OPENSSL_VERSION)
-	@curl --progress-bar http://www.openssl.org/source/openssl-$(OPENSSL_VERSION).tar.gz > openssl-$(OPENSSL_VERSION).tar.gz
+	@curl --progress-bar ftp://ftp.openssl.org/snapshot/openssl-$(OPENSSL_VERSION).tar.gz > openssl-$(OPENSSL_VERSION).tar.gz
 
 	@echo "Extracting OpenSSL..."
 	@tar -xvf openssl-$(OPENSSL_VERSION).tar.gz

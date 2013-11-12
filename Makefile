@@ -29,7 +29,7 @@ ZLIB_VERSION ?= 1.2.7
 
 # openssl config
 OPENSSL ?= 1
-OPENSSL_VERSION ?= SNAP-20131112
+OPENSSL_VERSION ?= 1.0.1e
 
 # libatomic config
 LIBATOMIC ?= 1
@@ -308,7 +308,7 @@ dependencies/zlib:
 dependencies/openssl:
 	@echo "Fetching OpenSSL..."
 	@mkdir -p dependencies/openssl/$(OPENSSL_VERSION)
-	@curl --progress-bar ftp://ftp.openssl.org/snapshot/openssl-$(OPENSSL_VERSION).tar.gz > openssl-$(OPENSSL_VERSION).tar.gz
+	@curl --progress-bar http://www.openssl.org/source/openssl-$(OPENSSL_VERSION).tar.gz > openssl-$(OPENSSL_VERSION).tar.gz
 
 	@echo "Extracting OpenSSL..."
 	@tar -xvf openssl-$(OPENSSL_VERSION).tar.gz

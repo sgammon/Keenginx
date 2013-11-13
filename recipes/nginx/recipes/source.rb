@@ -112,6 +112,7 @@ bash 'compile_nginx_source' do
   cwd  ::File.dirname(src_filepath)
   code <<-EOH
     cd nginx-#{node['nginx']['source']['version']} &&
+    sudo chmod -R 777 ./*;
     sudo bash -c "`cat ./.build_cmd`";
     sudo bash -c "`cat ./.make_cmd`";
     make install;

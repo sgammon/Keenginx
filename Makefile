@@ -5,7 +5,7 @@
 ##### Configuration
 
 DEBUG ?= 1
-STAMP = 1.5x55-alpha5
+STAMP = 1.5x60-alpha5
 WORKSPACE ?= latest
 PROJECT ?= $(shell pwd)
 
@@ -51,6 +51,7 @@ PAGESPEED_RELEASE ?= Debug
 NGINX_USER ?= $(shell whoami)
 NGINX_GROUP ?= $(shell id -g -n $(NGINX_USER))
 NGINX_ROOT ?= $(PROJECT)/build/
+TARSTAMP:=$(STAMP)-debug
 else
 OVERRIDE_PATHS ?= 0
 PAGESPEED_RELEASE ?= Release
@@ -68,7 +69,7 @@ NGINX_ENV += $(PAGESPEED_ENV)
 
 # configure vars
 _nginx_debug_cpuflags = -g -O0
-_nginx_release_cpuflags = -O3 -mtune=native -march=native -fexpensive-optimizations -fomit-frame-pointer
+_nginx_release_cpuflags = -O2 -mtune=native -march=native
 
 # openssl flags
 _openssl_flags:=-DOPENSSL_EC_NISTP_64_GCC_128 -DOPENSSL_RC5
@@ -206,7 +207,7 @@ package: build
 	#@mv pagespeed/ nginx-$(CURRENT)/pagespeed
 
 	@echo "Packaging tarball..."
-	@tar -czvf keenginx-$(STAMP).tar.gz nginx-$(STAMP)/
+	@tar -czvf keenginx-$(TARSTAMP).tar.gz nginx-$(STAMP)/
 	#@mv nginx-$(CURRENT)/pagespeed ./pagespeed
 	@mv nginx-$(STAMP)/ sources/$(CURRENT)/nginx-$(CURRENT);
 	@mv keenginx-$(STAMP).tar.gz build/;

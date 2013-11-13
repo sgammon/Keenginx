@@ -62,9 +62,10 @@ src_filepath  = "#{Chef::Config['file_cache_path'] || '/tmp'}/nginx-#{node['ngin
 #  recursive true
 #end
 
+#checksum node['nginx']['source']['checksum']  # disabled because NSA
+
 remote_file nginx_url do
   source   nginx_url
-  #checksum node['nginx']['source']['checksum']  # disabled because NSA
   path     src_filepath
   backup   false
 end
@@ -112,10 +113,12 @@ bash 'compile_nginx_source' do
   cwd  ::File.dirname(src_filepath)
   code <<-EOH
     cd nginx-#{node['nginx']['source']['version']} &&
-    sudo chmod -R 777 ./*;
-    sudo bash -c "`cat ./.build_cmd`";
-    sudo bash -c "`cat ./.make_cmd`";
-    make install;
+    sudo chown -R www-data *;
+    sudo chgrp -R www-data *;
+    sudo chmod 777 -R *;
+    sudo -u #{node['nginx']['user']} bash -c "`cat ./.build_cmd`";
+    sudo -u #{node['nginx']['user']} bash -c "`cat ./.make_cmd`";
+    sudo make install;
   EOH
 
   not_if do

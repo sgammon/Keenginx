@@ -108,7 +108,7 @@ endif
 
 # do we compile-in openssl?
 ifeq ($(OPENSSL),1)
-	EXTRA_FLAGS += --with-openssl=dependencies/openssl/$(OPENSSL_VERSION)/openssl-$(OPENSSL_VERSION) --with-http_ssl_module --with-http_spdy_module --with-openssl-opt=\"-DOPENSSL_EC_NISTP_64_GCC_128 -DOPENSSL_USE_GMP -lgmp -DOPENSSL_RC5\"
+	EXTRA_FLAGS += --with-openssl=dependencies/openssl/$(OPENSSL_VERSION)/openssl-$(OPENSSL_VERSION) --with-http_ssl_module --with-http_spdy_module
 endif
 
 
@@ -417,10 +417,10 @@ configure_nginx:
 	@echo "Configuring Nginx..."
 	-cp -fr modules dependencies sources/$(CURRENT)/nginx-$(CURRENT); \
 		cd sources/$(CURRENT)/nginx-$(CURRENT); \
-		CC=$(CC) CFLAGS="$(_nginx_gccflags)" CXXFLAGS="$(CXXFLAGS)" ./configure $(_nginx_config_mainflags) --with-cc-opt="$(_nginx_gccflags)"; \
+		CC=$(CC) CFLAGS="$(_nginx_gccflags)" CXXFLAGS="$(CXXFLAGS)" ./configure $(_nginx_config_mainflags) --with-cc-opt="$(_nginx_gccflags)" --with-openssl-opt="-DOPENSSL_EC_NISTP_64_GCC_128 -DOPENSSL_USE_GMP -lgmp -DOPENSSL_RC5"; \
 		cd ../../../;
 	@echo "Stamping configuration..."
-	@echo "CC=$(CC) CFLAGS=\"$(_nginx_gccflags)\" CXXFLAGS=\"$(CXXFLAGS)\" ./configure --with-cc-opt=\"$(_nginx_gccflags)\" $(_nginx_config_mainflags)" > workspace/.build_cmd
+	@echo "CC=$(CC) CFLAGS=\"$(_nginx_gccflags)\" CXXFLAGS=\"$(CXXFLAGS)\" ./configure --with-cc-opt=\"$(_nginx_gccflags)\" --with-openssl-opt=\"$(_openssl_flags)\" $(_nginx_config_mainflags)" > workspace/.build_cmd
 	@echo "CC=$(CC) CFLAGS=\"$(_nginx_gccflags)\" CXXFLAGS=\"$(CXXFLAGS)\" $(NGINX_ENV) make ;" > workspace/.make_cmd
 	@cp -f workspace/.build_cmd workspace/.make_cmd sources/$(CURRENT)/nginx-$(CURRENT)
 

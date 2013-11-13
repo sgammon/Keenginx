@@ -71,7 +71,7 @@ _nginx_debug_cpuflags = -g -O0
 _nginx_release_cpuflags = -O3 -mtune=native -march=native -fexpensive-optimizations -fomit-frame-pointer
 
 # openssl flags
-_openssl_flags:=-DOPENSSL_EC_NISTP_64_GCC_128 -DOPENSSL_USE_GMP -lgmp -DOPENSSL_RC5
+_openssl_flags:=-DOPENSSL_EC_NISTP_64_GCC_128 -DOPENSSL_RC5
 
 ifeq ($(DEBUG),0)
 	_nginx_gccflags = $(_nginx_release_cpuflags)

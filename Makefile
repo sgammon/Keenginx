@@ -62,7 +62,6 @@ endif
 
 NGINX_PREFIX:=$(NGINX_ROOT)$(NGINX_BASEPATH)
 
-
 PSOL_ENV := PSOL_BINARY=$(PROJECT)/modules/pagespeed/$(PAGESPEED_VERSION)/psol/lib/$(PAGESPEED_RELEASE)/linux/x64/pagespeed_automatic.a
 PAGESPEED_ENV := $(PSOL_ENV) MOD_PAGESPEED_DIR=$(PROJECT)/sources/pagespeed/$(PAGESPEED_VERSION)/trunk/src
 NGINX_ENV += $(PAGESPEED_ENV)
@@ -70,6 +69,9 @@ NGINX_ENV += $(PAGESPEED_ENV)
 # configure vars
 _nginx_debug_cpuflags = -g -O0
 _nginx_release_cpuflags = -O3 -mtune=native -march=native -fexpensive-optimizations -fomit-frame-pointer
+
+# openssl flags
+_openssl_flags:=-DOPENSSL_EC_NISTP_64_GCC_128 -DOPENSSL_USE_GMP -lgmp -DOPENSSL_RC5
 
 ifeq ($(DEBUG),0)
 	_nginx_gccflags = $(_nginx_release_cpuflags)
@@ -417,7 +419,7 @@ configure_nginx:
 	@echo "Configuring Nginx..."
 	-cp -fr modules dependencies sources/$(CURRENT)/nginx-$(CURRENT); \
 		cd sources/$(CURRENT)/nginx-$(CURRENT); \
-		CC=$(CC) CFLAGS="$(_nginx_gccflags)" CXXFLAGS="$(CXXFLAGS)" ./configure $(_nginx_config_mainflags) --with-cc-opt="$(_nginx_gccflags)" --with-openssl-opt="-DOPENSSL_EC_NISTP_64_GCC_128 -DOPENSSL_USE_GMP -lgmp -DOPENSSL_RC5"; \
+		CC=$(CC) CFLAGS="$(_nginx_gccflags)" CXXFLAGS="$(CXXFLAGS)" ./configure $(_nginx_config_mainflags) --with-cc-opt="$(_nginx_gccflags)" --with-openssl-opt="$(_openssl_flags)"; \
 		cd ../../../;
 	@echo "Stamping configuration..."
 	@echo "CC=$(CC) CFLAGS=\"$(_nginx_gccflags)\" CXXFLAGS=\"$(CXXFLAGS)\" ./configure --with-cc-opt=\"$(_nginx_gccflags)\" --with-openssl-opt=\"$(_openssl_flags)\" $(_nginx_config_mainflags)" > workspace/.build_cmd

@@ -108,7 +108,7 @@ endif
 
 # do we compile-in openssl?
 ifeq ($(OPENSSL),1)
-	EXTRA_FLAGS += --with-openssl=dependencies/openssl/$(OPENSSL_VERSION)/openssl-$(OPENSSL_VERSION) --with-http_ssl_module --with-http_spdy_module --with-openssl-opt="-DOPENSSL_EC_NISTP_64_GCC_128 -DOPENSSL_USE_GMP -lgmp -DOPENSSL_RC5"
+	EXTRA_FLAGS += --with-openssl=dependencies/openssl/$(OPENSSL_VERSION)/openssl-$(OPENSSL_VERSION) --with-http_ssl_module --with-http_spdy_module --with-openssl-opt="'-DOPENSSL_EC_NISTP_64_GCC_128 -DOPENSSL_USE_GMP -lgmp -DOPENSSL_RC5'"
 endif
 
 
@@ -165,6 +165,23 @@ _nginx_config_mainflags := --user=$(NGINX_USER) \
 						   --with-http_secure_link_module \
 						   --with-md5-asm \
 						   --with-sha1-asm \
+						   --without-http_ssi_module \
+						   --without-http_userid_module \
+						   --without-http_geo_module \
+						   --without-http_split_clients_module \
+						   --without-http_referer_module \
+						   --without-http_fastcgi_module \
+						   --without-http_scgi_module \
+						   --without-http_uwsgi_module \
+						   --without-http_memcached_module \
+						   --without-http_limit_conn_module \
+						   --without-http_limit_req_module \
+						   --without-http_empty_gif_module \
+						   --without-http_browser_module \
+						   --without-mail_pop3_module \
+						   --without-mail_imap_module \
+						   --without-mail_smtp_module \
+
 						   $(EXTRA_FLAGS)
 
 

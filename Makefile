@@ -142,10 +142,10 @@ endif
 # do we override paths?
 ifeq ($(OVERRIDE_PATHS),1)
 	EXTRA_FLAGS += --prefix=$(NGINX_PREFIX) \
-				   --pid-path=$(NGINX_ROOT)/$(NGINX_PIDPATH) \
-				   --sbin-path=$(NGINX_SBINPATH) \
-				   --lock-path=$(NGINX_ROOT)/$(NGINX_LOCKPATH) \
-				   --conf-path=$(NGINX_ROOT)/$(NGINX_CONFPATH) \
+				   --pid-path=$(NGINX_ROOT)$(NGINX_PIDPATH) \
+				   --sbin-path=$(NGINX_ROOT)$(NGINX_SBINPATH) \
+				   --lock-path=$(NGINX_ROOT)$(NGINX_LOCKPATH) \
+				   --conf-path=$(NGINX_ROOT)$(NGINX_CONFPATH) \
 				   --http-log-path=$(NGINX_ROOT)$(NGINX_LOGPATH)/access.log \
 				   --error-log-path=$(NGINX_ROOT)$(NGINX_LOGPATH)/error.log \
 				   --http-scgi-temp-path=$(NGINX_ROOT)$(NGINX_TEMPPATH)/scgi \

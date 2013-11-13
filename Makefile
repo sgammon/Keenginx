@@ -69,7 +69,7 @@ NGINX_ENV += $(PAGESPEED_ENV)
 
 # configure vars
 _nginx_debug_cpuflags = -g -O0
-_nginx_release_cpuflags = -Ofast -mtune=native -march=native -fwhole-program -fexpensive-optimizations -fomit-frame-pointer
+_nginx_release_cpuflags = -O3 -mtune=native -march=native -fexpensive-optimizations -fomit-frame-pointer
 
 ifeq ($(DEBUG),0)
 	_nginx_gccflags = $(_nginx_release_cpuflags)
@@ -181,7 +181,6 @@ _nginx_config_mainflags := --user=$(NGINX_USER) \
 						   --without-mail_pop3_module \
 						   --without-mail_imap_module \
 						   --without-mail_smtp_module \
-
 						   $(EXTRA_FLAGS)
 
 

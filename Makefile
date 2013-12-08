@@ -11,7 +11,7 @@ PROJECT ?= $(shell pwd)
 
 # nginx config
 stable ?= 1.4.3
-latest ?= 1.5.6
+latest ?= 1.5.7
 
 # pagespeed config
 PAGESPEED ?= 0
@@ -230,11 +230,11 @@ patch: sources patch_common patch_$(CURRENT) patch_pagespeed
 clean: clean_nginx
 	@echo "Cleaning..."
 	@echo "    ... buildroot."
-	@rm -fr build/
+	@-rm -fr build/
 	@echo "    ... workspace."
-	@rm -fr workspace
+	@-rm -fr workspace
 	@echo "    ... pagespeed."
-	@rm -fr pagespeed
+	@-rm -fr pagespeed
 
 distclean: clean
 	@echo "    ... dependencies."
@@ -411,7 +411,7 @@ build_nginx:
 
 clean_nginx:
 	@echo "Cleaning Nginx..."
-	-@cd sources/$(CURRENT)/nginx-$(CURRENT); \
+	@-cd sources/$(CURRENT)/nginx-$(CURRENT); \
 		make clean; \
 		rm -f modules/; \
 		cd ../../../;

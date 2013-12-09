@@ -177,6 +177,7 @@ _nginx_config_mainflags := --user=$(NGINX_USER) \
 						   --with-rtsig_module \
 						   --without-select_module \
 						   --with-http_gunzip_module \
+						   --with-http_stub_status_module \
 						   --with-http_gzip_static_module \
 						   --with-http_secure_link_module \
 						   --with-md5-asm \

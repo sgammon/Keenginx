@@ -51,13 +51,26 @@ PAGESPEED_RELEASE ?= Debug
 NGINX_USER ?= $(shell whoami)
 NGINX_GROUP ?= $(shell id -g -n $(NGINX_USER))
 NGINX_ROOT ?= $(PROJECT)/build/
+
+ifeq ($(PAGESPEED),1)
+TARSTAMP:=$(STAMP)-ps-debug
+else
 TARSTAMP:=$(STAMP)-debug
+endif
+
 else
 OVERRIDE_PATHS ?= 0
 PAGESPEED_RELEASE ?= Release
 NGINX_USER ?= www-data
 NGINX_GROUP ?= keen
 NGINX_ROOT ?= /
+
+ifeq ($(PAGESPEED),1)
+TARSTAMP:=$(STAMP)-ps
+else
+TARSTAMP:=$(STAMP)
+endif
+
 endif
 
 

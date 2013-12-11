@@ -189,15 +189,10 @@ _nginx_config_mainflags := --user=$(NGINX_USER) \
 						   --without-http_referer_module \
 						   --without-http_fastcgi_module \
 						   --without-http_scgi_module \
-						   --without-http_uwsgi_module \
-						   --without-http_memcached_module \
-						   --without-http_limit_conn_module \
-						   --without-http_limit_req_module \
 						   --without-http_empty_gif_module \
 						   --without-http_browser_module \
 						   --without-mail_pop3_module \
 						   --without-mail_imap_module \
-						   --without-mail_smtp_module \
 						   $(EXTRA_FLAGS)
 
 

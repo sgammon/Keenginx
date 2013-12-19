@@ -5,7 +5,7 @@
 ##### Configuration
 
 DEBUG ?= 1
-STAMP = 1.5x60-alpha5
+STAMP = 1.5x65-alpha5
 WORKSPACE ?= latest
 PROJECT ?= $(shell pwd)
 
@@ -50,7 +50,7 @@ OVERRIDE_PATHS ?= 1
 PAGESPEED_RELEASE ?= Debug
 NGINX_USER ?= $(shell whoami)
 NGINX_GROUP ?= $(shell id -g -n $(NGINX_USER))
-NGINX_ROOT ?= $(PROJECT)/build/
+NGINX_ROOT ?= /
 
 ifeq ($(PAGESPEED),1)
 TARSTAMP:=$(STAMP)-ps-debug
@@ -59,7 +59,7 @@ TARSTAMP:=$(STAMP)-debug
 endif
 
 else
-OVERRIDE_PATHS ?= 0
+OVERRIDE_PATHS ?= 1
 PAGESPEED_RELEASE ?= Release
 NGINX_USER ?= www-data
 NGINX_GROUP ?= keen
@@ -189,8 +189,8 @@ _nginx_config_mainflags := --user=$(NGINX_USER) \
 						   --without-http_referer_module \
 						   --without-http_fastcgi_module \
 						   --without-http_scgi_module \
-						   --without-http_empty_gif_module \
 						   --without-http_browser_module \
+						   --without-http_smtp_module \
 						   --without-mail_pop3_module \
 						   --without-mail_imap_module \
 						   $(EXTRA_FLAGS)

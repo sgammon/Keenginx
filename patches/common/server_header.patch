@@ -1,15 +1,15 @@
 diff -Naurdw sources/1.5.7/nginx-1.5.7/src/http/ngx_http_header_filter_module.c workspace/http/ngx_http_header_filter_module.c
---- sources/1.5.7/nginx-1.5.7/src/http/ngx_http_header_filter_module.c	2013-12-19 12:58:06.417737113 -0800
-+++ workspace/http/ngx_http_header_filter_module.c	2013-12-19 12:51:08.411144693 -0800
+--- sources/1.5.7/nginx-1.5.7/src/http/ngx_http_header_filter_module.c  2013-12-19 12:58:06.417737113 -0800
++++ workspace/http/ngx_http_header_filter_module.c  2013-12-19 12:51:08.411144693 -0800
 @@ -46,8 +46,9 @@
  };
- 
- 
+
+
 -static char ngx_http_server_string[] = "Server: nginx" CRLF;
 -static char ngx_http_server_full_string[] = "Server: " NGINX_VER CRLF;
 +static char ngx_http_server_string[] = "Server: K9/" CRLF;
 +static char ngx_http_server_full_string[] = "Server: Keen/K9/" NGINX_VER CRLF;
 +
- 
+
  static ngx_str_t ngx_http_status_lines[] = {
- 
+

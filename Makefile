@@ -67,13 +67,17 @@ NGINX_ROOT ?= /
 
 ifeq ($(PAGESPEED),1)
 TARSTAMP:=$(STAMP)-ps
-PATCH_PAGESPEED=patch_pagespeed
 else
 TARSTAMP:=$(STAMP)
 endif
 
 endif
 
+ifeq ($(PAGESPEED),1)
+PAGESPEED_MODULE=pagespeed
+PATCH_PAGESPEED=patch_pagespeed
+DEPENDENCIES_PAGESPEED=dependencies/depot_tools
+endif
 
 NGINX_PREFIX:=$(NGINX_ROOT)$(NGINX_BASEPATH)
 
@@ -259,10 +263,10 @@ distclean: clean
 sources: dependencies
 	@echo "Finished acquiring sources."
 
-modules: pagespeed
+modules: $(PAGESPEED_MODULE)
 	@echo "Downloaded module sources."
 
-dependencies: dependencies/pcre dependencies/zlib dependencies/openssl dependencies/libatomic dependencies/depot_tools
+dependencies: dependencies/pcre dependencies/zlib dependencies/openssl dependencies/libatomic $(DEPENDENCIES_PAGESPEED)
 	@echo "Finished fetching dependency sources."
 
 
@@ -362,6 +366,7 @@ dependencies/depot_tools:
 		cd ../;
 
 
+ifeq ($(PAGESPEED),1)
 #### ==== NGX PAGESPEED ==== ####
 pagespeed: sources/pagespeed
 	@echo "Mounting Pagespeed sources..."
@@ -411,7 +416,7 @@ sources/pagespeed:
 		../../../../dependencies/depot_tools/gclient config http://modpagespeed.googlecode.com/svn/tags/$(PSOL_VERSION)/src; \
 		../../../../dependencies/depot_tools/gclient sync --force --jobs=1;
 		cd ../../../../;
-
+endif
 
 #### ==== BUILD RULES ==== ####
 build_nginx:

@@ -12,6 +12,7 @@ diff -Naurdw sources/1.5.7/nginx-1.5.7/src/http/ngx_http_header_filter_module.c 
 +
 
  static ngx_str_t ngx_http_status_lines[] = {
+
 diff -Naurdw sources/1.5.7/nginx-1.5.7/src/core/nginx.h workspace/core/nginx.h
 --- sources/1.5.7/nginx-1.5.7/src/core/nginx.h  2013-11-19 02:03:48.000000000 -0800
 +++ workspace/core/nginx.h  2013-12-19 12:50:36.863147211 -0800

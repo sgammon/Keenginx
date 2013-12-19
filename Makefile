@@ -67,6 +67,7 @@ NGINX_ROOT ?= /
 
 ifeq ($(PAGESPEED),1)
 TARSTAMP:=$(STAMP)-ps
+PATCH_PAGESPEED=patch_pagespeed
 else
 TARSTAMP:=$(STAMP)
 endif
@@ -230,7 +231,7 @@ build: patch
 	@mkdir -p build/cache/nginx/client build/cache/nginx/proxy
 	@echo "Finished building Nginx $(CURRENT)."
 
-patch: sources patch_common patch_$(CURRENT) patch_pagespeed
+patch: sources patch_common patch_$(CURRENT) $(PATCH_PAGESPEED)
 	@echo "Patching complete."
 	@echo "Applied patches:"
 	@echo "  -- Common: " $(_common_patches)
@@ -290,13 +291,14 @@ patch_$(CURRENT): $(_current_patches)
 		cd ../../../../;
 	@echo "Patch done."
 
+ifeq ($(PAGESPEED),1)
 patch_pagespeed: $(_pagespeed_patches)
 	@echo "Applying patch " $^ "..."
 	-@cd modules/pagespeed/$(PAGESPEED_VERSION); \
 		patch -N -p1 < ../../../$^; \
 		cd ../../../;
 	@echo "Patch done."
-
+endif
 
 #### ==== NGINX SOURCES ==== ####
 sources/$(WORKSPACE):

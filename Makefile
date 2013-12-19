@@ -190,7 +190,7 @@ _nginx_config_mainflags := --user=$(NGINX_USER) \
 						   --without-http_fastcgi_module \
 						   --without-http_scgi_module \
 						   --without-http_browser_module \
-						   --without-http_smtp_module \
+						   --without-mail_smtp_module \
 						   --without-mail_pop3_module \
 						   --without-mail_imap_module \
 						   $(EXTRA_FLAGS)

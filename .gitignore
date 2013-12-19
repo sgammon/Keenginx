@@ -3,7 +3,7 @@ build/*
 *.DS_Store
 *.pyc
 dependencies/*
-modules/*
 sources/*
 workspace/*
 workspace
+modules/pagespeed

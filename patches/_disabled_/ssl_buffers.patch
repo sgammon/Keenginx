@@ -1,6 +1,6 @@
 diff -Naurdw sources/1.5.7/nginx-1.5.7/src/event/ngx_event_openssl.c workspace/event/ngx_event_openssl.c
---- sources/1.5.7/nginx-1.5.7/src/event/ngx_event_openssl.c	2013-11-19 02:03:48.000000000 -0800
-+++ workspace/event/ngx_event_openssl.c	2013-12-19 12:59:43.855339134 -0800
+--- sources/1.5.7/nginx-1.5.7/src/event/ngx_event_openssl.c 2013-11-19 02:03:48.000000000 -0800
++++ workspace/event/ngx_event_openssl.c 2013-12-19 12:59:43.855339134 -0800
 @@ -567,7 +567,7 @@
              wbio = SSL_get_wbio((ngx_ssl_conn_t *) ssl_conn);
 
@@ -12,8 +12,8 @@ diff -Naurdw sources/1.5.7/nginx-1.5.7/src/event/ngx_event_openssl.c workspace/e
          }
 
 diff -Naurdw sources/1.5.7/nginx-1.5.7/src/event/ngx_event_openssl.h workspace/event/ngx_event_openssl.h
---- sources/1.5.7/nginx-1.5.7/src/event/ngx_event_openssl.h	2013-11-19 02:03:48.000000000 -0800
-+++ workspace/event/ngx_event_openssl.h	2013-12-19 13:00:20.226436718 -0800
+--- sources/1.5.7/nginx-1.5.7/src/event/ngx_event_openssl.h 2013-11-19 02:03:48.000000000 -0800
++++ workspace/event/ngx_event_openssl.h 2013-12-19 13:00:20.226436718 -0800
 @@ -104,7 +104,7 @@
  #define NGX_SSL_BUFFER   1
  #define NGX_SSL_CLIENT   2

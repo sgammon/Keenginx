@@ -1,6 +1,6 @@
 ## == KEEN NGINX: makefile == ##
 
-## dependencies: gperf unzip subversion build-essential tar ps2pdf groff
+## dependencies: gperf unzip subversion build-essential tar pod2pdf groff
 
 ##### Configuration
 

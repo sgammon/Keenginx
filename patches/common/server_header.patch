@@ -22,7 +22,7 @@ diff -Naurdw sources/1.5.7/nginx-1.5.7/src/core/nginx.h workspace/core/nginx.h
  #define nginx_version      1005007
 -#define NGINX_VERSION      "1.5.7"
 -#define NGINX_VER          "nginx/" NGINX_VERSION
-+#define NGINX_VERSION      "1.5x65-alpha5"
++#define NGINX_VERSION      "1.5x70-alpha6"
 +#define NGINX_VER          NGINX_VERSION
 
  #define NGINX_VAR          "NGINX"

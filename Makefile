@@ -1,22 +1,22 @@
 ## == KEEN NGINX: makefile == ##
 
-## dependencies: gperf unzip subversion build-essential tar
+## dependencies: gperf unzip subversion build-essential tar ps2pdf groff
 
 ##### Configuration
 
 DEBUG ?= 1
-STAMP = 1.5x65-alpha5
+STAMP = 1.5x70-alpha6
 WORKSPACE ?= latest
 PROJECT ?= $(shell pwd)
 
 # nginx config
 stable ?= 1.4.3
-latest ?= 1.5.7
+latest ?= 1.5.8
 
 # pagespeed config
 PAGESPEED ?= 0
-PSOL_VERSION ?= 1.7.30.1
-PAGESPEED_VERSION ?= 1.7.30.1-beta
+PSOL_VERSION ?= 1.7.30.2
+PAGESPEED_VERSION ?= 1.7.30.2-beta
 PAGESPEED_EXTRA_ENV ?=
 
 # pcre config
@@ -87,7 +87,7 @@ NGINX_ENV += $(PAGESPEED_ENV)
 
 # configure vars
 _nginx_debug_cpuflags = -g -O0
-_nginx_release_cpuflags = -O2 -mtune=native -march=native
+_nginx_release_cpuflags = -O3 -mtune=native -march=native -m64 -fomit-frame-pointer -fno-exceptions -fno-strict-aliasing
 
 # openssl flags
 _openssl_flags:=-DOPENSSL_EC_NISTP_64_GCC_128 -DOPENSSL_RC5
@@ -226,6 +226,47 @@ package: build
 	@mv nginx-$(STAMP)/ sources/$(CURRENT)/nginx-$(CURRENT);
 	@mv keenginx-$(TARSTAMP).tar.gz build/;
 	@echo "=== Finished Keen-Nginx build. ==="
+
+release:
+	@echo "------------------------------------"
+	@echo "!!!!! Starting Keenginx build. !!!!!"
+	@echo "------------------------------------"
+	@echo ""
+	@echo "This will most certainly take awhile. Today we'll be building four versions:"
+	@echo "--production with no pagespeed"
+	@echo "--production with pagespeed"
+	@echo "--debug with no pagespeed"
+	@echo "--debug with pagespeed"
+	@echo ""
+	@echo "Waiting for 30..."
+	@echo ""
+	sleep 30
+
+	@echo ""
+	@echo "!!!!! Building production Keenginx WITHOUT pagespeed. !!!!!"
+	@sleep 5
+	make PAGESPEED=0 OPENSSL=$(OPENSSL) ZLIB=$(ZLIB) DEBUG=0
+	@echo ""
+
+	@echo ""
+	@echo "!!!!! Building debug Keenginx WITHOUT pagespeed. !!!!!"
+	@sleep 5
+	make PAGESPEED=0 OPENSSL=$(OPENSSL) ZLIB=$(ZLIB) DEBUG=1
+	@echo ""
+
+	@echo ""
+	@echo "!!!!! Building production Keenginx WITH pagespeed. !!!!!"
+	@sleep 5
+	make PAGESPEED=1 OPENSSL=$(OPENSSL) ZLIB=$(ZLIB) DEBUG=0
+	@echo ""
+
+	@echo ""
+	@echo "!!!!! Building debug Keenginx WITH pagespeed. !!!!!"
+	@sleep 5
+	make PAGESPEED=1 OPENSSL=$(OPENSSL) ZLIB=$(ZLIB) DEBUG=1
+	@echo ""
+	@echo ""
+	@echo "!!!!!!!!!! DONE :) !!!!!!!!!!"
 
 build: patch
 	@echo "Compiling Nginx $(CURRENT)..."

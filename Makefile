@@ -245,25 +245,25 @@ release:
 	@echo ""
 	@echo "!!!!! Building production Keenginx WITHOUT pagespeed. !!!!!"
 	@sleep 5
-	make PAGESPEED=0 OPENSSL=$(OPENSSL) ZLIB=$(ZLIB) DEBUG=0
+	make PAGESPEED=0 OPENSSL=$(OPENSSL) ZLIB=$(ZLIB) DEBUG=0 all
 	@echo ""
 
 	@echo ""
 	@echo "!!!!! Building debug Keenginx WITHOUT pagespeed. !!!!!"
 	@sleep 5
-	make PAGESPEED=0 OPENSSL=$(OPENSSL) ZLIB=$(ZLIB) DEBUG=1
+	make PAGESPEED=0 OPENSSL=$(OPENSSL) ZLIB=$(ZLIB) DEBUG=1 all
 	@echo ""
 
 	@echo ""
 	@echo "!!!!! Building production Keenginx WITH pagespeed. !!!!!"
 	@sleep 5
-	make PAGESPEED=1 OPENSSL=$(OPENSSL) ZLIB=$(ZLIB) DEBUG=0
+	make PAGESPEED=1 OPENSSL=$(OPENSSL) ZLIB=$(ZLIB) DEBUG=0 modules/pagespeed all
 	@echo ""
 
 	@echo ""
 	@echo "!!!!! Building debug Keenginx WITH pagespeed. !!!!!"
 	@sleep 5
-	make PAGESPEED=1 OPENSSL=$(OPENSSL) ZLIB=$(ZLIB) DEBUG=1
+	make PAGESPEED=1 OPENSSL=$(OPENSSL) ZLIB=$(ZLIB) DEBUG=1 all
 	@echo ""
 	@echo ""
 	@echo "!!!!!!!!!! DONE :) !!!!!!!!!!"

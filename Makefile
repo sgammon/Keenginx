@@ -240,7 +240,7 @@ release:
 	@echo ""
 	@echo "Waiting for 30..."
 	@echo ""
-	sleep 30
+	@sleep 30
 
 	@echo ""
 	@echo "!!!!! Building production Keenginx WITHOUT pagespeed. !!!!!"

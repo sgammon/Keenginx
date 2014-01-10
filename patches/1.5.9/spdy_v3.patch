@@ -13,7 +13,7 @@ This patch were developed by Liangbing Li And Xiaochen Wang
 
 diff -r a297b7ad6f94 -r 53a3d5ba3ad9 auto/sources
 --- a/auto/sources  Fri Dec 20 16:18:25 2013 +0400
-+++ b/auto/sources  Sun Dec 22 20:43:37 2013 +0800
++++ sources/1.5.9/nginx-1.5.9/auto/sources  Sun Dec 22 20:43:37 2013 +0800
 @@ -330,7 +330,8 @@
                  src/http/ngx_http_spdy_module.h"
  HTTP_SPDY_SRCS="src/http/ngx_http_spdy.c \
@@ -25,8 +25,8 @@ diff -r a297b7ad6f94 -r 53a3d5ba3ad9 auto/sources
 
  HTTP_CHARSET_FILTER_MODULE=ngx_http_charset_filter_module
 diff -r a297b7ad6f94 -r 53a3d5ba3ad9 src/http/modules/ngx_http_ssl_module.c
---- a/src/http/modules/ngx_http_ssl_module.c  Fri Dec 20 16:18:25 2013 +0400
-+++ b/src/http/modules/ngx_http_ssl_module.c  Sun Dec 22 20:43:37 2013 +0800
+--- sources/1.5.9/nginx-1.5.9/src/http/modules/ngx_http_ssl_module.c  Fri Dec 20 16:18:25 2013 +0400
++++ workspace/http/modules/ngx_http_ssl_module.c  Sun Dec 22 20:43:37 2013 +0800
 @@ -9,6 +9,9 @@
  #include <ngx_core.h>
  #include <ngx_http.h>
@@ -62,8 +62,8 @@ diff -r a297b7ad6f94 -r 53a3d5ba3ad9 src/http/modules/ngx_http_ssl_module.c
          return SSL_TLSEXT_ERR_OK;
      }
 diff -r a297b7ad6f94 -r 53a3d5ba3ad9 src/http/ngx_http_request.c
---- a/src/http/ngx_http_request.c Fri Dec 20 16:18:25 2013 +0400
-+++ b/src/http/ngx_http_request.c Sun Dec 22 20:43:37 2013 +0800
+--- sources/1.5.9/nginx-1.5.9/src/http/ngx_http_request.c Fri Dec 20 16:18:25 2013 +0400
++++ workspace/http/ngx_http_request.c Sun Dec 22 20:43:37 2013 +0800
 @@ -9,6 +9,10 @@
  #include <ngx_core.h>
  #include <ngx_http.h>
@@ -100,8 +100,8 @@ diff -r a297b7ad6f94 -r 53a3d5ba3ad9 src/http/ngx_http_request.c
          SSL_get0_next_proto_negotiated(c->ssl->connection, &data, &len);
 
 diff -r a297b7ad6f94 -r 53a3d5ba3ad9 src/http/ngx_http_spdy.c
---- a/src/http/ngx_http_spdy.c  Fri Dec 20 16:18:25 2013 +0400
-+++ b/src/http/ngx_http_spdy.c  Sun Dec 22 20:43:37 2013 +0800
+--- sources/1.5.9/nginx-1.5.9/src/http/ngx_http_spdy.c  Fri Dec 20 16:18:25 2013 +0400
++++ workspace/http/ngx_http_spdy.c  Sun Dec 22 20:43:37 2013 +0800
 @@ -145,8 +145,6 @@
  static void ngx_http_spdy_run_request(ngx_http_request_t *r);
  static ngx_int_t ngx_http_spdy_init_request_body(ngx_http_request_t *r);
@@ -175,8 +175,8 @@ diff -r a297b7ad6f94 -r 53a3d5ba3ad9 src/http/ngx_http_spdy.c
      ngx_log_debug2(NGX_LOG_DEBUG_HTTP, sc->connection->log, 0,
                     "spdy close stream %ui, processing %ui",
 diff -r a297b7ad6f94 -r 53a3d5ba3ad9 src/http/ngx_http_spdy.h
---- a/src/http/ngx_http_spdy.h  Fri Dec 20 16:18:25 2013 +0400
-+++ b/src/http/ngx_http_spdy.h  Sun Dec 22 20:43:37 2013 +0800
+--- sources/1.5.9/nginx-1.5.9/src/http/ngx_http_spdy.h  Fri Dec 20 16:18:25 2013 +0400
++++ workspace/http/ngx_http_spdy.h  Sun Dec 22 20:43:37 2013 +0800
 @@ -15,11 +15,17 @@
  #include <zlib.h>
 
@@ -325,8 +325,8 @@ diff -r a297b7ad6f94 -r 53a3d5ba3ad9 src/http/ngx_http_spdy.h
 
  #endif /* _NGX_HTTP_SPDY_H_INCLUDED_ */
 diff -r a297b7ad6f94 -r 53a3d5ba3ad9 src/http/ngx_http_spdy_filter_module.c
---- a/src/http/ngx_http_spdy_filter_module.c  Fri Dec 20 16:18:25 2013 +0400
-+++ b/src/http/ngx_http_spdy_filter_module.c  Sun Dec 22 20:43:37 2013 +0800
+--- sources/1.5.9/nginx-1.5.9/src/http/ngx_http_spdy_filter_module.c  Fri Dec 20 16:18:25 2013 +0400
++++ workspace/http/ngx_http_spdy_filter_module.c  Sun Dec 22 20:43:37 2013 +0800
 @@ -29,6 +29,21 @@
  #define ngx_http_spdy_nv_write_val(p, h)                                      \
      ngx_cpymem(ngx_http_spdy_nv_write_vlen(p, sizeof(h) - 1), h, sizeof(h) - 1)
@@ -1176,8 +1176,8 @@ diff -r a297b7ad6f94 -r 53a3d5ba3ad9 src/http/ngx_http_spdy_filter_module.c
      return NGX_OK;
  }
 diff -r a297b7ad6f94 -r 53a3d5ba3ad9 src/http/ngx_http_spdy_module.c
---- a/src/http/ngx_http_spdy_module.c Fri Dec 20 16:18:25 2013 +0400
-+++ b/src/http/ngx_http_spdy_module.c Sun Dec 22 20:43:37 2013 +0800
+--- sources/1.5.9/nginx-1.5.9/src/http/ngx_http_spdy_module.c Fri Dec 20 16:18:25 2013 +0400
++++ workspace/http/ngx_http_spdy_module.c Sun Dec 22 20:43:37 2013 +0800
 @@ -45,6 +45,12 @@
  static ngx_conf_post_t  ngx_http_spdy_streams_index_mask_post =
      { ngx_http_spdy_streams_index_mask };
@@ -1280,8 +1280,8 @@ diff -r a297b7ad6f94 -r 53a3d5ba3ad9 src/http/ngx_http_spdy_module.c
  }
 
 diff -r a297b7ad6f94 -r 53a3d5ba3ad9 src/http/ngx_http_spdy_module.h
---- a/src/http/ngx_http_spdy_module.h Fri Dec 20 16:18:25 2013 +0400
-+++ b/src/http/ngx_http_spdy_module.h Sun Dec 22 20:43:37 2013 +0800
+--- sources/1.5.9/nginx-1.5.9/src/http/ngx_http_spdy_module.h Fri Dec 20 16:18:25 2013 +0400
++++ workspace/http/ngx_http_spdy_module.h Sun Dec 22 20:43:37 2013 +0800
 @@ -27,6 +27,9 @@
      ngx_msec_t                      recv_timeout;
      ngx_msec_t                      keepalive_timeout;
@@ -1294,7 +1294,7 @@ diff -r a297b7ad6f94 -r 53a3d5ba3ad9 src/http/ngx_http_spdy_module.h
 
 diff -r a297b7ad6f94 -r 53a3d5ba3ad9 src/http/ngx_http_spdy_v3.c
 --- /dev/null Thu Jan 01 00:00:00 1970 +0000
-+++ b/src/http/ngx_http_spdy_v3.c Sun Dec 22 20:43:37 2013 +0800
++++ workspace/http/ngx_http_spdy_v3.c Sun Dec 22 20:43:37 2013 +0800
 @@ -0,0 +1,3297 @@
 +
 +/*

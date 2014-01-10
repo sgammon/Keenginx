@@ -1,6 +1,6 @@
 ## == KEEN NGINX: makefile == ##
 
-## dependencies: gperf unzip subversion build-essential tar pod2pdf groff
+## dependencies: gperf unzip subversion build-essential tar pod2pdf groff xsltproc libxml2-utils
 
 ##### Configuration
 
@@ -10,6 +10,7 @@ WORKSPACE ?= trunk
 PROJECT ?= $(shell pwd)
 
 # nginx config
+trunk ?= 1.5.9
 stable ?= 1.4.3
 latest ?= 1.5.8
 
@@ -371,7 +372,17 @@ sources/$(WORKSPACE):
 	@ln -s $(CURRENT)/ sources/$(WORKSPACE)
 
 	@echo "Cloning Nginx sources..."
-	@hg clone http://hg.nginx.org/nginx sources/$(CURRENT)
+	@hg clone http://hg.nginx.org/nginx sources/$(CURRENT)-tmp
+
+	@echo "Building Nginx release metapackage..."
+	@pushd sources/$(CURRENT)-tmp; \
+		@make -f misc/GNUmakefile release; \
+		@mv ./tmp/nginx-$(trunk) ../trunk; \
+		@popd;
+
+	@echo "Removing cloned Nginx sources..."
+	@rm -fr sources/$(CURRENT)-tmp
+
 endif
 
 
@@ -484,10 +495,10 @@ build_nginx:
 
 clean_nginx:
 	@echo "Cleaning Nginx..."
-	@-cd sources/$(CURRENT)/nginx-$(CURRENT); \
-		make clean; \
-		rm -f modules/; \
-		cd ../../../;
+	@-make -f sources/$(CURRENT)/nginx-$(CURRENT)/Makefile clean;
+
+	@echo "Cleaning modules..."
+	@-rm -fr modules/
 
 configure_nginx:
 	@echo "Configuring Nginx..."

@@ -337,6 +337,7 @@ workspace/.$(WORKSPACE): sources/$(WORKSPACE)
 	@cp -fr sources/$(CURRENT)/nginx-$(trunk)/src/* workspace/
 	@touch workspace/.$(WORKSPACE)
 	@echo "Workspace ready."
+endif
 
 
 #### ==== PATCH APPLICATION ==== ####

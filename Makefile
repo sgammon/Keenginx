@@ -322,11 +322,21 @@ dependencies: dependencies/pcre dependencies/zlib dependencies/openssl dependenc
 #### ==== WORKSPACE RULES ==== ####
 workspace: workspace/.$(WORKSPACE)
 
+ifneq ($(WORKSPACE),trunk)
 workspace/.$(WORKSPACE): sources/$(WORKSPACE)
 	@echo "Setting workspace to '$(WORKSPACE)'..."
 	@mkdir -p workspace/
 	@cp -fr sources/$(CURRENT)/nginx-$(CURRENT)/src/* workspace/
 	@touch workspace/.$(WORKSPACE)
+endif
+ifeq ($(WORKSPACE,trunk))
+workspace/.$(WORKSPACE): sources/$(WORKSPACE)
+	@echo "Setting workspace to latest trunk..."
+	@mkdir -p workspace/
+	@echo "Copying sources..."
+	@cp -fr sources/$(CURRENT)/nginx-$(trunk)/src/* workspace/
+	@touch workspace/.$(WORKSPACE)
+	@echo "Workspace ready."
 
 
 #### ==== PATCH APPLICATION ==== ####

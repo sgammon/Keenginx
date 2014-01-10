@@ -377,10 +377,10 @@ sources/$(WORKSPACE):
 	@hg clone http://hg.nginx.org/nginx sources/$(CURRENT)-tmp
 
 	@echo "Building Nginx release metapackage..."
-	@pushd sources/$(CURRENT)-tmp; \
+	@cd sources/$(CURRENT)-tmp; \
 		make -f misc/GNUmakefile release; \
 		mv ./tmp/nginx-$(trunk) ../trunk; \
-		popd;
+		cd ..;
 
 	@echo "Removing cloned Nginx sources..."
 	@rm -fr sources/$(CURRENT)-tmp

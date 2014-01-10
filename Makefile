@@ -329,7 +329,7 @@ workspace/.$(WORKSPACE): sources/$(WORKSPACE)
 	@cp -fr sources/$(CURRENT)/nginx-$(CURRENT)/src/* workspace/
 	@touch workspace/.$(WORKSPACE)
 endif
-ifeq ($(WORKSPACE,trunk))
+ifeq ($(WORKSPACE),trunk)
 workspace/.$(WORKSPACE): sources/$(WORKSPACE)
 	@echo "Setting workspace to latest trunk..."
 	@mkdir -p workspace/
@@ -337,6 +337,7 @@ workspace/.$(WORKSPACE): sources/$(WORKSPACE)
 	@cp -fr sources/$(CURRENT)/nginx-$(trunk)/src/* workspace/
 	@touch workspace/.$(WORKSPACE)
 	@echo "Workspace ready."
+endif
 
 
 #### ==== PATCH APPLICATION ==== ####

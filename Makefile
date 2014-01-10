@@ -6,7 +6,7 @@
 
 DEBUG ?= 1
 STAMP = 1.5x70-alpha6
-WORKSPACE ?= latest
+WORKSPACE ?= trunk
 PROJECT ?= $(shell pwd)
 
 # nginx config
@@ -106,7 +106,12 @@ endif
 ##### Runtime
 OSNAME := `uname`
 PATCH ?= omnibus
+ifeq ($(WORKSPACE),trunk)
+CURRENT := $(WORKSPACE)
+endif
+ifneq ($(WORKSPACE),trunk)
 CURRENT := $($(WORKSPACE))
+endif
 
 # flags for mac os x
 ifeq ($(OSNAME),Darwin)
@@ -346,6 +351,7 @@ patch_pagespeed: $(_pagespeed_patches)
 endif
 
 #### ==== NGINX SOURCES ==== ####
+ifneq ($(WORKSPACE),trunk)
 sources/$(WORKSPACE):
 	@echo "Preparing Nginx $(WORKSPACE)..."
 	@mkdir -p sources/$(CURRENT)
@@ -357,6 +363,16 @@ sources/$(WORKSPACE):
 	@echo "Extracting Nginx $(CURRENT)..."
 	@tar -xvf nginx-$(CURRENT).tar.gz
 	@mv nginx-$(CURRENT).tar.gz nginx-$(CURRENT) sources/$(CURRENT)
+endif
+ifeq ($(WORKSPACE),trunk)
+sources/$(WORKSPACE):
+	@echo "Preparing Nginx trunk..."
+	@mkdir -p sources/$(CURRENT)
+	@ln -s $(CURRENT)/ sources/$(WORKSPACE)
+
+	@echo "Cloning Nginx sources..."
+	@hg clone http://hg.nginx.org/nginx sources/$(CURRENT)
+endif
 
 
 #### ==== NGINX DEPENDENCIES ==== ####

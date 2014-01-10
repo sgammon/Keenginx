@@ -306,6 +306,8 @@ distclean: clean
 	@rm -fr sources/
 	@echo "Resetting codebase..."
 	@git reset --hard
+	@echo "Cleaning files..."
+	@git clean -xdf
 
 sources: dependencies
 	@echo "Finished acquiring sources."
@@ -376,9 +378,9 @@ sources/$(WORKSPACE):
 
 	@echo "Building Nginx release metapackage..."
 	@pushd sources/$(CURRENT)-tmp; \
-		@make -f misc/GNUmakefile release; \
-		@mv ./tmp/nginx-$(trunk) ../trunk; \
-		@popd;
+		make -f misc/GNUmakefile release; \
+		mv ./tmp/nginx-$(trunk) ../trunk; \
+		popd;
 
 	@echo "Removing cloned Nginx sources..."
 	@rm -fr sources/$(CURRENT)-tmp

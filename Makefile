@@ -396,6 +396,9 @@ sources/$(WORKSPACE):
 	@echo "Removing cloned Nginx sources..."
 	@rm -fr sources/$(CURRENT)-tmp
 
+	@echo "Symlinking proper versions..."
+	@ln -s sources/$(CURRENT) sources/nginx-$(trunk)
+
 endif
 
 

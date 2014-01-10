@@ -107,12 +107,7 @@ endif
 ##### Runtime
 OSNAME := `uname`
 PATCH ?= omnibus
-ifeq ($(WORKSPACE),trunk)
-CURRENT := $(WORKSPACE)
-endif
-ifneq ($(WORKSPACE),trunk)
 CURRENT := $($(WORKSPACE))
-endif
 
 # flags for mac os x
 ifeq ($(OSNAME),Darwin)
@@ -322,22 +317,11 @@ dependencies: dependencies/pcre dependencies/zlib dependencies/openssl dependenc
 #### ==== WORKSPACE RULES ==== ####
 workspace: workspace/.$(WORKSPACE)
 
-ifneq ($(WORKSPACE),trunk)
 workspace/.$(WORKSPACE): sources/$(WORKSPACE)
 	@echo "Setting workspace to '$(WORKSPACE)'..."
 	@mkdir -p workspace/
 	@cp -fr sources/$(CURRENT)/nginx-$(CURRENT)/src/* workspace/
 	@touch workspace/.$(WORKSPACE)
-endif
-ifeq ($(WORKSPACE),trunk)
-workspace/.$(WORKSPACE): sources/$(WORKSPACE)
-	@echo "Setting workspace to latest trunk..."
-	@mkdir -p workspace/
-	@echo "Copying sources..."
-	@cp -fr sources/$(CURRENT)/nginx-$(trunk)/src/* workspace/
-	@touch workspace/.$(WORKSPACE)
-	@echo "Workspace ready."
-endif
 
 
 #### ==== PATCH APPLICATION ==== ####
@@ -385,20 +369,13 @@ sources/$(WORKSPACE):
 	@ln -s $(CURRENT)/ sources/$(WORKSPACE)
 
 	@echo "Cloning Nginx sources..."
-	@hg clone http://hg.nginx.org/nginx sources/$(CURRENT)-tmp
+	@hg clone http://hg.nginx.org/nginx sources/$(CURRENT)/master
 
 	@echo "Building Nginx release metapackage..."
-	@cd sources/$(CURRENT)-tmp; \
+	@cd sources/$(CURRENT)/master; \
 		make -f misc/GNUmakefile release; \
-		mv ./tmp/nginx-$(trunk) ../trunk; \
+		mv ./tmp/nginx-$(trunk) ../; \
 		cd ..;
-
-	@echo "Removing cloned Nginx sources..."
-	@rm -fr sources/$(CURRENT)-tmp
-
-	@echo "Symlinking proper versions..."
-	@ln -s sources/$(CURRENT) sources/nginx-$(trunk)
-
 endif
 
 

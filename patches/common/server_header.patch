@@ -1,10 +1,13 @@
---- sources/1.5.9/nginx-1.5.9/src/http/ngx_http_header_filter_module.c	2014-01-11 14:08:31.275796975 -0800
-+++ workspace/src/http/ngx_http_header_filter_module.c	2014-01-11 14:10:52.144580831 -0800
-@@ -50,7 +50,6 @@
- static char ngx_http_server_full_string[] = "Server: Keen/K9/" NGINX_VER CRLF;
+--- sources/1.5.9/nginx-1.5.9/src/http/ngx_http_header_filter_module.c	2014-01-11 14:18:06.202682011 -0800
++++ workspace/src/http/ngx_http_header_filter_module.c	2014-01-11 14:18:52.205633783 -0800
+@@ -46,8 +46,8 @@
+ };
  
  
--
+-static char ngx_http_server_string[] = "Server: nginx" CRLF;
+-static char ngx_http_server_full_string[] = "Server: " NGINX_VER CRLF;
++static char ngx_http_server_string[] = "Server: K9/" CRLF;
++static char ngx_http_server_full_string[] = "Server: Keen/K9/" NGINX_VER CRLF;
+ 
+ 
  static ngx_str_t ngx_http_status_lines[] = {
- 
-     ngx_string("200 OK"),

@@ -259,7 +259,7 @@ diff -r a297b7ad6f94 -r 53a3d5ba3ad9 src/http/ngx_http_spdy.h
 +    ngx_int_t                        init_send_window_size;
 +    ngx_int_t                        init_recv_window_size;
 +
-     unsigned                         blocked:2;
+     unsigned                         blocked:1;
      unsigned                         waiting:1; /* FIXME better name */
 +    unsigned                         need_settings:1;
  };

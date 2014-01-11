@@ -271,6 +271,8 @@ release:
 
 build:
 	@echo "Compiling Nginx $(CURRENT)..."
+	@echo "Copying custom sources..."
+	@cp -fr workspace/ sources/$(CURRENT)/nginx-$(CURRENT)/
 	make configure_nginx;
 	make build_nginx;
 	@echo "Creating directories..."

@@ -13,7 +13,7 @@ This patch were developed by Liangbing Li And Xiaochen Wang
 
 diff -r a297b7ad6f94 -r 53a3d5ba3ad9 auto/sources
 --- sources/1.5.9/nginx-1.5.9/auto/sources  Fri Dec 20 16:18:25 2013 +0400
-+++ sources/1.5.9/nginx-1.5.9/auto/sources  Sun Dec 22 20:43:37 2013 +0800
++++ workspace/auto/sources  Sun Dec 22 20:43:37 2013 +0800
 @@ -330,7 +330,8 @@
                  src/http/ngx_http_spdy_module.h"
  HTTP_SPDY_SRCS="src/http/ngx_http_spdy.c \

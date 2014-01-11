@@ -179,13 +179,12 @@ _nginx_config_mainflags := --user=$(NGINX_USER) \
 						   --group=$(NGINX_GROUP) \
 						   --with-file-aio \
 						   --with-ipv6 \
-						   --with-poll_module \
 						   --with-rtsig_module \
+						   --without-poll_module \
 						   --without-select_module \
 						   --with-http_gunzip_module \
 						   --with-http_stub_status_module \
 						   --with-http_gzip_static_module \
-						   --with-http_secure_link_module \
 						   --with-md5-asm \
 						   --with-sha1-asm \
 						   --without-http_ssi_module \
@@ -217,7 +216,6 @@ seal:
 
 package: build
 	@echo "Packaging build..."
-	make install_nginx;
 	@mv sources/$(CURRENT)/nginx-$(CURRENT) ./nginx-$(STAMP)/;
 	#@mv pagespeed/ nginx-$(CURRENT)/pagespeed
 
@@ -272,7 +270,7 @@ release:
 build: patch
 	@echo "Compiling Nginx $(CURRENT)..."
 	@echo "Copying custom sources..."
-	@cp -fr workspace/ sources/$(CURRENT)/nginx-$(CURRENT)/
+	@cp -fr workspace/* sources/$(CURRENT)/nginx-$(CURRENT)/
 	make configure_nginx;
 	make build_nginx;
 	@echo "Creating directories..."
@@ -339,19 +337,19 @@ workspace/.$(WORKSPACE): sources/$(WORKSPACE)
 #### ==== PATCH APPLICATION ==== ####
 patch_common: $(_common_patches)
 	@echo "Applying patch " $^ "..."
-	patch -N -p0 < $^
+	-patch -N -p0 < $^
 	@echo "Patch done."
 
 patch_$(CURRENT): $(_current_patches)
 	@echo "Applying patch " $^ "..."
-	patch -N -p0 < $^
+	-patch -N -p0 < $^
 	@echo "Patch done."
 
 ifeq ($(PAGESPEED),1)
 patch_pagespeed: $(_pagespeed_patches)
 	@echo "Applying patch " $^ "..."
 	-@cd modules/pagespeed/$(PAGESPEED_VERSION); \
-		patch -N -p1 < ../../../$^; \
+		-patch -N -p1 < ../../../$^; \
 		cd ../../../;
 	@echo "Patch done."
 endif

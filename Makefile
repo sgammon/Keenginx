@@ -330,8 +330,7 @@ workspace: workspace/.$(WORKSPACE)
 workspace/.$(WORKSPACE): sources/$(WORKSPACE)
 	@echo "Setting workspace to '$(WORKSPACE)'..."
 	@mkdir -p workspace/
-	@cp -fr sources/$(CURRENT)/nginx-$(CURRENT)/src/* workspace/
-	@ln -s sources/$(CURRENT)/nginx-$(CURRENT)/auto/ workspace/auto
+	@cp -fr sources/$(CURRENT)/nginx-$(CURRENT)/* workspace/
 	@touch workspace/.$(WORKSPACE)
 
 

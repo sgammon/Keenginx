@@ -269,7 +269,7 @@ release:
 	@echo ""
 	@echo "!!!!!!!!!! DONE :) !!!!!!!!!!"
 
-build: patch
+build:
 	@echo "Compiling Nginx $(CURRENT)..."
 	make configure_nginx;
 	make build_nginx;
@@ -277,11 +277,21 @@ build: patch
 	@mkdir -p build/cache/nginx/client build/cache/nginx/proxy
 	@echo "Finished building Nginx $(CURRENT)."
 
+ifneq ($(WORKSPACE),trunk)
 patch: sources patch_common patch_$(CURRENT) $(PATCH_PAGESPEED)
 	@echo "Patching complete."
 	@echo "Applied patches:"
 	@echo "  -- Common: " $(_common_patches)
 	@echo "  -- Specific:" $(_current_patches)
+endif
+ifeq ($(WORKSPACE),trunk)
+patch: sources patch_common patch_$(CURRENT) $(PATCH_PAGESPEED)
+	@echo "Building Nginx release metapackage..."
+	@cd sources/$(CURRENT)/master; \
+		make -f misc/GNUmakefile release; \
+		cp -fr ./tmp/nginx-$(trunk) ../; \
+		cd ..;
+endif
 
 clean: clean_nginx
 	@echo "Cleaning..."
@@ -321,6 +331,7 @@ workspace/.$(WORKSPACE): sources/$(WORKSPACE)
 	@echo "Setting workspace to '$(WORKSPACE)'..."
 	@mkdir -p workspace/
 	@cp -fr sources/$(CURRENT)/nginx-$(CURRENT)/src/* workspace/
+	@ln -s sources/$(CURRENT)/nginx-$(CURRENT)/auto/ workspace/auto
 	@touch workspace/.$(WORKSPACE)
 
 
@@ -374,8 +385,9 @@ sources/$(WORKSPACE):
 	@echo "Building Nginx release metapackage..."
 	@cd sources/$(CURRENT)/master; \
 		make -f misc/GNUmakefile release; \
-		mv ./tmp/nginx-$(trunk) ../; \
+		cp -fr ./tmp/nginx-$(trunk) ../; \
 		cd ..;
+
 endif
 
 

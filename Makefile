@@ -338,14 +338,14 @@ workspace/.$(WORKSPACE): sources/$(WORKSPACE)
 patch_common: $(_common_patches)
 	@echo "Applying patch " $^ "..."
 	-@cd sources/$(CURRENT)/nginx-$(CURRENT); \
-		patch -N -p1 < ../../../../$^; \
+		patch -N -p1 < ../../../$^; \
 		cd ../../../../;
 	@echo "Patch done."
 
 patch_$(CURRENT): $(_current_patches)
 	@echo "Applying patch " $^ "..."
 	-@cd sources/$(CURRENT)/nginx-$(CURRENT); \
-		patch -N -p1 < ../../../../$^; \
+		patch -N -p1 < ../../../$^; \
 		cd ../../../../;
 	@echo "Patch done."
 

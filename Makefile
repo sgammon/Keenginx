@@ -337,16 +337,12 @@ workspace/.$(WORKSPACE): sources/$(WORKSPACE)
 #### ==== PATCH APPLICATION ==== ####
 patch_common: $(_common_patches)
 	@echo "Applying patch " $^ "..."
-	-@cd sources/$(CURRENT)/nginx-$(CURRENT); \
-		patch -N -p0 < ../../../$^; \
-		cd ../../../../;
+	patch -N -p0 < $^
 	@echo "Patch done."
 
 patch_$(CURRENT): $(_current_patches)
 	@echo "Applying patch " $^ "..."
-	-@cd sources/$(CURRENT)/nginx-$(CURRENT); \
-		patch -N -p1 < ../../../$^; \
-		cd ../../../../;
+	patch -N -p0 < $^
 	@echo "Patch done."
 
 ifeq ($(PAGESPEED),1)

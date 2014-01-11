@@ -1,29 +1,10 @@
-diff -Naurdw sources/1.5.9/nginx-1.5.9/src/http/ngx_http_header_filter_module.c workspace/http/ngx_http_header_filter_module.c
---- sources/1.5.9/nginx-1.5.9/src/http/ngx_http_header_filter_module.c  2013-12-19 12:58:06.417737113 -0800
-+++ workspace/http/ngx_http_header_filter_module.c  2013-12-19 12:51:08.411144693 -0800
-@@ -46,8 +46,9 @@
- };
-
-
--static char ngx_http_server_string[] = "Server: nginx" CRLF;
--static char ngx_http_server_full_string[] = "Server: " NGINX_VER CRLF;
-+static char ngx_http_server_string[] = "Server: K9/" CRLF;
-+static char ngx_http_server_full_string[] = "Server: Keen/K9/" NGINX_VER CRLF;
-+
-
+--- sources/1.5.9/nginx-1.5.9/src/http/ngx_http_header_filter_module.c	2014-01-11 14:08:31.275796975 -0800
++++ workspace/src/http/ngx_http_header_filter_module.c	2014-01-11 14:10:52.144580831 -0800
+@@ -50,7 +50,6 @@
+ static char ngx_http_server_full_string[] = "Server: Keen/K9/" NGINX_VER CRLF;
+ 
+ 
+-
  static ngx_str_t ngx_http_status_lines[] = {
-
-diff -Naurdw sources/1.5.9/nginx-1.5.9/src/core/nginx.h workspace/core/nginx.h
---- sources/1.5.9/nginx-1.5.9/src/core/nginx.h  2013-11-19 02:03:48.000000000 -0800
-+++ workspace/core/nginx.h  2013-12-19 12:50:36.863147211 -0800
-@@ -10,8 +10,8 @@
-
-
- #define nginx_version      1005009
--#define NGINX_VERSION      "1.5.8"
--#define NGINX_VER          "nginx/" NGINX_VERSION
-+#define NGINX_VERSION      "1.5x70-alpha6"
-+#define NGINX_VER          NGINX_VERSION
-
- #define NGINX_VAR          "NGINX"
- #define NGX_OLDPID_EXT     ".oldbin"
+ 
+     ngx_string("200 OK"),

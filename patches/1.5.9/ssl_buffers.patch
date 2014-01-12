@@ -1,0 +1,121 @@
+diff --git sources/1.5.9/nginx-1.5.9/src/event/ngx_event_openssl.c workspace/src/event/ngx_event_openssl.c
+--- sources/1.5.9/nginx-1.5.9/src/event/ngx_event_openssl.c
++++ workspace/src/event/ngx_event_openssl.c
+@@ -190,6 +190,8 @@ ngx_ssl_create(ngx_ssl_t *ssl, ngx_uint_
+return NGX_ERROR;
+}
+
++ ssl->buffer_size = NGX_SSL_BUFSIZE;
++
+/* client side options */
+
+SSL_CTX_set_options(ssl->ctx, SSL_OP_MICROSOFT_SESS_ID_BUG);
+@@ -726,6 +728,7 @@ ngx_ssl_create_connection(ngx_ssl_t *ssl
+}
+
+sc->buffer = ((flags & NGX_SSL_BUFFER) != 0);
++ sc->buffer_size = ssl->buffer_size;
+
+sc->connection = SSL_new(ssl->ctx);
+
+@@ -1222,7 +1225,7 @@ ngx_ssl_send_chain(ngx_connection_t *c,
+buf = c->ssl->buf;
+
+if (buf == NULL) {
+- buf = ngx_create_temp_buf(c->pool, NGX_SSL_BUFSIZE);
++ buf = ngx_create_temp_buf(c->pool, c->ssl->buffer_size);
+if (buf == NULL) {
+return NGX_CHAIN_ERROR;
+}
+@@ -1231,14 +1234,14 @@ ngx_ssl_send_chain(ngx_connection_t *c,
+}
+
+if (buf->start == NULL) {
+- buf->start = ngx_palloc(c->pool, NGX_SSL_BUFSIZE);
++ buf->start = ngx_palloc(c->pool, c->ssl->buffer_size);
+if (buf->start == NULL) {
+return NGX_CHAIN_ERROR;
+}
+
+buf->pos = buf->start;
+buf->last = buf->start;
+- buf->end = buf->start + NGX_SSL_BUFSIZE;
++ buf->end = buf->start + c->ssl->buffer_size;
+}
+
+send = buf->last - buf->pos;
+diff --git sources/1.5.9/nginx-1.5.9/src/event/ngx_event_openssl.h workspace/src/event/ngx_event_openssl.h
+--- sources/1.5.9/nginx-1.5.9/src/event/ngx_event_openssl.h
++++ workspace/src/event/ngx_event_openssl.h
+@@ -29,6 +29,7 @@
+typedef struct {
+SSL_CTX *ctx;
+ngx_log_t *log;
++ size_t buffer_size;
+} ngx_ssl_t;
+
+
+@@ -37,6 +38,7 @@ typedef struct {
+
+ngx_int_t last;
+ngx_buf_t *buf;
++ size_t buffer_size;
+
+ngx_connection_handler_pt handler;
+
+diff --git sources/1.5.9/nginx-1.5.9/src/http/modules/ngx_http_ssl_module.c workspace/src/http/modules/ngx_http_ssl_module.c
+--- sources/1.5.9/nginx-1.5.9/src/http/modules/ngx_http_ssl_module.c
++++ workspace/src/http/modules/ngx_http_ssl_module.c
+@@ -111,6 +111,13 @@ static ngx_command_t ngx_http_ssl_comma
+offsetof(ngx_http_ssl_srv_conf_t, ciphers),
+NULL },
+
++ { ngx_string("ssl_buffer_size"),
++ NGX_HTTP_MAIN_CONF|NGX_HTTP_SRV_CONF|NGX_CONF_TAKE1,
++ ngx_conf_set_size_slot,
++ NGX_HTTP_SRV_CONF_OFFSET,
++ offsetof(ngx_http_ssl_srv_conf_t, buffer_size),
++ NULL },
++
+{ ngx_string("ssl_verify_client"),
+NGX_HTTP_MAIN_CONF|NGX_HTTP_SRV_CONF|NGX_CONF_TAKE1,
+ngx_conf_set_enum_slot,
+@@ -424,6 +431,7 @@ ngx_http_ssl_create_srv_conf(ngx_conf_t
+
+sscf->enable = NGX_CONF_UNSET;
+sscf->prefer_server_ciphers = NGX_CONF_UNSET;
++ sscf->buffer_size = NGX_CONF_UNSET_SIZE;
+sscf->verify = NGX_CONF_UNSET_UINT;
+sscf->verify_depth = NGX_CONF_UNSET_UINT;
+sscf->builtin_session_cache = NGX_CONF_UNSET;
+@@ -465,6 +473,9 @@ ngx_http_ssl_merge_srv_conf(ngx_conf_t *
+(NGX_CONF_BITMASK_SET|NGX_SSL_SSLv3|NGX_SSL_TLSv1
+|NGX_SSL_TLSv1_1|NGX_SSL_TLSv1_2));
+
++ ngx_conf_merge_size_value(conf->buffer_size, prev->buffer_size,
++ NGX_SSL_BUFSIZE);
++
+ngx_conf_merge_uint_value(conf->verify, prev->verify, 0);
+ngx_conf_merge_uint_value(conf->verify_depth, prev->verify_depth, 1);
+
+@@ -572,6 +583,8 @@ ngx_http_ssl_merge_srv_conf(ngx_conf_t *
+return NGX_CONF_ERROR;
+}
+
++ conf->ssl.buffer_size = conf->buffer_size;
++
+if (conf->verify) {
+
+if (conf->client_certificate.len == 0 && conf->verify != 3) {
+diff --git sources/1.5.9/nginx-1.5.9/src/http/modules/ngx_http_ssl_module.h workspace/src/http/modules/ngx_http_ssl_module.h
+--- sources/1.5.9/nginx-1.5.9/src/http/modules/ngx_http_ssl_module.h
++++ workspace/src/http/modules/ngx_http_ssl_module.h
+@@ -26,6 +26,8 @@ typedef struct {
+ngx_uint_t verify;
+ngx_uint_t verify_depth;
+
++ size_t buffer_size;
++
+ssize_t builtin_session_cache;
+
+time_t session_timeout;

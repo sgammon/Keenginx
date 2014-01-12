@@ -5,7 +5,7 @@
 ##### Configuration
 
 DEBUG ?= 1
-STAMP = 1.5x70-alpha6
+STAMP = 1.5x70-alpha7
 WORKSPACE ?= trunk
 PROJECT ?= $(shell pwd)
 
@@ -30,7 +30,7 @@ ZLIB_VERSION ?= 1.2.7
 
 # openssl config
 OPENSSL ?= 1
-OPENSSL_VERSION ?= 1.0.1e
+OPENSSL_VERSION ?= 1.0.1f
 
 # libatomic config
 LIBATOMIC ?= 1
@@ -337,12 +337,12 @@ workspace/.$(WORKSPACE): sources/$(WORKSPACE)
 #### ==== PATCH APPLICATION ==== ####
 patch_common: $(_common_patches)
 	@echo "Applying patch " $^ "..."
-	-patch -N -p0 < $^
+	-patch -N -p0 < $(cat $^)
 	@echo "Patch done."
 
 patch_$(CURRENT): $(_current_patches)
 	@echo "Applying patch " $^ "..."
-	-patch -N -p0 < $^
+	-patch -N -p0 < $(cat $^)
 	@echo "Patch done."
 
 ifeq ($(PAGESPEED),1)

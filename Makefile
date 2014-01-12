@@ -337,12 +337,12 @@ workspace/.$(WORKSPACE): sources/$(WORKSPACE)
 #### ==== PATCH APPLICATION ==== ####
 patch_common: $(_common_patches)
 	@echo "Applying patch " $^ "..."
-	-patch -N -p0 < $(cat $^)
+	-patch -N -p0 < `cat $^`
 	@echo "Patch done."
 
 patch_$(CURRENT): $(_current_patches)
 	@echo "Applying patch " $^ "..."
-	-patch -N -p0 < $(cat $^)
+	-patch -N -p0 < `cat $^`
 	@echo "Patch done."
 
 ifeq ($(PAGESPEED),1)

@@ -237,9 +237,9 @@ release:
 	@echo "--debug with no pagespeed"
 	@echo "--debug with pagespeed"
 	@echo ""
-	@echo "Waiting for 30..."
+	@echo "Wait 5..."
 	@echo ""
-	@sleep 30
+	@sleep 5
 
 	@echo ""
 	@echo "!!!!! Building production Keenginx WITHOUT pagespeed. !!!!!"

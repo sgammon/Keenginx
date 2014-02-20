@@ -5,19 +5,19 @@
 ##### Configuration
 
 DEBUG ?= 1
-STAMP = 1.5x70-alpha7
+STAMP = 1.5x80-alpha8
 WORKSPACE ?= trunk
 PROJECT ?= $(shell pwd)
 
 # nginx config
-trunk ?= 1.5.9
+trunk ?= 1.5.10
 stable ?= 1.4.3
 latest ?= 1.5.8
 
 # pagespeed config
 PAGESPEED ?= 0
-PSOL_VERSION ?= 1.7.30.2
-PAGESPEED_VERSION ?= 1.7.30.2-beta
+PSOL_VERSION ?= 1.7.30.3
+PAGESPEED_VERSION ?= 1.7.30.3-beta
 PAGESPEED_EXTRA_ENV ?=
 
 # pcre config

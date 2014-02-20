@@ -10,7 +10,7 @@ WORKSPACE ?= trunk
 PROJECT ?= $(shell pwd)
 
 # nginx config
-trunk ?= 1.5.10
+trunk ?= 1.5.11
 stable ?= 1.4.3
 latest ?= 1.5.8
 

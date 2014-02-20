@@ -32,7 +32,7 @@ ZLIB_VERSION ?= 1.2.7
 OPENSSL ?= 1
 OPENSSL_TRUNK ?= 0
 OPENSSL_VERSION ?= 1.0.1f
-OPENSSL_SNAPSHOT ?= openssl-1.0.2-stable-SNAP-20140220.tar.gz
+OPENSSL_SNAPSHOT ?= openssl-1.0.2-stable-SNAP-20140220
 
 # libatomic config
 LIBATOMIC ?= 1
@@ -425,7 +425,7 @@ else
 dependencies/openssl:
 	@echo "Fetching OpenSSL from snapshot..."
 	@mkdir -p dependencies/openssl/$(OPENSSL_SNAPSHOT)
-	@curl --progress-bar ftp://ftp.openssl.org/snapshot/openssl-1.0.2-stable-SNAP-20140220.tar.gz > openssl-$(OPENSSL_SNAPSHOT)
+	@curl --progress-bar ftp://ftp.openssl.org/snapshot/$(OPENSSL_SNAPSHOT).tar.gz > openssl-$(OPENSSL_SNAPSHOT)
 
 	@echo "Extracting OpenSSL..."
 	@tar -xvf $(OPENSSL_SNAPSHOT).tar.gz

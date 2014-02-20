@@ -425,7 +425,7 @@ else
 dependencies/openssl:
 	@echo "Fetching OpenSSL from snapshot..."
 	@mkdir -p dependencies/openssl/$(OPENSSL_SNAPSHOT)
-	@curl --progress-bar ftp://ftp.openssl.org/snapshot/$(OPENSSL_SNAPSHOT).tar.gz > openssl-$(OPENSSL_SNAPSHOT)
+	@curl --progress-bar ftp://ftp.openssl.org/snapshot/$(OPENSSL_SNAPSHOT).tar.gz > $(OPENSSL_SNAPSHOT).tar.gz
 
 	@echo "Extracting OpenSSL..."
 	@tar -xvf $(OPENSSL_SNAPSHOT).tar.gz

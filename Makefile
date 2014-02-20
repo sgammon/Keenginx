@@ -9,10 +9,13 @@ STAMP = 1.5x80-alpha8
 WORKSPACE ?= trunk
 PROJECT ?= $(shell pwd)
 
-# nginx config
+# nginx versioning
 trunk ?= 1.5.11
 stable ?= 1.4.3
 latest ?= 1.5.8
+
+# nginx config
+STATIC ?= 1
 
 # pagespeed config
 PAGESPEED ?= 0
@@ -39,6 +42,7 @@ LIBATOMIC ?= 1
 
 
 ##### Nginx Configuration
+BUILDROOT ?= $(PWD)/build
 NGINX_BASEPATH ?= opt/keenginx-$(STAMP)
 NGINX_CONFPATH ?= etc/nginx/nginx.conf
 NGINX_LOCKPATH ?= tmp/nginx.lock
@@ -59,6 +63,12 @@ ifeq ($(PAGESPEED),1)
 TARSTAMP:=$(STAMP)-ps-debug
 else
 TARSTAMP:=$(STAMP)-debug
+endif
+
+ifeq ($(STATIC),1)
+LDFLAGS?=-static
+else
+LDFLAGS?=
 endif
 
 else
@@ -90,7 +100,7 @@ NGINX_ENV += $(PAGESPEED_ENV)
 
 # configure vars
 _nginx_debug_cpuflags = -g -O0
-_nginx_release_cpuflags = -O3 -mtune=native -march=native -m64 -fomit-frame-pointer -fno-exceptions -fno-strict-aliasing
+_nginx_release_cpuflags = -O3 -mtune=native -march=native -m64 -fomit-frame-pointer -fno-exceptions -fno-strict-aliasing -felide-constructors -fno-implicit-templates
 
 # openssl flags
 _openssl_flags:=-DOPENSSL_EC_NISTP_64_GCC_128 -DOPENSSL_RC5
@@ -401,6 +411,14 @@ dependencies/pcre:
 	@mv pcre-$(PCRE_VERSION)/ pcre-$(PCRE_VERSION).tar.gz dependencies/pcre/$(PCRE_VERSION)/
 	@ln -s $(PCRE_VERSION)/pcre-$(PCRE_VERSION) dependencies/pcre/latest
 
+	@echo "Preparing PCRE..."
+	@mkdir -p $(BUILDROOT)/dependencies/pcre;
+	@-cd dependencies/pcre/latest; CFLAGS="$(_nginx_gccflags)" ./configure \
+		--disable-option-checking --disable-dependency-tracking \
+		--enable-shared=no --enable-static=yes --enable-jit --enable-utf \
+		--enable-unicode-properties --enable-newline-is-any --disable-valgrind \
+		--disable-coverage CFLAGS="$(_nginx_gccflags)" CXXFLAGS="$(_nginx_gccflags)";
+
 dependencies/zlib:
 	@echo "Fetching Zlib..."
 	@mkdir -p dependencies/zlib/$(ZLIB_VERSION)
@@ -410,6 +428,13 @@ dependencies/zlib:
 	@tar -xvf zlib-$(ZLIB_VERSION).tar.gz
 	@mv zlib-$(ZLIB_VERSION)/ zlib-$(ZLIB_VERSION).tar.gz dependencies/zlib/$(ZLIB_VERSION)/
 	@ln -s $(ZLIB_VERSION)/zlib-$(ZLIB_VERSION) dependencies/zlib/latest
+
+	@echo "Preparing Zlib ASM..."
+	@mkdir -p $(BUILDROOT)/dependencies/zlib
+	@-cd dependencies/zlib/latest; cp contrib/amd64/amd64-match.S match.S; \
+		CFLAGS="$(_nginx_gccflags) -DASMV" ./configure; \
+		make -j 4 OBJA=match.o libz.a; \
+		cp -Lp *.a *.h *.o $(BUILDROOT)/dependencies/zlib/;
 
 ifeq ($(OPENSSL_TRUNK),0)
 dependencies/openssl:
@@ -523,8 +548,8 @@ configure_nginx:
 		CC=$(CC) CFLAGS="$(_nginx_gccflags)" CXXFLAGS="$(CXXFLAGS)" ./configure $(_nginx_config_mainflags) --with-cc-opt="$(_nginx_gccflags)" --with-openssl-opt="$(_openssl_flags)"; \
 		cd ../../../;
 	@echo "Stamping configuration..."
-	@echo "CC=$(CC) CFLAGS=\"$(_nginx_gccflags)\" CXXFLAGS=\"$(CXXFLAGS)\" ./configure --with-cc-opt=\"$(_nginx_gccflags)\" --with-openssl-opt=\"$(_openssl_flags)\" $(_nginx_config_mainflags)" > workspace/.build_cmd
-	@echo "CC=$(CC) CFLAGS=\"$(_nginx_gccflags)\" CXXFLAGS=\"$(CXXFLAGS)\" $(NGINX_ENV) make ;" > workspace/.make_cmd
+	@echo "CC=$(CC) CFLAGS=\"$(_nginx_gccflags)\" CXXFLAGS=\"$(CXXFLAGS)\" LDFLAGS=\"$(LDFLAGS)\" ./configure --with-cc-opt=\"$(_nginx_gccflags)\" --with-openssl-opt=\"$(_openssl_flags)\" $(_nginx_config_mainflags)" > workspace/.build_cmd
+	@echo "CC=$(CC) CFLAGS=\"$(_nginx_gccflags)\" CXXFLAGS=\"$(CXXFLAGS)\" LDFLAGS=\"$(LDFLAGS)\" $(NGINX_ENV) make ;" > workspace/.make_cmd
 	@cp -f workspace/.build_cmd workspace/.make_cmd sources/$(CURRENT)/nginx-$(CURRENT)
 
 install_nginx:

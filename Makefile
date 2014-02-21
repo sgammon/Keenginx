@@ -415,7 +415,7 @@ dependencies/pcre:
 
 	@echo "Preparing PCRE..."
 	@mkdir -p $(BUILDROOT)/dependencies/pcre;
-	@cd dependencies/pcre/latest; CFLAGS="$(_nginx_gccflags)" ./configure \
+	cd dependencies/pcre/latest; CFLAGS="$(_nginx_gccflags)" ./configure \
 		--disable-option-checking --disable-dependency-tracking \
 		--enable-shared=no --enable-static=yes --enable-jit --enable-utf \
 		--enable-unicode-properties --enable-newline-is-any --disable-valgrind \
@@ -435,7 +435,7 @@ dependencies/zlib:
 
 	@echo "Preparing Zlib ASM..."
 	@mkdir -p $(BUILDROOT)/dependencies/zlib
-	@cd dependencies/zlib/latest; cp contrib/amd64/amd64-match.S match.S; \
+	cd dependencies/zlib/latest; cp contrib/amd64/amd64-match.S match.S; \
 		CFLAGS="$(_nginx_gccflags) -DASMV" ./configure; \
 		make -j $(JOBS) OBJA=match.o libz.a;
 
@@ -465,7 +465,7 @@ dependencies/openssl:
 
 	@echo "Preparing OpenSSL..."
 	@mkdir -p $(BUILDROOT)/dependencies/openssl;
-	@cd dependencies/openssl/latest; make clean ; \
+	cd dependencies/openssl/latest; make clean ; \
 		./config $(_openssl_config); \
 		_xflags=$(egrep -e ^CFLAG Makefile | cut -d ' ' -f 2- | xargs -n 1 | egrep -e ^-D -e ^-W | xargs) \
 		_cflags="$(_nginx_gccflags) $_xflags" \

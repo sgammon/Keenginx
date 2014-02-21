@@ -4,6 +4,7 @@
 
 ##### Configuration
 
+JOBS ?= 1
 DEBUG ?= 1
 STAMP = 1.5x80-alpha8
 WORKSPACE ?= trunk
@@ -128,6 +129,7 @@ ifeq ($(OSNAME),Darwin)
 	ifeq ($(DEBUG),0)
 		_nginx_gccflags = $(_nginx_gccflags) -mssse3
 	endif
+	_openssl_config:=no-shared no-threads no-krb5 zlib no-md2 no-jpake no-gmp no-ssl-trace
 endif
 
 ifeq ($(OSNAME),Linux)
@@ -138,6 +140,7 @@ ifeq ($(OSNAME),Linux)
 	else
 		_nginx_gccflags = $(_nginx_gccflags) -w
 	endif
+	_openssl_config:=enable-rc5 enable-rfc3779 enable-ec_nistp_64_gcc_128 no-shared no-threads no-krb5 zlib no-md2 no-jpake no-gmp no-ssl-trace
 endif
 
 # do we compile-in openssl?
@@ -187,6 +190,7 @@ ifeq ($(OVERRIDE_PATHS),1)
 				   --http-client-body-temp-path=$(NGINX_ROOT)$(NGINX_TEMPPATH)/client
 endif
 
+_nginx_config_extras := --with-pcre=$(BUILDROOT)/dependencies/pcre --with-zlib=$(BUILDROOT)/dependencies/zlib
 _nginx_config_mainflags := --user=$(NGINX_USER) \
 						   --group=$(NGINX_GROUP) \
 						   --with-file-aio \
@@ -413,11 +417,15 @@ dependencies/pcre:
 
 	@echo "Preparing PCRE..."
 	@mkdir -p $(BUILDROOT)/dependencies/pcre;
-	@-cd dependencies/pcre/latest; CFLAGS="$(_nginx_gccflags)" ./configure \
+	@cd dependencies/pcre/latest; CFLAGS="$(_nginx_gccflags)" ./configure \
 		--disable-option-checking --disable-dependency-tracking \
 		--enable-shared=no --enable-static=yes --enable-jit --enable-utf \
 		--enable-unicode-properties --enable-newline-is-any --disable-valgrind \
-		--disable-coverage CFLAGS="$(_nginx_gccflags)" CXXFLAGS="$(_nginx_gccflags)";
+		--disable-coverage CFLAGS="$(_nginx_gccflags)" CXXFLAGS="$(_nginx_gccflags)"; \
+		cp -Lp *.h $(BUILDROOT)/dependencies/pcre; \
+		make -j $(JOBS) libpcre.la; \
+		cp -Lp *.o .libs/* $(BUILDROOT)/dependencies/pcre;
+
 
 dependencies/zlib:
 	@echo "Fetching Zlib..."
@@ -431,9 +439,9 @@ dependencies/zlib:
 
 	@echo "Preparing Zlib ASM..."
 	@mkdir -p $(BUILDROOT)/dependencies/zlib
-	@-cd dependencies/zlib/latest; cp contrib/amd64/amd64-match.S match.S; \
+	@cd dependencies/zlib/latest; cp contrib/amd64/amd64-match.S match.S; \
 		CFLAGS="$(_nginx_gccflags) -DASMV" ./configure; \
-		make -j 4 OBJA=match.o libz.a; \
+		make -j $(JOBS) OBJA=match.o libz.a; \
 		cp -Lp *.a *.h *.o $(BUILDROOT)/dependencies/zlib/;
 
 ifeq ($(OPENSSL_TRUNK),0)
@@ -447,6 +455,7 @@ dependencies/openssl:
 	@mv openssl-$(OPENSSL_VERSION)/ openssl-$(OPENSSL_VERSION).tar.gz dependencies/openssl/$(OPENSSL_VERSION)/
 	@ln -s $(OPENSSL_VERSION)/openssl-$(OPENSSL_VERSION) dependencies/openssl/latest
 else
+_nginx_config_extras += --with-openssl=$(BUILDROOT)/dependencies/openssl/
 dependencies/openssl:
 	@echo "Fetching OpenSSL from snapshot..."
 	@mkdir -p dependencies/openssl/$(OPENSSL_SNAPSHOT)
@@ -456,6 +465,17 @@ dependencies/openssl:
 	@tar -xvf openssl-$(OPENSSL_SNAPSHOT).tar.gz
 	@mv openssl-$(OPENSSL_SNAPSHOT)/ openssl-$(OPENSSL_SNAPSHOT).tar.gz dependencies/openssl/$(OPENSSL_SNAPSHOT)/
 	@ln -s $(OPENSSL_SNAPSHOT)/openssl-$(OPENSSL_SNAPSHOT) dependencies/openssl/latest
+
+	@echo "Preparing OpenSSL..."
+	@mkdir -p $(BUILDROOT)/dependencies/openssl;
+	@cd dependencies/openssl/latest; make clean ; \
+		./config $(_openssl_config); \
+		_xflags=$(egrep -e ^CFLAG Makefile | cut -d ' ' -f 2- | xargs -n 1 | egrep -e ^-D -e ^-W | xargs) \
+		_cflags="$(_nginx_gccflags) $_xflags" \
+		sed -i Makefile -re "s#^CFLAG.*\$#CFLAG=$_cflags"; \
+		make -j $(JOBS) depend; \
+		make -j $(JOBS) build_libs; \
+		cp -Lp *.a $(BUILDROOT)/dependencies/openssl;
 endif
 
 dependencies/libatomic:
@@ -548,7 +568,7 @@ configure_nginx:
 		CC=$(CC) CFLAGS="$(_nginx_gccflags)" CXXFLAGS="$(CXXFLAGS)" ./configure $(_nginx_config_mainflags) --with-cc-opt="$(_nginx_gccflags)" --with-openssl-opt="$(_openssl_flags)"; \
 		cd ../../../;
 	@echo "Stamping configuration..."
-	@echo "CC=$(CC) CFLAGS=\"$(_nginx_gccflags)\" CXXFLAGS=\"$(CXXFLAGS)\" LDFLAGS=\"$(LDFLAGS)\" ./configure --with-cc-opt=\"$(_nginx_gccflags)\" --with-openssl-opt=\"$(_openssl_flags)\" $(_nginx_config_mainflags)" > workspace/.build_cmd
+	@echo "CC=$(CC) CFLAGS=\"$(_nginx_gccflags)\" CXXFLAGS=\"$(CXXFLAGS)\" LDFLAGS=\"$(LDFLAGS)\" ./configure --with-cc-opt=\"$(_nginx_gccflags)\" --with-openssl-opt=\"$(_openssl_flags)\" $(_nginx_config_extras) $(_nginx_config_mainflags)" > workspace/.build_cmd
 	@echo "CC=$(CC) CFLAGS=\"$(_nginx_gccflags)\" CXXFLAGS=\"$(CXXFLAGS)\" LDFLAGS=\"$(LDFLAGS)\" $(NGINX_ENV) make ;" > workspace/.make_cmd
 	@cp -f workspace/.build_cmd workspace/.make_cmd sources/$(CURRENT)/nginx-$(CURRENT)
 

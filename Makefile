@@ -67,9 +67,9 @@ TARSTAMP:=$(STAMP)-debug
 endif
 
 ifeq ($(STATIC),1)
-LDFLAGS?=-static
+LDFLAGS=-static
 else
-LDFLAGS?=
+LDFLAGS=
 endif
 
 else
@@ -130,9 +130,7 @@ ifeq ($(OSNAME),Darwin)
 		_nginx_gccflags = $(_nginx_gccflags) -mssse3
 	endif
 	_openssl_config:=no-shared no-threads no-krb5 zlib no-md2 no-jpake no-gmp no-ssl-trace
-endif
-
-ifeq ($(OSNAME),Linux)
+else
 	CC := gcc
 	EXTRA_FLAGS += --with-file-aio
 	ifeq ($(DEBUG),1)
@@ -145,7 +143,7 @@ endif
 
 # do we compile-in openssl?
 ifeq ($(OPENSSL),1)
-	EXTRA_FLAGS += --with-openssl=dependencies/openssl/$(OPENSSL_VERSION)/openssl-$(OPENSSL_VERSION) --with-http_ssl_module --with-http_spdy_module
+	EXTRA_FLAGS += --with-http_ssl_module --with-http_spdy_module
 endif
 
 
@@ -161,12 +159,12 @@ endif
 
 # do we compile-in our version of PCRE?
 ifeq ($(PCRE),1)
-	EXTRA_FLAGS += --with-pcre=dependencies/pcre/$(PCRE_VERSION)/pcre-$(PCRE_VERSION) --with-pcre-jit #--with-pcre-opt="$(_nginx_gccflags)"
+	EXTRA_FLAGS += --with-pcre=$(BUILDROOT)/dependencies/pcre --with-pcre-jit --with-pcre-opt="$(_nginx_gccflags)"
 endif
 
 # do we compile-in our version of Zlib?
 ifeq ($(ZLIB),1)
-	EXTRA_FLAGS += --with-zlib=dependencies/zlib/$(ZLIB_VERSION)/zlib-$(ZLIB_VERSION) #--with-zlib-opt="$(_nginx_gccflags)"
+	EXTRA_FLAGS += --with-zlib=$(BUILDROOT)/dependencies/zlib --with-zlib-opt="$(_nginx_gccflags)"
 endif
 
 # do we compile-in libatomic?
@@ -190,7 +188,7 @@ ifeq ($(OVERRIDE_PATHS),1)
 				   --http-client-body-temp-path=$(NGINX_ROOT)$(NGINX_TEMPPATH)/client
 endif
 
-_nginx_config_extras := --with-pcre=$(BUILDROOT)/dependencies/pcre --with-zlib=$(BUILDROOT)/dependencies/zlib
+_nginx_config_extras :=
 _nginx_config_mainflags := --user=$(NGINX_USER) \
 						   --group=$(NGINX_GROUP) \
 						   --with-file-aio \
@@ -445,6 +443,7 @@ dependencies/zlib:
 		cp -Lp *.a *.h *.o $(BUILDROOT)/dependencies/zlib/;
 
 ifeq ($(OPENSSL_TRUNK),0)
+_nginx_config_extras += --with-openssl=dependencies/openssl/$(OPENSSL_VERSION)/openssl-$(OPENSSL_VERSION)
 dependencies/openssl:
 	@echo "Fetching OpenSSL..."
 	@mkdir -p dependencies/openssl/$(OPENSSL_VERSION)
@@ -565,10 +564,10 @@ configure_nginx:
 	@echo "Configuring Nginx..."
 	-cp -fr modules dependencies sources/$(CURRENT)/nginx-$(CURRENT); \
 		cd sources/$(CURRENT)/nginx-$(CURRENT); \
-		CC=$(CC) CFLAGS="$(_nginx_gccflags)" CXXFLAGS="$(CXXFLAGS)" ./configure $(_nginx_config_mainflags) --with-cc-opt="$(_nginx_gccflags)" --with-openssl-opt="$(_openssl_flags)"; \
+		CC=$(CC) CFLAGS="$(_nginx_gccflags)" CXXFLAGS="$(CXXFLAGS)" ./configure $(_nginx_config_mainflags) --with-cc-opt="$(_nginx_gccflags)" --with-ld-opt="$(LDFLAGS)" --with-openssl-opt="$(_openssl_flags)"; \
 		cd ../../../;
 	@echo "Stamping configuration..."
-	@echo "CC=$(CC) CFLAGS=\"$(_nginx_gccflags)\" CXXFLAGS=\"$(CXXFLAGS)\" LDFLAGS=\"$(LDFLAGS)\" ./configure --with-cc-opt=\"$(_nginx_gccflags)\" --with-openssl-opt=\"$(_openssl_flags)\" $(_nginx_config_extras) $(_nginx_config_mainflags)" > workspace/.build_cmd
+	@echo "CC=$(CC) CFLAGS=\"$(_nginx_gccflags)\" CXXFLAGS=\"$(CXXFLAGS)\" LDFLAGS=\"$(LDFLAGS)\" ./configure --with-cc-opt=\"$(_nginx_gccflags)\" --with-ld-opt="$(LDFLAGS)" --with-openssl-opt=\"$(_openssl_flags)\" $(_nginx_config_extras) $(_nginx_config_mainflags)" > workspace/.build_cmd
 	@echo "CC=$(CC) CFLAGS=\"$(_nginx_gccflags)\" CXXFLAGS=\"$(CXXFLAGS)\" LDFLAGS=\"$(LDFLAGS)\" $(NGINX_ENV) make ;" > workspace/.make_cmd
 	@cp -f workspace/.build_cmd workspace/.make_cmd sources/$(CURRENT)/nginx-$(CURRENT)
 

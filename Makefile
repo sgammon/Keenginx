@@ -101,7 +101,7 @@ NGINX_ENV += $(PAGESPEED_ENV)
 
 # configure vars
 _nginx_debug_cpuflags = -g -O0
-_nginx_release_cpuflags = -O3 -mtune=native -march=native -m64 -fomit-frame-pointer -fno-exceptions -fno-strict-aliasing
+_nginx_release_cpuflags = -O3 -g0 -mtune=native -march=native -m64 -fomit-frame-pointer -fno-exceptions -fno-strict-aliasing
 
 # openssl flags
 _openssl_flags:=-DOPENSSL_EC_NISTP_64_GCC_128 -DOPENSSL_RC5

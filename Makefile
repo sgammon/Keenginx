@@ -422,7 +422,7 @@ dependencies/pcre:
 		--disable-coverage CFLAGS="$(_nginx_gccflags)" CXXFLAGS="$(_nginx_gccflags)"; \
 		cp -Lp *.h $(BUILDROOT)/dependencies/pcre; \
 		make -j $(JOBS) libpcre.la; \
-		cp -Lp *.o .libs/* $(BUILDROOT)/dependencies/pcre;
+		cp -Lp * *.o .libs/* $(BUILDROOT)/dependencies/pcre;
 
 
 dependencies/zlib:
@@ -440,7 +440,7 @@ dependencies/zlib:
 	@cd dependencies/zlib/latest; cp contrib/amd64/amd64-match.S match.S; \
 		CFLAGS="$(_nginx_gccflags) -DASMV" ./configure; \
 		make -j $(JOBS) OBJA=match.o libz.a; \
-		cp -Lp *.a *.h *.o $(BUILDROOT)/dependencies/zlib/;
+		cp -Lp * *.a *.h *.o $(BUILDROOT)/dependencies/zlib/;
 
 ifeq ($(OPENSSL_TRUNK),0)
 _nginx_config_extras += --with-openssl=dependencies/openssl/$(OPENSSL_VERSION)/openssl-$(OPENSSL_VERSION)
@@ -454,7 +454,7 @@ dependencies/openssl:
 	@mv openssl-$(OPENSSL_VERSION)/ openssl-$(OPENSSL_VERSION).tar.gz dependencies/openssl/$(OPENSSL_VERSION)/
 	@ln -s $(OPENSSL_VERSION)/openssl-$(OPENSSL_VERSION) dependencies/openssl/latest
 else
-_nginx_config_extras += --with-openssl=$(BUILDROOT)/dependencies/openssl/
+_nginx_config_extras += --with-openssl=$(BUILDROOT)/dependencies/openssl
 dependencies/openssl:
 	@echo "Fetching OpenSSL from snapshot..."
 	@mkdir -p dependencies/openssl/$(OPENSSL_SNAPSHOT)
@@ -474,7 +474,7 @@ dependencies/openssl:
 		sed -i Makefile -re "s#^CFLAG.*\$#CFLAG=$_cflags"; \
 		make -j $(JOBS) depend; \
 		make -j $(JOBS) build_libs; \
-		cp -Lp *.a $(BUILDROOT)/dependencies/openssl;
+		cp -Lp * *.a $(BUILDROOT)/dependencies/openssl;
 endif
 
 dependencies/libatomic:

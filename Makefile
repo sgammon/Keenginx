@@ -439,6 +439,7 @@ dependencies/zlib:
 		CFLAGS="$(_nginx_gccflags) -DASMV" ./configure; \
 		make -j $(JOBS) OBJA=match.o libz.a;
 
+ifeq ($(OPENSSL),1)
 ifeq ($(OPENSSL_TRUNK),0)
 _nginx_config_extras += --with-openssl=dependencies/openssl/$(OPENSSL_VERSION)/openssl-$(OPENSSL_VERSION)
 dependencies/openssl:
@@ -452,7 +453,7 @@ dependencies/openssl:
 	@ln -s $(OPENSSL_VERSION)/openssl-$(OPENSSL_VERSION) dependencies/openssl/latest
 else
 #_nginx_config_extras += --with-openssl=$(BUILDROOT)/dependencies/openssl
-_nginx_config_extras += --with-openssl=dependencies/openssl/$(OPENSSL_VERSION)/openssl-$(OPENSSL_VERSION)
+_nginx_config_extras += --with-openssl=dependencies/openssl/$(OPENSSL_SNAPSHOT)/openssl-$(OPENSSL_SNAPSHOT)
 dependencies/openssl:
 	@echo "Fetching OpenSSL from snapshot..."
 	@mkdir -p dependencies/openssl/$(OPENSSL_SNAPSHOT)
@@ -472,6 +473,7 @@ dependencies/openssl:
 		sed -i Makefile -re "s#^CFLAG.*\$#CFLAG=$_cflags"; \
 		make -j $(JOBS) depend; \
 		make -j $(JOBS) build_libs;
+endif
 endif
 
 dependencies/libatomic:
@@ -561,7 +563,7 @@ configure_nginx:
 	@echo "Configuring Nginx..."
 	-cp -fr modules dependencies sources/$(CURRENT)/nginx-$(CURRENT); \
 		cd sources/$(CURRENT)/nginx-$(CURRENT); \
-		CC=$(CC) CFLAGS="$(_nginx_gccflags)" CXXFLAGS="$(CXXFLAGS)" ./configure $(_nginx_config_mainflags) --with-cc-opt="$(_nginx_gccflags)" --with-ld-opt="$(LDFLAGS)" --with-openssl-opt="$(_openssl_flags)"; \
+		CC=$(CC) CFLAGS="$(_nginx_gccflags)" CXXFLAGS="$(CXXFLAGS)" ./configure $(_nginx_config_extras) $(_nginx_config_mainflags) --with-cc-opt="$(_nginx_gccflags)" --with-ld-opt="$(LDFLAGS)" --with-openssl-opt="$(_openssl_flags)"; \
 		cd ../../../;
 	@echo "Stamping configuration..."
 	@echo "CC=$(CC) CFLAGS=\"$(_nginx_gccflags)\" CXXFLAGS=\"$(CXXFLAGS)\" LDFLAGS=\"$(LDFLAGS)\" ./configure --with-cc-opt=\"$(_nginx_gccflags)\" --with-ld-opt="$(LDFLAGS)" --with-openssl-opt=\"$(_openssl_flags)\" $(_nginx_config_extras) $(_nginx_config_mainflags)" > workspace/.build_cmd

@@ -127,18 +127,18 @@ ifeq ($(OSNAME),Darwin)
 	CC := clang
 	PAGESPEED = 0
 	ifeq ($(DEBUG),0)
-		_nginx_gccflags = $(_nginx_gccflags) -mssse3
+		_nginx_gccflags += -mssse3
 	endif
 	_openssl_config:=no-shared no-threads no-krb5 zlib no-md2 no-jpake no-gmp no-ssl-trace
 else
 	CC := gcc
 	EXTRA_FLAGS += --with-file-aio
 	ifeq ($(DEBUG),1)
-		_nginx_gccflags = $(_nginx_gccflags) -fno-stack-protector
+		_nginx_gccflags += -fno-stack-protector
 	else
-		_nginx_gccflags = $(_nginx_gccflags) -w
+		_nginx_gccflags += -w
 	endif
-	_openssl_config:=enable-rc5 enable-rfc3779 enable-ec_nistp_64_gcc_128 no-shared no-threads no-krb5 zlib no-md2 no-jpake no-gmp no-ssl-trace
+	_openssl_config := enable-rc5 enable-rfc3779 enable-ec_nistp_64_gcc_128 no-shared no-threads no-krb5 zlib no-md2 no-jpake no-gmp no-ssl-trace
 endif
 
 # do we compile-in openssl?

@@ -420,9 +420,8 @@ dependencies/pcre:
 		--enable-shared=no --enable-static=yes --enable-jit --enable-utf \
 		--enable-unicode-properties --enable-newline-is-any --disable-valgrind \
 		--disable-coverage CFLAGS="$(_nginx_gccflags)" CXXFLAGS="$(_nginx_gccflags)"; \
-		cp -Lp *.h $(BUILDROOT)/dependencies/pcre; \
 		make -j $(JOBS) libpcre.la; \
-		cp -Lp * *.o .libs/* $(BUILDROOT)/dependencies/pcre;
+		cp -Lp * $(BUILDROOT)/dependencies/pcre;
 
 
 dependencies/zlib:
@@ -440,7 +439,7 @@ dependencies/zlib:
 	@cd dependencies/zlib/latest; cp contrib/amd64/amd64-match.S match.S; \
 		CFLAGS="$(_nginx_gccflags) -DASMV" ./configure; \
 		make -j $(JOBS) OBJA=match.o libz.a; \
-		cp -Lp * *.a *.h *.o $(BUILDROOT)/dependencies/zlib/;
+		cp -Lp * $(BUILDROOT)/dependencies/zlib/;
 
 ifeq ($(OPENSSL_TRUNK),0)
 _nginx_config_extras += --with-openssl=dependencies/openssl/$(OPENSSL_VERSION)/openssl-$(OPENSSL_VERSION)
@@ -474,7 +473,7 @@ dependencies/openssl:
 		sed -i Makefile -re "s#^CFLAG.*\$#CFLAG=$_cflags"; \
 		make -j $(JOBS) depend; \
 		make -j $(JOBS) build_libs; \
-		cp -Lp * *.a $(BUILDROOT)/dependencies/openssl;
+		cp -Lp * $(BUILDROOT)/dependencies/openssl;
 endif
 
 dependencies/libatomic:

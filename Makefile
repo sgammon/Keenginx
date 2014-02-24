@@ -500,9 +500,8 @@ dependencies/openssl:
 	@echo "Preparing OpenSSL..."
 	@mkdir -p $(BUILDROOT)/openssl-$(OPENSSL_SNAPSHOT);
 	cd dependencies/openssl/latest; $(MAKE) clean ; \
-		./config $(_openssl_config); \
-		_cflags=$(egrep -e ^CFLAG Makefile | cut -d ' ' -f 2- | xargs -n 1 | egrep -e ^-D -e ^-W | xargs) \
-		_cflags="$(_nginx_gccflags) $_cflags" \
+		./config $(_openssl_config) $(_nginx_gccflags); \
+		_cflags="$(egrep -e ^CFLAG Makefile | cut -d ' ' -f 2- | xargs -n 1 | egrep -e ^-D -e ^-W | xargs) $(_nginx_gccflags)" \
 		sed -i Makefile -re "s#^CFLAG.*\$#CFLAG=${_cflags}#"; \
 		CFLAGS=$_cflags $(MAKE) -j $(JOBS) depend; \
 		CFLAGS=$_cflags $(MAKE) -j $(JOBS) build_libs; \
@@ -589,16 +588,23 @@ endif
 
 
 #### ==== BUILD RULES ==== ####
+ifeq ($(STATIC),1)
 nginx_makefile:
-	@echo "Rewriting Makefile..."
-	@echo fgrep -e -lcrypt objs/Makefile | xargs -n 1 -r | egrep -v -e ^- | xargs;
-	#link_order="$link_order -lm -lrt -lpthread -ldl -lcrypt $(LDFLAGS)";
-	#echo $link_order;
-
-build_nginx:
-	@cd $(BUILDROOT)/; mv -f objs/Makefile objs/Makefile.old; \
+	@echo "Rewriting Makefile for static binary..."
+	link_order=$(fgrep -e -lcrypt objs/Makefile | xargs -n 1 -r | egrep -v -e ^- | xargs); \
+		link_order="$link_order $(LDFLAGS) -lm -lrt -lpthread -ldl -lcrypt"; \
+		cd $(BUILDROOT)/; mv -f objs/Makefile objs/Makefile.old; \
 		gawk '/^(openssl|pcre|zlib)/ {$0=$1;gsub("^(.*:).*$","& objs/Makefile")} /^(openssl|pcre|zlib).+:/,/^$/ { if ($0 ~ "^[[:space:]]") $0="";}; {print}' <objs/Makefile.old >objs/Makefile; \
+	@echo "Makefile ready for static binary."
+else
+nginx_makefile:
+	@echo "Rewriting Makefile for dynamic binary..."
+	cd $(BUILDROOT)/; mv -f objs/Makefile objs/Makefile.old; \
+		gawk '/^(openssl|pcre|zlib)/ {$0=$1;gsub("^(.*:).*$","& objs/Makefile")} /^(openssl|pcre|zlib).+:/,/^$/ { if ($0 ~ "^[[:space:]]") $0="";}; {print}' <objs/Makefile.old >objs/Makefile;
+	@echo "Makefile ready for dynamic binary.";
+endif
 
+build_nginx: nginx_makefile
 	@echo "Compiling Nginx..."
 	@mkdir -p build/ dist/
 	cd sources/$(CURRENT)/nginx-$(CURRENT); \
@@ -619,7 +625,7 @@ configure_nginx:
 		cd ../../../;
 	@echo "Stamping configuration..."
 	@echo "CC=$(CC) CFLAGS=\"$(_nginx_gccflags)\" CXXFLAGS=\"$(CXXFLAGS)\" LDFLAGS=\"$(LDFLAGS)\" ./configure --with-cc-opt=\"$(_nginx_gccflags)\" --with-ld-opt="$(LDFLAGS)" --with-openssl-opt=\"$(_openssl_flags)\" $(_nginx_config_extras) $(_nginx_config_mainflags)" > workspace/.build_cmd
-	@echo "CC=$(CC) CFLAGS=\"$(_nginx_gccflags)\" CXXFLAGS=\"$(CXXFLAGS)\" LDFLAGS=\"$(LDFLAGS)\" $(NGINX_ENV) make ;" > workspace/.make_cmd
+	@echo "CC=$(CC) CFLAGS=\"$(_nginx_gccflags)\" CXXFLAGS=\"$(CXXFLAGS)\" LDFLAGS=\"$(LDFLAGS)\" $(NGINX_ENV) make install ;" > workspace/.make_cmd
 	@cp -f workspace/.build_cmd workspace/.make_cmd sources/$(CURRENT)/nginx-$(CURRENT)
 
 install_nginx:

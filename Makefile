@@ -591,14 +591,25 @@ endif
 
 #### ==== BUILD RULES ==== ####
 ifeq ($(STATIC),1)
+ifeq ($(LTO),1)
+nginx_makefile: configure_nginx
+	@echo "Rewriting Makefile for an LTO-enabled static binary..."
+	@cp scripts/rewrite.sh $(BUILDROOT);
+	@chmod +x $(BUILDROOT)rewrite.sh;
+	cd $(BUILDROOT); \
+		link_order="`fgrep -e -lcrypt objs/Makefile | xargs -n 1 -r | egrep -v -e ^- | xargs` -static -flto=4 -fuse-linker-plugin -save-temps -flto-report -lm -lrt -lpthread -ldl -lcrypt" \
+		bash ./rewrite.sh;
+	@echo "Makefile ready for LTO-enabled static binary."
+else
 nginx_makefile: configure_nginx
 	@echo "Rewriting Makefile for static binary..."
 	@cp scripts/rewrite.sh $(BUILDROOT);
 	@chmod +x $(BUILDROOT)rewrite.sh;
 	cd $(BUILDROOT); \
-		link_order="`fgrep -e -lcrypt objs/Makefile | xargs -n 1 -r | egrep -v -e ^- | xargs` $(LDFLAGS) -lm -lrt -lpthread -ldl -lcrypt" \
+		link_order="`fgrep -e -lcrypt objs/Makefile | xargs -n 1 -r | egrep -v -e ^- | xargs` -lm -lrt -lpthread -ldl -lcrypt" \
 		bash ./rewrite.sh;
 	@echo "Makefile ready for static binary."
+endif
 else
 nginx_makefile: configure_nginx
 	@echo "Rewriting Makefile for dynamic binary..."

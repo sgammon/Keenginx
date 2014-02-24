@@ -629,9 +629,11 @@ clean_nginx:
 	@echo "Cleaning modules..."
 	@-rm -fr modules/
 
-configure_nginx: workspace dependencies sources patch
+$(BUILDROOT)/configure:
 	@echo "Copying Nginx sources..."
 	@cp -fr workspace/* $(BUILDROOT)
+
+configure_nginx: workspace dependencies sources patch $(BUILDROOT)/configure
 	@echo "Configuring Nginx..."
 	-cp -fr modules dependencies sources/$(CURRENT)/nginx-$(CURRENT); \
 		cd $(BUILDROOT); \
@@ -645,10 +647,10 @@ patch_nginx_install:
 	@echo "Patching Nginx install routine..."
 
 	@echo "Adding debug-only binary..."
-	@echo "\tcp -f objs/nginx.dbg '$(DESTDIR)/opt/keenginx-1.5x110-alpha10/sbin/nginx.dbg'" >> $(BUILDROOT)objs/Makefile
+	@echo -e "\tcp -f objs/nginx.dbg '$(DESTDIR)/opt/keenginx-1.5x110-alpha10/sbin/nginx.dbg'" >> $(BUILDROOT)objs/Makefile
 
 	@echo "Adding original binary..."
-	@echo "\tcp -f objs/nginx.orig '$(DESTDIR)/opt/keenginx-1.5x110-alpha10/sbin/nginx.orig'" >> $(BUILDROOT)objs/Makefile
+	@echo -e "\tcp -f objs/nginx.orig '$(DESTDIR)/opt/keenginx-1.5x110-alpha10/sbin/nginx.orig'" >> $(BUILDROOT)objs/Makefile
 
 strip_nginx: build_nginx patch_nginx_install
 	@echo "Performing binary post-processing..."

@@ -589,9 +589,7 @@ endif
 
 #### ==== BUILD RULES ==== ####
 ifeq ($(STATIC),1)
-nginx_makefile:
-	@echo "Copying Nginx sources..."
-	@cp -fr workspace/* $(BUILDROOT)
+nginx_makefile: configure_nginx
 	@echo "Rewriting Makefile for static binary..."
 	@cp scripts/rewrite.sh $(BUILDROOT);
 	@chmod +x $(BUILDROOT)rewrite.sh;
@@ -602,7 +600,7 @@ nginx_makefile:
 		sed -i objs/Makefile -re "/^\t.*$s-lcrypt$s.*\$/ {s##\t${link_order}#}" ;
 	@echo "Makefile ready for static binary."
 else
-nginx_makefile:
+nginx_makefile: configure_nginx
 	@echo "Rewriting Makefile for dynamic binary..."
 	cd $(BUILDROOT); mv -f objs/Makefile objs/Makefile.old; \
 
@@ -624,11 +622,12 @@ clean_nginx:
 	@-rm -fr modules/
 
 configure_nginx:
+	@echo "Copying Nginx sources..."
+	@cp -fr workspace/* $(BUILDROOT)
 	@echo "Configuring Nginx..."
 	-cp -fr modules dependencies sources/$(CURRENT)/nginx-$(CURRENT); \
 		cd $(BUILDROOT); \
-		CC=$(CC) CFLAGS="$(_nginx_gccflags)" CXXFLAGS="$(CXXFLAGS)" ./configure $(_nginx_config_extras) $(_nginx_config_mainflags) --with-cc-opt="$(_nginx_gccflags)" --with-ld-opt="$(LDFLAGS)" --with-openssl-opt="$(_openssl_flags)"; \
-		cd ../../../;
+		CC=$(CC) CFLAGS="$(_nginx_gccflags)" CXXFLAGS="$(CXXFLAGS)" $(BUILDROOT)configure $(_nginx_config_extras) $(_nginx_config_mainflags) --with-cc-opt="$(_nginx_gccflags)" --with-ld-opt="$(LDFLAGS)" --with-openssl-opt="$(_openssl_flags)";
 	@echo "Stamping configuration..."
 	@echo "CC=$(CC) CFLAGS=\"$(_nginx_gccflags)\" CXXFLAGS=\"$(CXXFLAGS)\" LDFLAGS=\"$(LDFLAGS)\" ./configure --with-cc-opt=\"$(_nginx_gccflags)\" --with-ld-opt="$(LDFLAGS)" --with-openssl-opt=\"$(_openssl_flags)\" $(_nginx_config_extras) $(_nginx_config_mainflags)" > workspace/.build_cmd
 	@echo "CC=$(CC) CFLAGS=\"$(_nginx_gccflags)\" CXXFLAGS=\"$(CXXFLAGS)\" LDFLAGS=\"$(LDFLAGS)\" $(NGINX_ENV) make install ;" > workspace/.make_cmd

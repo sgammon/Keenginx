@@ -49,7 +49,7 @@ OPENSSL_VERSION ?= 1.0.1f
 OPENSSL_SNAPSHOT ?= 1.0.2-stable-SNAP-20140221
 
 # libatomic config
-LIBATOMIC ?= 1
+LIBATOMIC ?= 0
 
 
 ##### Pagespeed Overrides

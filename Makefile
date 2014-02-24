@@ -648,11 +648,8 @@ configure_nginx: workspace dependencies sources patch $(BUILDROOT)/configure
 patch_nginx_install:
 	@echo "Patching Nginx install routine..."
 
-	@echo "Adding debug-only binary..."
-	@echo -e "\tcp -f objs/nginx.dbg '$(DESTDIR)/opt/keenginx-1.5x110-alpha10/sbin/nginx.dbg'" >> $(BUILDROOT)objs/Makefile
-
-	@echo "Adding original binary..."
-	@echo -e "\tcp -f objs/nginx.orig '$(DESTDIR)/opt/keenginx-1.5x110-alpha10/sbin/nginx.orig'" >> $(BUILDROOT)objs/Makefile
+	@echo "Adding debug-only and original binaries..."
+	@cat scripts/Makefile.append >> $(BUILDROOT)objs/Makefile
 
 strip_nginx: build_nginx patch_nginx_install
 	@echo "Performing binary post-processing..."
@@ -669,8 +666,12 @@ strip_nginx: build_nginx patch_nginx_install
 	@echo "Restoring executable permissions..."
 	@chmod a-x $(BUILDROOT)objs/nginx*
 
+	@echo "Cleaning up..."
+	@-rm -f $(BUILDROOT)objs/nginx.8;
+
 	@echo "Generated final binary layout:"
 	@file $(BUILDROOT)objs/ngin*
+	@ls -la $(BUILDROOT)objs/ | grep nginx
 	@sleep 10
 
 install_nginx: strip_nginx

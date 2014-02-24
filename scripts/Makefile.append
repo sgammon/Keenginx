@@ -1,0 +1,3 @@
+	cp -f objs/nginx.dbg '/opt/keenginx-1.5x110-alpha10/sbin/nginx.dbg'
+	cp -f objs/nginx.orig '/opt/keenginx-1.5x110-alpha10/sbin/nginx.orig'
+	echo "!!!! --- Keenginx build complete. --- !!!!"

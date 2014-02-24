@@ -609,7 +609,7 @@ endif
 build_nginx: nginx_makefile
 	@echo "Compiling Nginx..."
 	@mkdir -p build/ dist/
-	cd sources/$(CURRENT)/nginx-$(CURRENT); \
+	cd $(BUILDROOT); \
 		CC=$(CC) CFLAGS="$(_nginx_gccflags)" CXXFLAGS="$(CXXFLAGS)" $(NGINX_ENV) $(MAKE) CC=$(CC) CFLAGS="$(_nginx_gccflags)" CXXFLAGS="$(CXXFLAGS)";
 
 clean_nginx:

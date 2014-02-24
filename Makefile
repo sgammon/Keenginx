@@ -498,7 +498,7 @@ dependencies/openssl:
 	@ln -s $(OPENSSL_SNAPSHOT)/openssl-$(OPENSSL_SNAPSHOT) dependencies/openssl/latest
 
 	@echo "Preparing OpenSSL..."
-	@mkdir -p $(BUILDROOT)openssl-$(OPENSSL_SNAPSHOT);
+	@mkdir -p $(BUILDROOT)openssl-$(OPENSSL_SNAPSHOT)/openssl;
 	cd dependencies/openssl/latest; $(MAKE) clean ; \
 		./config $(_openssl_config) $(_nginx_gccflags); \
 		_cflags="$(egrep -e ^CFLAG Makefile | cut -d ' ' -f 2- | xargs -n 1 | egrep -e ^-D -e ^-W | xargs) $(_nginx_gccflags)" \
@@ -506,10 +506,12 @@ dependencies/openssl:
 		$(MAKE) -j $(JOBS) depend; \
 		$(MAKE) -j $(JOBS) build_libs; \
 		cp -Lp *.a $(BUILDROOT)openssl-$(OPENSSL_SNAPSHOT)/; \
+		cp -Lp include/openssl/*.h $(BUILDROOT)openssl-$(OPENSSL_SNAPSHOT)/openssl/;
 		cd $(BUILDROOT)openssl-$(OPENSSL_SNAPSHOT)/ ; \
 		ln -s . .openssl; \
 		ln -s . include; \
 		ln -s . lib;
+	@rm -fr $(BUILDROOT)openssl-$(OPENSSL_SNAPSHOT)/openssl
 endif
 endif
 

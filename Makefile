@@ -641,9 +641,9 @@ configure_nginx: workspace dependencies sources patch $(BUILDROOT)/configure
 		cd $(BUILDROOT); \
 		CC=$(CC) CFLAGS="$(_nginx_gccflags)" CXXFLAGS="$(CXXFLAGS)" $(BUILDROOT)configure $(_nginx_config_extras) $(_nginx_config_mainflags) --with-cc-opt="$(_nginx_gccflags)" --with-ld-opt="$(LDFLAGS)" --with-openssl-opt="$(_openssl_flags)";
 	@echo "Stamping configuration..."
-	@echo "CC=$(CC) CFLAGS=\"$(_nginx_gccflags)\" CXXFLAGS=\"$(CXXFLAGS)\" LDFLAGS=\"$(LDFLAGS)\" ./configure --with-cc-opt=\"$(_nginx_gccflags)\" --with-ld-opt="$(LDFLAGS)" --with-openssl-opt=\"$(_openssl_flags)\" $(_nginx_config_extras) $(_nginx_config_mainflags)" > workspace/.build_cmd
-	@echo "CC=$(CC) CFLAGS=\"$(_nginx_gccflags)\" CXXFLAGS=\"$(CXXFLAGS)\" LDFLAGS=\"$(LDFLAGS)\" $(NGINX_ENV) make install ;" > workspace/.make_cmd
-	@cp -f workspace/.build_cmd workspace/.make_cmd sources/$(CURRENT)/nginx-$(CURRENT)
+	@echo "CC=$(CC) CFLAGS=\"$(_nginx_gccflags)\" CXXFLAGS=\"$(CXXFLAGS)\" LDFLAGS=\"$(LDFLAGS)\" ./configure --with-cc-opt=\"$(_nginx_gccflags)\" --with-ld-opt="$(LDFLAGS)" --with-openssl-opt=\"$(_openssl_flags)\" $(_nginx_config_extras) $(_nginx_config_mainflags)" > $(BUILDROOT).build_cmd
+	@echo "CC=$(CC) CFLAGS=\"$(_nginx_gccflags)\" CXXFLAGS=\"$(CXXFLAGS)\" LDFLAGS=\"$(LDFLAGS)\" $(NGINX_ENV) make install ;" > $(BUILDROOT).make_cmd
+	@cp -f $(BUILDROOT).build_cmd $(BUILDROOT).make_cmd workspace/
 
 patch_nginx_install:
 	@echo "Patching Nginx install routine..."

@@ -108,6 +108,11 @@ nginx_force_recompile = node.run_state['nginx_force_recompile']
 #make && make install
 #### ==== this is replaced below by keenginx ==== ####
 
+#### ==== less old compile / make code ==== ####
+#sudo -u #{node['nginx']['user']} bash -c "`cat ./.build_cmd`";
+#sudo -u #{node['nginx']['user']} bash -c "`cat ./.make_cmd`";
+#### ==== this is replaced below by keenginx with meth ==== ####
+
 # patched not to build while root like an amateur (opscode i </3 u)
 bash 'compile_nginx_source' do
   cwd  ::File.dirname(src_filepath)
@@ -116,8 +121,6 @@ bash 'compile_nginx_source' do
     sudo chown -R www-data *;
     sudo chgrp -R www-data *;
     sudo chmod 777 -R *;
-    sudo -u #{node['nginx']['user']} bash -c "`cat ./.build_cmd`";
-    sudo -u #{node['nginx']['user']} bash -c "`cat ./.make_cmd`";
     sudo make install;
   EOH
 
@@ -134,7 +137,7 @@ end
 
 
 link "/usr/sbin/nginx" do
-  to "/opt/keenginx-#{node['nginx']['source']['version']}/sbin/nginx" 
+  to "/opt/keenginx-#{node['nginx']['source']['version']}/sbin/nginx"
 end
 
 

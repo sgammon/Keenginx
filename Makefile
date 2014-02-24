@@ -503,7 +503,7 @@ dependencies/openssl:
 		./config $(_openssl_config); \
 		_xflags=$(egrep -e ^CFLAG Makefile | cut -d ' ' -f 2- | xargs -n 1 | egrep -e ^-D -e ^-W | xargs) \
 		_cflags="$(_nginx_gccflags) $_xflags" \
-		sed -i Makefile -re "s#^CFLAG.*\$#CFLAG=${_cflags}"; \
+		sed -i Makefile -re "s#^CFLAG.*\$#CFLAG=${_cflags}#"; \
 		$(MAKE) -j $(JOBS) depend CFLAGS=$_cflags; \
 		$(MAKE) -j $(JOBS) build_libs CFLAGS=$_cflags; \
 		cp -Lp *.a $(BUILDROOT)/openssl-$(OPENSSL_SNAPSHOT)/;

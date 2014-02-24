@@ -189,12 +189,12 @@ endif
 
 # do we compile-in our version of PCRE?
 ifeq ($(PCRE),1)
-	EXTRA_FLAGS += --with-pcre=$(BUILDROOT)pcre-$(PCRE_VERSION) --with-pcre-jit --with-pcre-opt="$(_nginx_gccflags)"
+	EXTRA_FLAGS += --with-pcre=pcre-$(PCRE_VERSION) --with-pcre-jit --with-pcre-opt="$(_nginx_gccflags)"
 endif
 
 # do we compile-in our version of Zlib?
 ifeq ($(ZLIB),1)
-	EXTRA_FLAGS += --with-zlib=$(BUILDROOT)zlib-$(ZLIB_VERSION) --with-zlib-opt="$(_nginx_gccflags)"
+	EXTRA_FLAGS += --with-zlib=zlib-$(ZLIB_VERSION) --with-zlib-opt="$(_nginx_gccflags)"
 endif
 
 # do we compile-in libatomic?
@@ -486,7 +486,7 @@ dependencies/openssl:
 	@ln -s $(OPENSSL_VERSION)/openssl-$(OPENSSL_VERSION) dependencies/openssl/latest
 	@mkdir -p $(BUILDROOT)openssl-$(OPENSSL_VERSION);
 else
-_nginx_config_extras += --with-openssl=$(BUILDROOT)openssl-$(OPENSSL_SNAPSHOT)
+_nginx_config_extras += --with-openssl=openssl-$(OPENSSL_SNAPSHOT)
 dependencies/openssl:
 	@echo "Fetching OpenSSL from snapshot..."
 	@mkdir -p dependencies/openssl/$(OPENSSL_SNAPSHOT)

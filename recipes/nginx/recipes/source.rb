@@ -117,7 +117,7 @@ nginx_force_recompile = node.run_state['nginx_force_recompile']
 bash 'compile_nginx_source' do
   cwd  ::File.dirname(src_filepath)
   code <<-EOH
-    cd nginx-#{node['nginx']['source']['version']} &&
+    cd keenginx-#{node['nginx']['source']['version']} &&
     sudo chown -R www-data *;
     sudo chgrp -R www-data *;
     sudo chmod 777 -R *;

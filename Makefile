@@ -263,9 +263,11 @@ package: strip_nginx
 	#@mv pagespeed/ nginx-$(CURRENT)/pagespeed
 
 	@echo "Packaging tarball...";
+	@mv build/nginx-$(CURRENT) build/keenginx-$(STAMP);
 	@cd build/; \
-		tar -czvf ./keenginx-$(TARSTAMP).tar.gz nginx-$(CURRENT)
+		tar -czvf ./keenginx-$(TARSTAMP).tar.gz keenginx-$(STAMP)
 	#@mv nginx-$(CURRENT)/pagespeed ./pagespeed
+	@mv build/keenginx-$(STAMP) build/nginx-$(CURRENT);
 	@echo "=== Finished Keen-Nginx build. ==="
 
 release:
@@ -581,7 +583,7 @@ sources/pagespeed:
 	@mkdir -p sources/pagespeed/$(PAGESPEED_VERSION)/trunk;
 	cd sources/pagespeed/$(PAGESPEED_VERSION)/trunk; \
 		../../../../dependencies/depot_tools/gclient config http://modpagespeed.googlecode.com/svn/tags/$(PSOL_VERSION)/src; \
-		../../../../dependencies/depot_tools/gclient sync --force --jobs=1;
+		../../../../dependencies/depot_tools/gclient sync --force --jobs=8;
 		cd ../../../../;
 
 

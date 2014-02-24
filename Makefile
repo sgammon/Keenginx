@@ -258,7 +258,7 @@ seal:
 	@echo "Generating new pagespeed patch..."
 	-diff -Naurdw sources/pagespeed/$(PAGESPEED_VERSION)/ pagespeed/ > patches/pagespeed/omnibus.patch
 
-package: build strip_nginx
+package: strip_nginx
 	@echo "Packaging build..."
 	#@mv pagespeed/ nginx-$(CURRENT)/pagespeed
 

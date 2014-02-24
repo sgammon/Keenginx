@@ -285,22 +285,22 @@ release:
 
 	@echo ""
 	@echo "!!!!! Building production Keenginx WITHOUT pagespeed. !!!!!"
-	$(MAKE) PAGESPEED=0 OPENSSL=$(OPENSSL) ZLIB=$(ZLIB) DEBUG=0 all
+	$(MAKE) -j $(JOBS) PAGESPEED=0 OPENSSL=$(OPENSSL) ZLIB=$(ZLIB) PCRE=$(PCRE) STATIC=$(STATIC) LTO=$(LTO) DEBUG=0 package
 	@echo ""
 
 	@echo ""
 	@echo "!!!!! Building debug Keenginx WITHOUT pagespeed. !!!!!"
-	$(MAKE) PAGESPEED=0 OPENSSL=$(OPENSSL) ZLIB=$(ZLIB) DEBUG=1 all
+	$(MAKE) -j $(JOBS) PAGESPEED=0 OPENSSL=$(OPENSSL) ZLIB=$(ZLIB) PCRE=$(PCRE) STATIC=0 LTO=0 DEBUG=1 package
 	@echo ""
 
 	@echo ""
 	@echo "!!!!! Building production Keenginx WITH pagespeed. !!!!!"
-	$(MAKE) PAGESPEED=1 OPENSSL=$(OPENSSL) ZLIB=$(ZLIB) DEBUG=0 modules/pagespeed all
+	$(MAKE) -j $(JOBS) PAGESPEED=1 OPENSSL=$(OPENSSL) ZLIB=$(ZLIB) STATIC=0 LTO=0 DEBUG=0 modules/pagespeed package
 	@echo ""
 
 	@echo ""
 	@echo "!!!!! Building debug Keenginx WITH pagespeed. !!!!!"
-	$(MAKE) PAGESPEED=1 OPENSSL=$(OPENSSL) ZLIB=$(ZLIB) DEBUG=1 all
+	$(MAKE) PAGESPEED=1 OPENSSL=$(OPENSSL) ZLIB=$(ZLIB) STATIC=0 LTO=0 DEBUG=1 package
 	@echo ""
 	@echo ""
 	@echo "!!!!!!!!!! DONE :) !!!!!!!!!!"
@@ -612,9 +612,6 @@ endif
 else
 nginx_makefile: configure_nginx
 	@echo "Rewriting Makefile for dynamic binary..."
-	cd $(BUILDROOT); mv -f objs/Makefile objs/Makefile.old; \
-
-		bash
 	@echo "Makefile ready for dynamic binary.";
 endif
 

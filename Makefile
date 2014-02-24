@@ -460,7 +460,7 @@ dependencies/pcre:
 
 	@echo "Preparing PCRE..."
 	@mkdir -p $(BUILDROOT)pcre-$(PCRE_VERSION);
-	@cd dependencies/pcre/latest; CFLAGS="$(_nginx_gccflags)" ./configure \
+	@-cd dependencies/pcre/latest; CFLAGS="$(_nginx_gccflags)" ./configure \
 		--disable-option-checking --disable-dependency-tracking \
 		--enable-shared=no --enable-static=yes --enable-jit --enable-utf \
 		--enable-unicode-properties --enable-newline-is-any --disable-valgrind \

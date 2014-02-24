@@ -260,14 +260,11 @@ seal:
 
 package: build
 	@echo "Packaging build..."
-	@mv sources/$(CURRENT)/nginx-$(CURRENT) ./nginx-$(STAMP)/;
 	#@mv pagespeed/ nginx-$(CURRENT)/pagespeed
 
 	@echo "Packaging tarball..."
-	@tar -czvf keenginx-$(TARSTAMP).tar.gz nginx-$(STAMP)/
+	@tar -czvf build/keenginx-$(TARSTAMP).tar.gz $(BUILDROOT)
 	#@mv nginx-$(CURRENT)/pagespeed ./pagespeed
-	@mv nginx-$(STAMP)/ sources/$(CURRENT)/nginx-$(CURRENT);
-	@mv keenginx-$(TARSTAMP).tar.gz build/;
 	@echo "=== Finished Keen-Nginx build. ==="
 
 release:

@@ -623,7 +623,7 @@ clean_nginx:
 configure_nginx:
 	@echo "Configuring Nginx..."
 	-cp -fr modules dependencies sources/$(CURRENT)/nginx-$(CURRENT); \
-		cd sources/$(CURRENT)/nginx-$(CURRENT); \
+		cd $(BUILDROOT); \
 		CC=$(CC) CFLAGS="$(_nginx_gccflags)" CXXFLAGS="$(CXXFLAGS)" ./configure $(_nginx_config_extras) $(_nginx_config_mainflags) --with-cc-opt="$(_nginx_gccflags)" --with-ld-opt="$(LDFLAGS)" --with-openssl-opt="$(_openssl_flags)"; \
 		cd ../../../;
 	@echo "Stamping configuration..."

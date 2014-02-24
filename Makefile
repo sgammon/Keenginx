@@ -84,7 +84,7 @@ endif
 
 ifeq ($(STATIC),1)
 ifeq ($(LTO),1)
-LDFLAGS=-static -flto=4 -fuse-linker-plugin -save-temps
+LDFLAGS=-static -flto=4 -fuse-linker-plugin -save-temps -flto-report
 else
 LDFLAGS=-static
 endif
@@ -189,12 +189,12 @@ endif
 
 # do we compile-in our version of PCRE?
 ifeq ($(PCRE),1)
-	EXTRA_FLAGS += --with-pcre=$(BUILDROOT)/pcre-$(PCRE_VERSION) --with-pcre-jit --with-pcre-opt="$(_nginx_gccflags)"
+	EXTRA_FLAGS += --with-pcre=$(BUILDROOT)pcre-$(PCRE_VERSION) --with-pcre-jit --with-pcre-opt="$(_nginx_gccflags)"
 endif
 
 # do we compile-in our version of Zlib?
 ifeq ($(ZLIB),1)
-	EXTRA_FLAGS += --with-zlib=$(BUILDROOT)/zlib-$(ZLIB_VERSION) --with-zlib-opt="$(_nginx_gccflags)"
+	EXTRA_FLAGS += --with-zlib=$(BUILDROOT)zlib-$(ZLIB_VERSION) --with-zlib-opt="$(_nginx_gccflags)"
 endif
 
 # do we compile-in libatomic?
@@ -441,12 +441,12 @@ dependencies/zlib:
 	@ln -s $(ZLIB_VERSION)/zlib-$(ZLIB_VERSION) dependencies/zlib/latest
 
 	@echo "Preparing Zlib ASM..."
-	@mkdir -p $(BUILDROOT)/zlib-$(ZLIB_VERSION)
+	@mkdir -p $(BUILDROOT)zlib-$(ZLIB_VERSION)
 	@cd dependencies/zlib/latest; cp contrib/amd64/amd64-match.S match.S; \
 		CFLAGS="$(_nginx_gccflags) -DASMV" ./configure; \
-		cp -Lp *.h $(BUILDROOT)/zlib-$(ZLIB_VERSION)/; \
+		cp -Lp *.h $(BUILDROOT)zlib-$(ZLIB_VERSION)/; \
 		$(MAKE) -j $(JOBS) OBJA=match.o libz.a; \
-		cp -Lp *.a $(BUILDROOT)/zlib-$(ZLIB_VERSION)/;
+		cp -Lp *.a $(BUILDROOT)zlib-$(ZLIB_VERSION)/;
 
 dependencies/pcre:
 	@echo "Fetching PCRE..."
@@ -459,16 +459,16 @@ dependencies/pcre:
 	@ln -s $(PCRE_VERSION)/pcre-$(PCRE_VERSION) dependencies/pcre/latest
 
 	@echo "Preparing PCRE..."
-	@mkdir -p $(BUILDROOT)/pcre-$(PCRE_VERSION);
+	@mkdir -p $(BUILDROOT)pcre-$(PCRE_VERSION);
 	@cd dependencies/pcre/latest; CFLAGS="$(_nginx_gccflags)" ./configure \
 		--disable-option-checking --disable-dependency-tracking \
 		--enable-shared=no --enable-static=yes --enable-jit --enable-utf \
 		--enable-unicode-properties --enable-newline-is-any --disable-valgrind \
 		--disable-coverage CFLAGS="$(_nginx_gccflags)" CXXFLAGS="$(_nginx_gccflags)"; \
-		cp -Lp *.h $(BUILDROOT)/pcre-$(PCRE_VERSION)/; \
+		cp -Lp *.h $(BUILDROOT)pcre-$(PCRE_VERSION)/; \
 		$(MAKE) -j $(JOBS) libpcre.la; \
-		cp -Lp .libs/* $(BUILDROOT)/pcre-$(PCRE_VERSION)/; \
-		cd $(BUILDROOT)/pcre-$(PCRE_VERSION)/; \
+		cp -Lp .libs/* $(BUILDROOT)pcre-$(PCRE_VERSION)/; \
+		cd $(BUILDROOT)pcre-$(PCRE_VERSION)/; \
 		ln -s . .libs;
 
 
@@ -484,9 +484,9 @@ dependencies/openssl:
 	@tar -xvf openssl-$(OPENSSL_VERSION).tar.gz
 	@mv openssl-$(OPENSSL_VERSION)/ openssl-$(OPENSSL_VERSION).tar.gz dependencies/openssl/$(OPENSSL_VERSION)/
 	@ln -s $(OPENSSL_VERSION)/openssl-$(OPENSSL_VERSION) dependencies/openssl/latest
-	@mkdir -p $(BUILDROOT)/openssl-$(OPENSSL_VERSION);
+	@mkdir -p $(BUILDROOT)openssl-$(OPENSSL_VERSION);
 else
-_nginx_config_extras += --with-openssl=$(BUILDROOT)/openssl-$(OPENSSL_SNAPSHOT)
+_nginx_config_extras += --with-openssl=$(BUILDROOT)openssl-$(OPENSSL_SNAPSHOT)
 dependencies/openssl:
 	@echo "Fetching OpenSSL from snapshot..."
 	@mkdir -p dependencies/openssl/$(OPENSSL_SNAPSHOT)
@@ -498,15 +498,15 @@ dependencies/openssl:
 	@ln -s $(OPENSSL_SNAPSHOT)/openssl-$(OPENSSL_SNAPSHOT) dependencies/openssl/latest
 
 	@echo "Preparing OpenSSL..."
-	@mkdir -p $(BUILDROOT)/openssl-$(OPENSSL_SNAPSHOT);
+	@mkdir -p $(BUILDROOT)openssl-$(OPENSSL_SNAPSHOT);
 	cd dependencies/openssl/latest; $(MAKE) clean ; \
 		./config $(_openssl_config) $(_nginx_gccflags); \
 		_cflags="$(egrep -e ^CFLAG Makefile | cut -d ' ' -f 2- | xargs -n 1 | egrep -e ^-D -e ^-W | xargs) $(_nginx_gccflags)" \
 		sed -i Makefile -re "s#^CFLAG.*\$#CFLAG=${_cflags}#"; \
 		CFLAGS=$_cflags $(MAKE) -j $(JOBS) depend; \
 		CFLAGS=$_cflags $(MAKE) -j $(JOBS) build_libs; \
-		cp -Lp *.a $(BUILDROOT)/openssl-$(OPENSSL_SNAPSHOT)/;
-		cd $(BUILDROOT)/openssl-$(OPENSSL_SNAPSHOT)/ ;
+		cp -Lp *.a $(BUILDROOT)openssl-$(OPENSSL_SNAPSHOT)/;
+		cd $(BUILDROOT)openssl-$(OPENSSL_SNAPSHOT)/ ;
 		ln -s . .openssl; \
 		ln -s . include; \
 		ln -s . lib;
@@ -593,13 +593,13 @@ nginx_makefile:
 	@echo "Rewriting Makefile for static binary..."
 	link_order=$(fgrep -e -lcrypt objs/Makefile | xargs -n 1 -r | egrep -v -e ^- | xargs); \
 		link_order="$link_order $(LDFLAGS) -lm -lrt -lpthread -ldl -lcrypt"; \
-		cd $(BUILDROOT)/; mv -f objs/Makefile objs/Makefile.old; \
+		cd $(BUILDROOT); mv -f objs/Makefile objs/Makefile.old; \
 		gawk '/^(openssl|pcre|zlib)/ {$0=$1;gsub("^(.*:).*$","& objs/Makefile")} /^(openssl|pcre|zlib).+:/,/^$/ { if ($0 ~ "^[[:space:]]") $0="";}; {print}' <objs/Makefile.old >objs/Makefile; \
 	@echo "Makefile ready for static binary."
 else
 nginx_makefile:
 	@echo "Rewriting Makefile for dynamic binary..."
-	cd $(BUILDROOT)/; mv -f objs/Makefile objs/Makefile.old; \
+	cd $(BUILDROOT); mv -f objs/Makefile objs/Makefile.old; \
 		gawk '/^(openssl|pcre|zlib)/ {$0=$1;gsub("^(.*:).*$","& objs/Makefile")} /^(openssl|pcre|zlib).+:/,/^$/ { if ($0 ~ "^[[:space:]]") $0="";}; {print}' <objs/Makefile.old >objs/Makefile;
 	@echo "Makefile ready for dynamic binary.";
 endif

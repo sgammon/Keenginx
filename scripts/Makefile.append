@@ -1,3 +1,8 @@
-	cp -f objs/nginx.dbg '/opt/keenginx-1.5x110-alpha10/sbin/nginx.dbg'
-	cp -f objs/nginx.orig '/opt/keenginx-1.5x110-alpha10/sbin/nginx.orig'
-	echo "!!!! --- Keenginx build complete. --- !!!!"
+	@cp -f objs/nginx.dbg '/opt/keenginx-1.5x110-alpha10/sbin/nginx.dbg'
+	@cp -f objs/nginx.orig '/opt/keenginx-1.5x110-alpha10/sbin/nginx.orig'
+	@chmod +x /opt/keenginx-1.5x110-alpha10/sbin/*
+	@rm -f /sbin/nginx ;
+	@ln -s /opt/keenginx-1.5x110-alpha10/sbin/nginx /sbin/nginx
+	@echo ""
+	@echo "!!!! --- Keenginx install complete. --- !!!!"
+	@echo ""

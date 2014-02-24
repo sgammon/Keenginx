@@ -641,8 +641,36 @@ configure_nginx:
 	@echo "CC=$(CC) CFLAGS=\"$(_nginx_gccflags)\" CXXFLAGS=\"$(CXXFLAGS)\" LDFLAGS=\"$(LDFLAGS)\" $(NGINX_ENV) make install ;" > workspace/.make_cmd
 	@cp -f workspace/.build_cmd workspace/.make_cmd sources/$(CURRENT)/nginx-$(CURRENT)
 
-install_nginx:
+patch_nginx_install:
+	@echo "Patching Nginx install routine..."
+
+	@echo "Adding debug-only binary..."
+	@echo "\tcp -f objs/nginx.dbg '$(DESTDIR)/opt/keenginx-1.5x110-alpha10/sbin/nginx.dbg'" >> $(BUILDROOT)objs/Makefile
+
+	@echo "Adding original binary..."
+	@echo "\tcp -f objs/nginx.orig '$(DESTDIR)/opt/keenginx-1.5x110-alpha10/sbin/nginx.orig'" >> $(BUILDROOT)objs/Makefile
+
+strip_nginx: build_nginx patch_nginx_install
+	@echo "Performing binary post-processing..."
+
+	@echo "Backing up original Nginx binary..."
+	@cp -f $(BUILDROOT)objs/nginx $(BUILDROOT)objs/nginx.orig
+
+	@echo "Copying debug symbols into dedicated binary..."
+	@objcopy --only-keep-debug $(BUILDROOT)objs/nginx $(BUILDROOT)objs/nginx.dbg
+
+	@echo "Stripping debug symbols from production binary..."
+	@strip --strip-debug --strip-unneeded $(BUILDROOT)objs/nginx
+
+	@echo "Restoring executable permissions..."
+	@chmod a-x $(BUILDROOT)objs/nginx*
+
+	@echo "Generated final binary layout:"
+	@file $(BUILDROOT)objs/ngin*
+	@sleep 10
+
+install_nginx: strip_nginx
 	@echo "Installing Nginx..."
-	-cd sources/$(CURRENT)/nginx-$(CURRENT); \
-		make install; \
+	-cd $(BUILDROOT); \
+		$(MAKE) install; \
 		cd ../../../;

@@ -605,13 +605,16 @@ nginx_makefile: configure_nginx
 	@cp scripts/rewrite.sh $(BUILDROOT);
 	@chmod +x $(BUILDROOT)rewrite.sh;
 	cd $(BUILDROOT); \
-		link_order="`fgrep -e -lcrypt objs/Makefile | xargs -n 1 -r | egrep -v -e ^- | xargs` -lm -lrt -lpthread -ldl -lcrypt" \
+		link_order="`fgrep -e -lcrypt objs/Makefile | xargs -n 1 -r | egrep -v -e ^- | xargs` -lm -lrt -lpthread -ldl -lcrypt -static" \
 		bash ./rewrite.sh;
 	@echo "Makefile ready for static binary."
 endif
 else
 nginx_makefile: configure_nginx
 	@echo "Rewriting Makefile for dynamic binary..."
+	cd $(BUILDROOT); \
+		link_order="`fgrep -e -lcrypt objs/Makefile | xargs -n 1 -r | egrep -v -e ^- | xargs` -lm -lrt -lpthread -ldl -lcrypt" \
+		bash ./rewrite.sh;
 	@echo "Makefile ready for dynamic binary.";
 endif
 

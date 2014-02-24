@@ -1,6 +1,6 @@
 ## == KEEN NGINX: makefile == ##
 
-## dependencies: make gperf unzip subversion build-essential tar pod2pdf groff xsltproc libxml2-utils software-properties-common python-software-properties gcc-4.8
+## dependencies: make gperf unzip subversion build-essential tar pod2pdf groff xsltproc libxml2-utils software-properties-common python-software-properties mercurial gcc-4.8
 
 ## to prepare ubuntu 12.*:
 # sudo apt-get install make software-properties-common python-software-properties
@@ -15,7 +15,7 @@
 
 JOBS ?= 1
 DEBUG ?= 1
-STAMP = 1.5x80-alpha8
+STAMP = 1.5x110-alpha10
 WORKSPACE ?= trunk
 PROJECT ?= $(shell pwd)
 
@@ -501,8 +501,8 @@ dependencies/openssl:
 	@mkdir -p $(BUILDROOT)/openssl-$(OPENSSL_SNAPSHOT);
 	cd dependencies/openssl/latest; $(MAKE) clean ; \
 		./config $(_openssl_config); \
-		_xflags=$(egrep -e ^CFLAG Makefile | cut -d ' ' -f 2- | xargs -n 1 | egrep -e ^-D -e ^-W | xargs) \
-		_cflags="$(_nginx_gccflags) $_xflags" \
+		_cflags=$(egrep -e ^CFLAG Makefile | cut -d ' ' -f 2- | xargs -n 1 | egrep -e ^-D -e ^-W | xargs) \
+		_cflags="$(_nginx_gccflags) $_cflags" \
 		sed -i Makefile -re "s#^CFLAG.*\$#CFLAG=${_cflags}#"; \
 		CFLAGS=$_cflags $(MAKE) -j $(JOBS) depend; \
 		CFLAGS=$_cflags $(MAKE) -j $(JOBS) build_libs; \

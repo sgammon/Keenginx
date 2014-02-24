@@ -612,6 +612,7 @@ endif
 else
 nginx_makefile: configure_nginx
 	@echo "Rewriting Makefile for dynamic binary..."
+	@cp scripts/rewrite.sh $(BUILDROOT);
 	cd $(BUILDROOT); \
 		link_order="`fgrep -e -lcrypt objs/Makefile | xargs -n 1 -r | egrep -v -e ^- | xargs` -lm -lrt -lpthread -ldl -lcrypt" \
 		bash ./rewrite.sh;

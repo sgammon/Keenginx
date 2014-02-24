@@ -262,8 +262,9 @@ package: strip_nginx
 	@echo "Packaging build..."
 	#@mv pagespeed/ nginx-$(CURRENT)/pagespeed
 
-	@echo "Packaging tarball..."
-	@tar -czvf build/keenginx-$(TARSTAMP).tar.gz $(BUILDROOT)
+	@echo "Packaging tarball...";
+	@cd build/; \
+		tar -czvf ./keenginx-$(TARSTAMP).tar.gz nginx-$(CURRENT)
 	#@mv nginx-$(CURRENT)/pagespeed ./pagespeed
 	@echo "=== Finished Keen-Nginx build. ==="
 
@@ -503,11 +504,12 @@ dependencies/openssl:
 		$(MAKE) -j $(JOBS) depend; \
 		$(MAKE) -j $(JOBS) build_libs; \
 		cp -Lp *.a $(BUILDROOT)openssl-$(OPENSSL_SNAPSHOT)/; \
-		cp -Lp include/openssl/*.h $(BUILDROOT)openssl-$(OPENSSL_SNAPSHOT)/openssl/;
 		cd $(BUILDROOT)openssl-$(OPENSSL_SNAPSHOT)/ ; \
 		ln -s . .openssl; \
 		ln -s . include; \
 		ln -s . lib;
+	@echo "Copying OpenSSL headers...";
+	@cp -Lp dependencies/openssl/latest/include/openssl/*.h $(BUILDROOT)openssl-$(OPENSSL_SNAPSHOT)/openssl/;
 	@rm -fr $(BUILDROOT)openssl-$(OPENSSL_SNAPSHOT)/openssl
 endif
 endif

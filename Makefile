@@ -505,8 +505,8 @@ dependencies/openssl:
 		sed -i Makefile -re "s#^CFLAG.*\$#CFLAG=${_cflags}#"; \
 		CFLAGS=$_cflags $(MAKE) -j $(JOBS) depend; \
 		CFLAGS=$_cflags $(MAKE) -j $(JOBS) build_libs; \
-		cp -Lp *.a $(BUILDROOT)openssl-$(OPENSSL_SNAPSHOT)/;
-		cd $(BUILDROOT)openssl-$(OPENSSL_SNAPSHOT)/ ;
+		cp -Lp *.a $(BUILDROOT)openssl-$(OPENSSL_SNAPSHOT)/; \
+		cd $(BUILDROOT)openssl-$(OPENSSL_SNAPSHOT)/ ; \
 		ln -s . .openssl; \
 		ln -s . include; \
 		ln -s . lib;

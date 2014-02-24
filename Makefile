@@ -503,8 +503,8 @@ dependencies/openssl:
 		./config $(_openssl_config) $(_nginx_gccflags); \
 		_cflags="$(egrep -e ^CFLAG Makefile | cut -d ' ' -f 2- | xargs -n 1 | egrep -e ^-D -e ^-W | xargs) $(_nginx_gccflags)" \
 		sed -i Makefile -re "s#^CFLAG.*\$#CFLAG=${_cflags}#"; \
-		CFLAGS=$_cflags $(MAKE) -j $(JOBS) depend; \
-		CFLAGS=$_cflags $(MAKE) -j $(JOBS) build_libs; \
+		$(MAKE) -j $(JOBS) depend; \
+		$(MAKE) -j $(JOBS) build_libs; \
 		cp -Lp *.a $(BUILDROOT)openssl-$(OPENSSL_SNAPSHOT)/; \
 		cd $(BUILDROOT)openssl-$(OPENSSL_SNAPSHOT)/ ; \
 		ln -s . .openssl; \
@@ -595,9 +595,8 @@ nginx_makefile: configure_nginx
 	@chmod +x $(BUILDROOT)rewrite.sh;
 	cd $(BUILDROOT); \
 		mv -f objs/Makefile objs/Makefile.old; \
-		bash ./rewrite.sh; \
 		link_order="`fgrep -e -lcrypt objs/Makefile | xargs -n 1 -r | egrep -v -e ^- | xargs` $(LDFLAGS) -lm -lrt -lpthread -ldl -lcrypt" \
-		sed -i objs/Makefile -re "/^\t.*$s-lcrypt$s.*\$/ {s##\t${link_order}#}" ;
+		bash ./rewrite.sh;
 	@echo "Makefile ready for static binary."
 else
 nginx_makefile: configure_nginx

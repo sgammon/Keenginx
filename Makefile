@@ -1,6 +1,15 @@
 ## == KEEN NGINX: makefile == ##
 
-## dependencies: gperf unzip subversion build-essential tar pod2pdf groff xsltproc libxml2-utils
+## dependencies: make gperf unzip subversion build-essential tar pod2pdf groff xsltproc libxml2-utils software-properties-common python-software-properties gcc-4.8
+
+## to prepare ubuntu 12.*:
+# sudo apt-get install make software-properties-common python-software-properties
+# sudo add-apt-repository ppa:ubuntu-toolchain-r/test; sudo apt-get update
+# sudo apt-get install gcc-4.8 g++-4.8 binutils-gold gcc-4.8-locales g++-4.8-multilib gcc-4.8-doc libstdc++6-4.8-db8-dev libgcc1-dbg libgomp1-dbg libitm1-dbg libatomic1-dbg make
+# sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.8 50
+# wget http://www.mr511.de/software/libelf-0.8.12.tar.gz; tar -xvf libelf-0.8.12.tar.gz;
+# pushd libelf-0.8.12; ./configure --enable-compat --enable-elf64 --enable-versioning --enable-nls --enable-shared --enable-extended-format; make; sudo make install; popd; sudo ldconfig -v;
+# sudo apt-get install gperf unzip subversion build-essential tar pod2pdf groff xsltproc libxml2-utils gawk libbz2-dev libsnappy1 libsnappy-dev
 
 ##### Configuration
 
@@ -15,7 +24,8 @@ trunk ?= 1.5.11
 stable ?= 1.4.3
 latest ?= 1.5.8
 
-# nginx config
+# binary config
+LTO ?= 1
 STATIC ?= 1
 
 # pagespeed config
@@ -36,14 +46,20 @@ ZLIB_VERSION ?= 1.2.7
 OPENSSL ?= 1
 OPENSSL_TRUNK ?= 0
 OPENSSL_VERSION ?= 1.0.1f
-OPENSSL_SNAPSHOT ?= 1.0.2-stable-SNAP-20140220
+OPENSSL_SNAPSHOT ?= 1.0.2-stable-SNAP-20140221
 
 # libatomic config
 LIBATOMIC ?= 1
 
 
+##### Pagespeed Overrides
+ifeq ($(PAGESPEED),1)
+STATIC=0
+LTO=0
+endif
+
+
 ##### Nginx Configuration
-BUILDROOT ?= $(PWD)/build
 NGINX_BASEPATH ?= opt/keenginx-$(STAMP)
 NGINX_CONFPATH ?= etc/nginx/nginx.conf
 NGINX_LOCKPATH ?= tmp/nginx.lock
@@ -67,7 +83,11 @@ TARSTAMP:=$(STAMP)-debug
 endif
 
 ifeq ($(STATIC),1)
+ifeq ($(LTO),1)
+LDFLAGS=-static -flto=4 -fuse-linker-plugin -save-temps
+else
 LDFLAGS=-static
+endif
 else
 LDFLAGS=
 endif
@@ -99,9 +119,17 @@ PSOL_ENV := PSOL_BINARY=$(PROJECT)/modules/pagespeed/$(PAGESPEED_VERSION)/psol/l
 PAGESPEED_ENV := $(PSOL_ENV) MOD_PAGESPEED_DIR=$(PROJECT)/sources/pagespeed/$(PAGESPEED_VERSION)/trunk/src
 NGINX_ENV += $(PAGESPEED_ENV)
 
+# optimization flags
+ifeq ($(LTO),1)
+_lto_cflags = -flto=4
+else
+_lto_cflags =
+endif
+_nginx_opt_flags = -funroll-loops -fweb -ftree-loop-distribution -floop-nest-optimize -fgraphite-identity -floop-block -floop-strip-mine -ftree-loop-linear -floop-interchange -fgcse-after-reload -fgcse-las -fgcse-sm $(_lto_cflags)
+
 # configure vars
 _nginx_debug_cpuflags = -g -O0
-_nginx_release_cpuflags = -O3 -g0 -mtune=native -march=native -m64 -fomit-frame-pointer -fno-exceptions -fno-strict-aliasing
+_nginx_release_cpuflags := -Ofast -g0 -mtune=native -march=native -m64 -fomit-frame-pointer -fno-exceptions -fno-strict-aliasing -msse4.2 $(_nginx_opt_flags)
 
 # openssl flags
 _openssl_flags:=-DOPENSSL_EC_NISTP_64_GCC_128 -DOPENSSL_RC5
@@ -121,6 +149,7 @@ endif
 OSNAME := `uname`
 PATCH ?= omnibus
 CURRENT := $($(WORKSPACE))
+BUILDROOT ?= $(PWD)/build/nginx-$(CURRENT)/
 
 # flags for mac os x
 ifeq ($(OSNAME),Darwin)
@@ -129,7 +158,7 @@ ifeq ($(OSNAME),Darwin)
 	ifeq ($(DEBUG),0)
 		_nginx_gccflags += -mssse3
 	endif
-	_openssl_config:=no-shared no-threads no-krb5 zlib no-md2 no-jpake no-gmp no-ssl-trace
+	_openssl_config := no-shared no-threads no-krb5 zlib no-md2 no-jpake no-gmp no-ssl-trace
 else
 	CC := gcc
 	EXTRA_FLAGS += --with-file-aio
@@ -151,6 +180,7 @@ endif
 _common_patches = $(wildcard patches/common/*)
 _current_patches := $(wildcard patches/$(CURRENT)/*)
 _pagespeed_patches = $(wildcard patches/pagespeed/*)
+
 
 # do we compile-in pagespeed?
 ifeq ($(PAGESPEED),1)
@@ -257,26 +287,22 @@ release:
 
 	@echo ""
 	@echo "!!!!! Building production Keenginx WITHOUT pagespeed. !!!!!"
-	@sleep 5
-	make PAGESPEED=0 OPENSSL=$(OPENSSL) ZLIB=$(ZLIB) DEBUG=0 all
+	$(MAKE) PAGESPEED=0 OPENSSL=$(OPENSSL) ZLIB=$(ZLIB) DEBUG=0 all
 	@echo ""
 
 	@echo ""
 	@echo "!!!!! Building debug Keenginx WITHOUT pagespeed. !!!!!"
-	@sleep 5
-	make PAGESPEED=0 OPENSSL=$(OPENSSL) ZLIB=$(ZLIB) DEBUG=1 all
+	$(MAKE) PAGESPEED=0 OPENSSL=$(OPENSSL) ZLIB=$(ZLIB) DEBUG=1 all
 	@echo ""
 
 	@echo ""
 	@echo "!!!!! Building production Keenginx WITH pagespeed. !!!!!"
-	@sleep 5
-	make PAGESPEED=1 OPENSSL=$(OPENSSL) ZLIB=$(ZLIB) DEBUG=0 modules/pagespeed all
+	$(MAKE) PAGESPEED=1 OPENSSL=$(OPENSSL) ZLIB=$(ZLIB) DEBUG=0 modules/pagespeed all
 	@echo ""
 
 	@echo ""
 	@echo "!!!!! Building debug Keenginx WITH pagespeed. !!!!!"
-	@sleep 5
-	make PAGESPEED=1 OPENSSL=$(OPENSSL) ZLIB=$(ZLIB) DEBUG=1 all
+	$(MAKE) PAGESPEED=1 OPENSSL=$(OPENSSL) ZLIB=$(ZLIB) DEBUG=1 all
 	@echo ""
 	@echo ""
 	@echo "!!!!!!!!!! DONE :) !!!!!!!!!!"
@@ -285,8 +311,8 @@ build: patch
 	@echo "Compiling Nginx $(CURRENT)..."
 	@echo "Copying custom sources..."
 	@cp -fr workspace/* sources/$(CURRENT)/nginx-$(CURRENT)/
-	make configure_nginx;
-	make build_nginx;
+	$(MAKE) configure_nginx;
+	$(MAKE) build_nginx;
 	@echo "Creating directories..."
 	@mkdir -p build/cache/nginx/client build/cache/nginx/proxy
 	@echo "Finished building Nginx $(CURRENT)."
@@ -302,7 +328,7 @@ ifeq ($(WORKSPACE),trunk)
 patch: sources dependencies workspace patch_common patch_$(CURRENT) $(PATCH_PAGESPEED)
 	@echo "Building Nginx release metapackage..."
 	@cd sources/$(CURRENT)/master; \
-		make -f misc/GNUmakefile release; \
+		$(MAKE) -f misc/GNUmakefile release; \
 		cp -fr ./tmp/nginx-$(trunk) ../; \
 		cd ..;
 endif
@@ -370,6 +396,7 @@ patch_pagespeed: $(_pagespeed_patches)
 	@echo "Patch done."
 endif
 
+
 #### ==== NGINX SOURCES ==== ####
 ifneq ($(WORKSPACE),trunk)
 sources/$(WORKSPACE):
@@ -395,7 +422,7 @@ sources/$(WORKSPACE):
 
 	@echo "Building Nginx release metapackage..."
 	@cd sources/$(CURRENT)/master; \
-		make -f misc/GNUmakefile release; \
+		$(MAKE) -f misc/GNUmakefile release; \
 		cp -fr ./tmp/nginx-$(trunk) ../; \
 		cd ..;
 
@@ -403,26 +430,6 @@ endif
 
 
 #### ==== NGINX DEPENDENCIES ==== ####
-dependencies/pcre:
-	@echo "Fetching PCRE..."
-	@mkdir -p dependencies/pcre/$(PCRE_VERSION)
-	@curl --progress-bar ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/pcre-$(PCRE_VERSION).tar.gz > pcre-$(PCRE_VERSION).tar.gz
-
-	@echo "Extracting PCRE..."
-	@tar -xvf pcre-$(PCRE_VERSION).tar.gz
-	@mv pcre-$(PCRE_VERSION)/ pcre-$(PCRE_VERSION).tar.gz dependencies/pcre/$(PCRE_VERSION)/
-	@ln -s $(PCRE_VERSION)/pcre-$(PCRE_VERSION) dependencies/pcre/latest
-
-	@echo "Preparing PCRE..."
-	@mkdir -p $(BUILDROOT)/dependencies/pcre;
-	cd dependencies/pcre/latest; CFLAGS="$(_nginx_gccflags)" ./configure \
-		--disable-option-checking --disable-dependency-tracking \
-		--enable-shared=no --enable-static=yes --enable-jit --enable-utf \
-		--enable-unicode-properties --enable-newline-is-any --disable-valgrind \
-		--disable-coverage CFLAGS="$(_nginx_gccflags)" CXXFLAGS="$(_nginx_gccflags)"; \
-		make -j $(JOBS) libpcre.la;
-
-
 dependencies/zlib:
 	@echo "Fetching Zlib..."
 	@mkdir -p dependencies/zlib/$(ZLIB_VERSION)
@@ -434,10 +441,36 @@ dependencies/zlib:
 	@ln -s $(ZLIB_VERSION)/zlib-$(ZLIB_VERSION) dependencies/zlib/latest
 
 	@echo "Preparing Zlib ASM..."
-	@mkdir -p $(BUILDROOT)/dependencies/zlib
-	cd dependencies/zlib/latest; cp contrib/amd64/amd64-match.S match.S; \
-		CFLAGS="$(_nginx_gccflags) -DASMV" ./configure; \
-		make -j $(JOBS) OBJA=match.o libz.a;
+	@mkdir -p $(BUILDROOT)/zlib-$(ZLIB_VERSION)
+	@cd dependencies/zlib/latest; cp contrib/amd64/amd64-match.S match.S; \
+		CFLAGS="$(_nginx_gccflags) -DASMV" ./configure CFLAGS="$(_nginx_gccflags)"; \
+		cp -Lp *.h $(BUILDROOT)/zlib-$(ZLIB_VERSION)/; \
+		$(MAKE) -j $(JOBS) OBJA=match.o libz.a; \
+		cp -Lp *.a $(BUILDROOT)/zlib-$(ZLIB_VERSION)/;
+
+dependencies/pcre:
+	@echo "Fetching PCRE..."
+	@mkdir -p dependencies/pcre/$(PCRE_VERSION)
+	@curl --progress-bar ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/pcre-$(PCRE_VERSION).tar.gz > pcre-$(PCRE_VERSION).tar.gz
+
+	@echo "Extracting PCRE..."
+	@tar -xvf pcre-$(PCRE_VERSION).tar.gz
+	@mv pcre-$(PCRE_VERSION)/ pcre-$(PCRE_VERSION).tar.gz dependencies/pcre/$(PCRE_VERSION)/
+	@ln -s $(PCRE_VERSION)/pcre-$(PCRE_VERSION) dependencies/pcre/latest
+
+	@echo "Preparing PCRE..."
+	@mkdir -p $(BUILDROOT)/pcre-$(PCRE_VERSION);
+	@cd dependencies/pcre/latest; CFLAGS="$(_nginx_gccflags)" ./configure \
+		--disable-option-checking --disable-dependency-tracking \
+		--enable-shared=no --enable-static=yes --enable-jit --enable-utf \
+		--enable-unicode-properties --enable-newline-is-any --disable-valgrind \
+		--disable-coverage CFLAGS="$(_nginx_gccflags)" CXXFLAGS="$(_nginx_gccflags)"; \
+		cp -Lp *.h $(BUILDROOT)/pcre-$(PCRE_VERSION)/; \
+		$(MAKE) -j $(JOBS) libpcre.la; \
+		cp -Lp .libs/* $(BUILDROOT)/pcre-$(PCRE_VERSION)/; \
+		cd $(BUILDROOT)/pcre-$(PCRE_VERSION)/; \
+		ln -s . .libs;
+
 
 ifeq ($(OPENSSL),1)
 ifeq ($(OPENSSL_TRUNK),0)
@@ -451,9 +484,9 @@ dependencies/openssl:
 	@tar -xvf openssl-$(OPENSSL_VERSION).tar.gz
 	@mv openssl-$(OPENSSL_VERSION)/ openssl-$(OPENSSL_VERSION).tar.gz dependencies/openssl/$(OPENSSL_VERSION)/
 	@ln -s $(OPENSSL_VERSION)/openssl-$(OPENSSL_VERSION) dependencies/openssl/latest
+	@mkdir -p $(BUILDROOT)/openssl-$(OPENSSL_VERSION);
 else
-#_nginx_config_extras += --with-openssl=$(BUILDROOT)/dependencies/openssl
-_nginx_config_extras += --with-openssl=dependencies/openssl/$(OPENSSL_SNAPSHOT)/openssl-$(OPENSSL_SNAPSHOT)
+_nginx_config_extras += --with-openssl=$(BUILDROOT)/openssl-$(OPENSSL_SNAPSHOT)
 dependencies/openssl:
 	@echo "Fetching OpenSSL from snapshot..."
 	@mkdir -p dependencies/openssl/$(OPENSSL_SNAPSHOT)
@@ -465,14 +498,19 @@ dependencies/openssl:
 	@ln -s $(OPENSSL_SNAPSHOT)/openssl-$(OPENSSL_SNAPSHOT) dependencies/openssl/latest
 
 	@echo "Preparing OpenSSL..."
-	@mkdir -p $(BUILDROOT)/dependencies/openssl;
-	cd dependencies/openssl/latest; make clean ; \
+	@mkdir -p $(BUILDROOT)/openssl-$(OPENSSL_SNAPSHOT);
+	cd dependencies/openssl/latest; $(MAKE) clean ; \
 		./config $(_openssl_config); \
 		_xflags=$(egrep -e ^CFLAG Makefile | cut -d ' ' -f 2- | xargs -n 1 | egrep -e ^-D -e ^-W | xargs) \
 		_cflags="$(_nginx_gccflags) $_xflags" \
-		sed -i Makefile -re "s#^CFLAG.*\$#CFLAG=$_cflags"; \
-		make -j $(JOBS) depend; \
-		make -j $(JOBS) build_libs;
+		sed -i Makefile -re "s#^CFLAG.*\$#CFLAGS=$_cflags"; \
+		$(MAKE) -j $(JOBS) depend CFLAGS=$_cflags; \
+		$(MAKE) -j $(JOBS) build_libs CFLAGS=$_cflags; \
+		cp -Lp *.a $(BUILDROOT)/openssl-$(OPENSSL_SNAPSHOT)/;
+		cd $(BUILDROOT)/openssl-$(OPENSSL_SNAPSHOT)/ ;
+		ln -s . .openssl; \
+		ln -s . include; \
+		ln -s . lib;
 endif
 endif
 
@@ -494,6 +532,8 @@ dependencies/depot_tools:
 
 
 ifeq ($(PAGESPEED),1)
+
+
 #### ==== NGX PAGESPEED ==== ####
 pagespeed: sources/pagespeed
 	@echo "Mounting Pagespeed sources..."
@@ -509,14 +549,14 @@ modules/pagespeed: dependencies/depot_tools sources/pagespeed
 
 	@echo "Building pagespeed core..."
 	-cd ./sources/pagespeed/$(PAGESPEED_VERSION)/trunk/src; \
-		make AR.host="$(PROJECT)/sources/pagespeed/$(PAGESPEED_VERSION)/trunk/src/build/wrappers/ar.sh" \
+		$(MAKE) AR.host="$(PROJECT)/sources/pagespeed/$(PAGESPEED_VERSION)/trunk/src/build/wrappers/ar.sh" \
 	         AR.target="$(PROJECT)/sources/pagespeed/$(PAGESPEED_VERSION)/trunk/src/build/wrappers/ar.sh" \
 		     BUILDTYPE=$(PAGESPEED_RELEASE) \
 	         mod_pagespeed_test pagespeed_automatic_test;
 
 	@echo "Building PSOL sources..."
 	-cd ./sources/pagespeed/$(PAGESPEED_VERSION)/trunk/src/net/instaweb/automatic; \
-		make AR.host="$(PROJECT)/sources/pagespeed/$(PAGESPEED_VERSION)/trunk/src/build/wrappers/ar.sh" \
+		$(MAKE) AR.host="$(PROJECT)/sources/pagespeed/$(PAGESPEED_VERSION)/trunk/src/build/wrappers/ar.sh" \
 	         AR.target="$(PROJECT)/sources/pagespeed/$(PAGESPEED_VERSION)/trunk/src/build/wrappers/ar.sh" \
 		     BUILDTYPE=$(PAGESPEED_RELEASE) \
 	         all;
@@ -543,18 +583,21 @@ sources/pagespeed:
 		../../../../dependencies/depot_tools/gclient config http://modpagespeed.googlecode.com/svn/tags/$(PSOL_VERSION)/src; \
 		../../../../dependencies/depot_tools/gclient sync --force --jobs=1;
 		cd ../../../../;
+
+
 endif
+
 
 #### ==== BUILD RULES ==== ####
 build_nginx:
 	@echo "Compiling Nginx..."
 	@mkdir -p build/ dist/
 	cd sources/$(CURRENT)/nginx-$(CURRENT); \
-		CC=$(CC) CFLAGS="$(_nginx_gccflags)" CXXFLAGS="$(CXXFLAGS)" $(NGINX_ENV) make;
+		CC=$(CC) CFLAGS="$(_nginx_gccflags)" CXXFLAGS="$(CXXFLAGS)" $(NGINX_ENV) $(MAKE);
 
 clean_nginx:
 	@echo "Cleaning Nginx..."
-	@-make -f sources/$(CURRENT)/nginx-$(CURRENT)/Makefile clean;
+	@-$(MAKE) -f sources/$(CURRENT)/nginx-$(CURRENT)/Makefile clean;
 
 	@echo "Cleaning modules..."
 	@-rm -fr modules/

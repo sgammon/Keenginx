@@ -629,7 +629,7 @@ clean_nginx:
 	@echo "Cleaning modules..."
 	@-rm -fr modules/
 
-configure_nginx:
+configure_nginx: workspace dependencies sources patch
 	@echo "Copying Nginx sources..."
 	@cp -fr workspace/* $(BUILDROOT)
 	@echo "Configuring Nginx..."

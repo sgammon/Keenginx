@@ -160,7 +160,7 @@ ifeq ($(OSNAME),Darwin)
 	endif
 	_openssl_config := no-shared no-threads no-krb5 zlib no-md2 no-jpake no-gmp no-ssl-trace
 else
-	CC := gcc
+	CC := gcc-4.8-sandbox
 	EXTRA_FLAGS += --with-file-aio
 	ifeq ($(DEBUG),1)
 		_nginx_gccflags += -fno-stack-protector
@@ -189,12 +189,12 @@ endif
 
 # do we compile-in our version of PCRE?
 ifeq ($(PCRE),1)
-	EXTRA_FLAGS += --with-pcre=dependencies/pcre/latest --with-pcre-jit --with-pcre-opt="$(_nginx_gccflags)"
+	EXTRA_FLAGS += --with-pcre=$(BUILDROOT)/pcre-$(PCRE_VERSION) --with-pcre-jit --with-pcre-opt="$(_nginx_gccflags)"
 endif
 
 # do we compile-in our version of Zlib?
 ifeq ($(ZLIB),1)
-	EXTRA_FLAGS += --with-zlib=dependencies/zlib/latest --with-zlib-opt="$(_nginx_gccflags)"
+	EXTRA_FLAGS += --with-zlib=$(BUILDROOT)/zlib-$(ZLIB_VERSION) --with-zlib-opt="$(_nginx_gccflags)"
 endif
 
 # do we compile-in libatomic?
@@ -589,11 +589,20 @@ endif
 
 
 #### ==== BUILD RULES ==== ####
+nginx_makefile:
+	@echo "Rewriting Makefile..."
+	@echo fgrep -e -lcrypt objs/Makefile | xargs -n 1 -r | egrep -v -e ^- | xargs;
+	#link_order="$link_order -lm -lrt -lpthread -ldl -lcrypt $(LDFLAGS)";
+	#echo $link_order;
+
 build_nginx:
+	@cd $(BUILDROOT)/; mv -f objs/Makefile objs/Makefile.old; \
+		gawk '/^(openssl|pcre|zlib)/ {$0=$1;gsub("^(.*:).*$","& objs/Makefile")} /^(openssl|pcre|zlib).+:/,/^$/ { if ($0 ~ "^[[:space:]]") $0="";}; {print}' <objs/Makefile.old >objs/Makefile; \
+
 	@echo "Compiling Nginx..."
 	@mkdir -p build/ dist/
 	cd sources/$(CURRENT)/nginx-$(CURRENT); \
-		CC=$(CC) CFLAGS="$(_nginx_gccflags)" CXXFLAGS="$(CXXFLAGS)" $(NGINX_ENV) $(MAKE);
+		CC=$(CC) CFLAGS="$(_nginx_gccflags)" CXXFLAGS="$(CXXFLAGS)" $(NGINX_ENV) $(MAKE) CC=$(CC) CFLAGS="$(_nginx_gccflags)" CXXFLAGS="$(CXXFLAGS)";
 
 clean_nginx:
 	@echo "Cleaning Nginx..."

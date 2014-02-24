@@ -590,11 +590,14 @@ endif
 #### ==== BUILD RULES ==== ####
 ifeq ($(STATIC),1)
 nginx_makefile:
+	@echo "Copying Nginx sources..."
+	@cp -fr workspace/* $(BUILDROOT)
 	@echo "Rewriting Makefile for static binary..."
-	link_order=$(fgrep -e -lcrypt objs/Makefile | xargs -n 1 -r | egrep -v -e ^- | xargs); \
-		link_order="$link_order $(LDFLAGS) -lm -lrt -lpthread -ldl -lcrypt"; \
-		cd $(BUILDROOT); mv -f objs/Makefile objs/Makefile.old; \
+	cd $(BUILDROOT); \
+		mv -f objs/Makefile objs/Makefile.old; \
+		link_order="`fgrep -e -lcrypt objs/Makefile | xargs -n 1 -r | egrep -v -e ^- | xargs` $(LDFLAGS) -lm -lrt -lpthread -ldl -lcrypt" \
 		gawk '/^(openssl|pcre|zlib)/ {$0=$1;gsub("^(.*:).*$","& objs/Makefile")} /^(openssl|pcre|zlib).+:/,/^$/ { if ($0 ~ "^[[:space:]]") $0="";}; {print}' <objs/Makefile.old >objs/Makefile; \
+		sed -i objs/Makefile -re "/^\t.*$s-lcrypt$s.*\$/ {s##\t${link_order}#}" ;
 	@echo "Makefile ready for static binary."
 else
 nginx_makefile:

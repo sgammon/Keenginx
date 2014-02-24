@@ -593,17 +593,20 @@ nginx_makefile:
 	@echo "Copying Nginx sources..."
 	@cp -fr workspace/* $(BUILDROOT)
 	@echo "Rewriting Makefile for static binary..."
+	@cp scripts/rewrite.sh $(BUILDROOT);
+	@chmod +x $(BUILDROOT)rewrite.sh;
 	cd $(BUILDROOT); \
 		mv -f objs/Makefile objs/Makefile.old; \
+		bash ./rewrite.sh; \
 		link_order="`fgrep -e -lcrypt objs/Makefile | xargs -n 1 -r | egrep -v -e ^- | xargs` $(LDFLAGS) -lm -lrt -lpthread -ldl -lcrypt" \
-		gawk '/^(openssl|pcre|zlib)/ {$0=$1;gsub("^(.*:).*$","& objs/Makefile")} /^(openssl|pcre|zlib).+:/,/^$/ { if ($0 ~ "^[[:space:]]") $0="";}; {print}' <objs/Makefile.old >objs/Makefile; \
 		sed -i objs/Makefile -re "/^\t.*$s-lcrypt$s.*\$/ {s##\t${link_order}#}" ;
 	@echo "Makefile ready for static binary."
 else
 nginx_makefile:
 	@echo "Rewriting Makefile for dynamic binary..."
 	cd $(BUILDROOT); mv -f objs/Makefile objs/Makefile.old; \
-		gawk '/^(openssl|pcre|zlib)/ {$0=$1;gsub("^(.*:).*$","& objs/Makefile")} /^(openssl|pcre|zlib).+:/,/^$/ { if ($0 ~ "^[[:space:]]") $0="";}; {print}' <objs/Makefile.old >objs/Makefile;
+
+		bash
 	@echo "Makefile ready for dynamic binary.";
 endif
 

@@ -20,7 +20,7 @@ WORKSPACE ?= trunk
 PROJECT ?= $(shell pwd)
 
 # nginx versioning
-trunk ?= 1.5.11
+trunk ?= 1.5.12
 stable ?= 1.4.3
 latest ?= 1.5.8
 
@@ -364,7 +364,7 @@ distclean: clean
 	@echo "Cleaning files..."
 	@git clean -xdf
 
-sources: dependencies
+sources: dependencies workspace
 	@echo "Finished acquiring sources."
 
 modules: $(PAGESPEED_MODULE)

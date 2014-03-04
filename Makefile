@@ -459,6 +459,7 @@ dependencies/zlib:
 		$(MAKE) -j $(JOBS) OBJA=match.o libz.a; \
 		cp -Lp *.a $(BUILDROOT)zlib-$(ZLIB_VERSION)/;
 else
+dependencies/zlib:
 	@echo "Fetching Zlib..."
 	@mkdir -p dependencies/zlib/$(ZLIB_VERSION)
 	@curl --progress-bar http://commondatastorage.googleapis.com/keen-static/dependencies/zlib/zlib-$(ZLIB_VERSION).tar.gz > zlib-$(ZLIB_VERSION).tar.gz

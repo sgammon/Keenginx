@@ -469,6 +469,7 @@ else
 	@ln -s $(ZLIB_VERSION)/zlib-$(ZLIB_VERSION) dependencies/zlib/latest
 
 	@echo "Copying Zlib sources to buildroot..."
+	@mkdir -p $(BUILDROOT)zlib-$(ZLIB_VERSION)
 	@cp -fr dependencies/zlib/$(ZLIB_VERSION)/zlib-$(ZLIB_VERSION) $(BUILDROOT)zlib-$(ZLIB_VERSION)/
 endif
 
@@ -507,6 +508,7 @@ dependencies/pcre:
 	@ln -s $(PCRE_VERSION)/pcre-$(PCRE_VERSION) dependencies/pcre/latest
 
 	@echo "Copying PCRE sources to buildroot..."
+	@mkdir -p $(BUILDROOT)pcre-$(PCRE_VERSION)
 	@cp -fr dependencies/pcre/$(PCRE_VERSION)/pcre-$(PCRE_VERSION) $(BUILDROOT)pcre-$(PCRE_VERSION)/
 endif
 

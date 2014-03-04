@@ -484,7 +484,7 @@ dependencies/pcre:
 
 ifeq ($(OPENSSL),1)
 ifeq ($(OPENSSL_TRUNK),0)
-_nginx_config_extras += --with-openssl=$(BUILDROOT)openssl-$(OPENSSL_VERSION)
+_nginx_config_extras += --with-openssl=$(BUILDROOT)openssl-$(OPENSSL_VERSION)/openssl-$(OPENSSL_VERSION)
 dependencies/openssl:
 	@echo "Fetching OpenSSL..."
 	@mkdir -p dependencies/openssl/$(OPENSSL_VERSION)

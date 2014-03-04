@@ -440,6 +440,7 @@ endif
 
 
 #### ==== NGINX DEPENDENCIES ==== ####
+ifeq ($(STATIC),1)
 dependencies/zlib:
 	@echo "Fetching Zlib..."
 	@mkdir -p dependencies/zlib/$(ZLIB_VERSION)
@@ -457,7 +458,21 @@ dependencies/zlib:
 		cp -Lp *.h $(BUILDROOT)zlib-$(ZLIB_VERSION)/; \
 		$(MAKE) -j $(JOBS) OBJA=match.o libz.a; \
 		cp -Lp *.a $(BUILDROOT)zlib-$(ZLIB_VERSION)/;
+else
+	@echo "Fetching Zlib..."
+	@mkdir -p dependencies/zlib/$(ZLIB_VERSION)
+	@curl --progress-bar http://commondatastorage.googleapis.com/keen-static/dependencies/zlib/zlib-$(ZLIB_VERSION).tar.gz > zlib-$(ZLIB_VERSION).tar.gz
 
+	@echo "Extracting Zlib..."
+	@tar -xvf zlib-$(ZLIB_VERSION).tar.gz
+	@mv zlib-$(ZLIB_VERSION)/ zlib-$(ZLIB_VERSION).tar.gz dependencies/zlib/$(ZLIB_VERSION)/
+	@ln -s $(ZLIB_VERSION)/zlib-$(ZLIB_VERSION) dependencies/zlib/latest
+
+	@echo "Copying Zlib sources to buildroot..."
+	@cp -fr dependencies/zlib/$(ZLIB_VERSION)/zlib-$(ZLIB_VERSION) $(BUILDROOT)zlib-$(ZLIB_VERSION)/
+endif
+
+ifeq ($(STATIC),1)
 dependencies/pcre:
 	@echo "Fetching PCRE..."
 	@mkdir -p dependencies/pcre/$(PCRE_VERSION)
@@ -480,7 +495,20 @@ dependencies/pcre:
 		cp -Lp .libs/* $(BUILDROOT)pcre-$(PCRE_VERSION)/; \
 		cd $(BUILDROOT)pcre-$(PCRE_VERSION)/; \
 		ln -s . .libs;
+else
+dependencies/pcre:
+	@echo "Fetching PCRE..."
+	@mkdir -p dependencies/pcre/$(PCRE_VERSION)
+	@curl --progress-bar ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/pcre-$(PCRE_VERSION).tar.gz > pcre-$(PCRE_VERSION).tar.gz
 
+	@echo "Extracting PCRE..."
+	@tar -xvf pcre-$(PCRE_VERSION).tar.gz
+	@mv pcre-$(PCRE_VERSION)/ pcre-$(PCRE_VERSION).tar.gz dependencies/pcre/$(PCRE_VERSION)/
+	@ln -s $(PCRE_VERSION)/pcre-$(PCRE_VERSION) dependencies/pcre/latest
+
+	@echo "Copying PCRE sources to buildroot..."
+	@cp -fr dependencies/pcre/$(PCRE_VERSION)/pcre-$(PCRE_VERSION) $(BUILDROOT)pcre-$(PCRE_VERSION)/
+endif
 
 ifeq ($(OPENSSL),1)
 ifeq ($(OPENSSL_TRUNK),0)

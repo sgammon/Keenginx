@@ -495,6 +495,7 @@ dependencies/openssl:
 	@mv openssl-$(OPENSSL_VERSION)/ openssl-$(OPENSSL_VERSION).tar.gz dependencies/openssl/$(OPENSSL_VERSION)/
 	@ln -s $(OPENSSL_VERSION)/openssl-$(OPENSSL_VERSION) dependencies/openssl/latest
 	@mkdir -p $(BUILDROOT)openssl-$(OPENSSL_VERSION);
+	@cp -fr dependencies/openssl/$(OPENSSL_VERSION)/* $(BUILDROOT)openssl-$(OPENSSL_VERSION);
 else
 _nginx_config_extras += --with-openssl=openssl-$(OPENSSL_SNAPSHOT)
 dependencies/openssl:

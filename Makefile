@@ -52,7 +52,12 @@ OPENSSL_SNAPSHOT ?= 1.0.2-stable-SNAP-20140223
 LIBATOMIC ?= 0
 
 
-##### Pagespeed Overrides
+##### Overrides
+ifeq ($(DEBUG),1)
+STATIC=0
+LTO=0
+endif
+
 ifeq ($(PAGESPEED),1)
 STATIC=0
 LTO=0
@@ -125,7 +130,12 @@ _lto_cflags = -flto=4
 else
 _lto_cflags =
 endif
+
+ifeq (0,1)
 _nginx_opt_flags = -funroll-loops -fweb -ftree-loop-distribution -floop-nest-optimize -fgraphite-identity -floop-block -floop-strip-mine -ftree-loop-linear -floop-interchange -fgcse-after-reload -fgcse-las -fgcse-sm $(_lto_cflags)
+else
+_nginx_opt_flags = $(_lto_cflags)
+endif
 
 # configure vars
 _nginx_debug_cpuflags = -g -O0
@@ -497,12 +507,15 @@ dependencies/openssl:
 	@mv openssl-$(OPENSSL_SNAPSHOT)/ openssl-$(OPENSSL_SNAPSHOT).tar.gz dependencies/openssl/$(OPENSSL_SNAPSHOT)/
 	@ln -s $(OPENSSL_SNAPSHOT)/openssl-$(OPENSSL_SNAPSHOT) dependencies/openssl/latest
 
+	#
+	# sed -i Makefile -re "s#^CFLAG.*\$#CFLAG=${_cflags}#"; \
+	#
+
 	@echo "Preparing OpenSSL..."
 	@mkdir -p $(BUILDROOT)openssl-$(OPENSSL_SNAPSHOT)/openssl;
 	cd dependencies/openssl/latest; \
 		./config $(_openssl_config) $(_nginx_gccflags); \
 		_cflags="$(egrep -e ^CFLAG Makefile | cut -d ' ' -f 2- | xargs -n 1 | egrep -e ^-D -e ^-W | xargs) $(_nginx_gccflags)" \
-		sed -i Makefile -re "s#^CFLAG.*\$#CFLAG=${_cflags}#"; \
 		$(MAKE) -j $(JOBS) depend; \
 		$(MAKE) -j $(JOBS) build_libs; \
 		cp -Lp *.a $(BUILDROOT)openssl-$(OPENSSL_SNAPSHOT)/; \

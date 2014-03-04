@@ -638,7 +638,7 @@ build_nginx: nginx_makefile
 		CC=$(CC) CFLAGS="$(_nginx_gccflags)" CXXFLAGS="$(CXXFLAGS)" $(NGINX_ENV) $(MAKE) CC=$(CC) CFLAGS="$(_nginx_gccflags)" CXXFLAGS="$(CXXFLAGS)";
 
 	@echo "Patching Makefile..."
-	@sed -i Makefile -re "s#^install:.*\$#install:#"
+	sed -i $(BUILDROOT)objs/Makefile -re "s/install:.*/install:/"
 
 
 clean_nginx:
@@ -648,11 +648,11 @@ clean_nginx:
 	@echo "Cleaning modules..."
 	@-rm -fr modules/
 
-$(BUILDROOT)/configure:
+$(BUILDROOT)configure:
 	@echo "Copying Nginx sources..."
 	@cp -fr workspace/* $(BUILDROOT)
 
-configure_nginx: workspace dependencies sources patch $(BUILDROOT)/configure
+configure_nginx: workspace dependencies sources patch $(BUILDROOT)configure
 	@echo "Configuring Nginx..."
 	-cp -fr modules dependencies sources/$(CURRENT)/nginx-$(CURRENT); \
 		cd $(BUILDROOT); \
@@ -692,9 +692,6 @@ strip_nginx: build_nginx patch_nginx_install
 	@sleep 10
 
 install_nginx: strip_nginx
-	@echo "Patching Makefile..."
-	@sed -i Makefile -re "s#^install:.*\$#install:#"
-
 	@echo "Installing Nginx..."
 	-cd $(BUILDROOT); \
 		$(MAKE) install; \

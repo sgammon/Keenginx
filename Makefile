@@ -46,7 +46,7 @@ ZLIB_VERSION ?= 1.2.7
 OPENSSL ?= 1
 OPENSSL_TRUNK ?= 1
 OPENSSL_VERSION ?= 1.0.1f
-OPENSSL_SNAPSHOT ?= 1.0.2-stable-SNAP-20140303
+OPENSSL_SNAPSHOT ?= 1.0.2-stable-SNAP-20140304
 
 # libatomic config
 LIBATOMIC ?= 0
@@ -636,6 +636,10 @@ build_nginx: nginx_makefile
 	@mkdir -p build/ dist/
 	cd $(BUILDROOT); \
 		CC=$(CC) CFLAGS="$(_nginx_gccflags)" CXXFLAGS="$(CXXFLAGS)" $(NGINX_ENV) $(MAKE) CC=$(CC) CFLAGS="$(_nginx_gccflags)" CXXFLAGS="$(CXXFLAGS)";
+
+	@echo "Patching Makefile..."
+	@sed -i Makefile -re "s#^install:.*\$#install:#"
+
 
 clean_nginx:
 	@echo "Cleaning Nginx..."

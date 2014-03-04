@@ -605,6 +605,7 @@ endif
 
 
 #### ==== BUILD RULES ==== ####
+ifeq ($(OPENSSL_TRUNK),1)
 ifeq ($(STATIC),1)
 ifeq ($(LTO),1)
 nginx_makefile: configure_nginx
@@ -633,6 +634,10 @@ nginx_makefile: configure_nginx
 		link_order="`fgrep -e -lcrypt objs/Makefile | xargs -n 1 -r | egrep -v -e ^- | xargs` -lm -lrt -lpthread -ldl -lcrypt" \
 		bash ./rewrite.sh;
 	@echo "Makefile ready for dynamic binary.";
+endif
+else
+nginx_makefile: configure_nginx
+	@echo "No makefile rewrite required."
 endif
 
 build_nginx: nginx_makefile

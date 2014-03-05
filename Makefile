@@ -188,7 +188,7 @@ _pagespeed_patches = $(wildcard patches/pagespeed/*)
 
 # do we compile-in pagespeed?
 ifeq ($(PAGESPEED),1)
-	EXTRA_FLAGS += --add-module=modules/pagespeed/$(PAGESPEED_VERSION)
+	EXTRA_FLAGS += --add-module=$(BUILDROOT)modules/pagespeed/$(PAGESPEED_VERSION)
 endif
 
 # do we compile-in libatomic?

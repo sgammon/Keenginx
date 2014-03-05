@@ -565,10 +565,11 @@ dependencies/libatomic:
 	@ln -s 7.2/libatomic_ops-7.2 dependencies/libatomic/latest
 
 dependencies/depot_tools:
-	@echo "Fetching depot_tools..."
-	@-cd dependencies/; \
-		svn co http://src.chromium.org/svn/trunk/tools/depot_tools; \
-		cd ../;
+	@echo "Skipping depot_tools fetch."
+	#@echo "Fetching depot_tools..."
+	#@-cd dependencies/; \
+	#	svn co http://src.chromium.org/svn/trunk/tools/depot_tools; \
+	#	cd ../;
 
 
 ifeq ($(PAGESPEED),1)

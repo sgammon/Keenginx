@@ -566,7 +566,7 @@ dependencies/libatomic:
 
 dependencies/depot_tools:
 	@echo "Fetching depot_tools..."
-	@cd dependencies/; \
+	@-cd dependencies/; \
 		svn co http://src.chromium.org/svn/trunk/tools/depot_tools; \
 		cd ../;
 

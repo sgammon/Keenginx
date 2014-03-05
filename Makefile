@@ -131,11 +131,7 @@ else
 _lto_cflags =
 endif
 
-ifeq (0,1)
 _nginx_opt_flags = -funroll-loops -fweb -ftree-loop-distribution -floop-nest-optimize -fgraphite-identity -floop-block -floop-strip-mine -ftree-loop-linear -floop-interchange -fgcse-after-reload -fgcse-las -fgcse-sm $(_lto_cflags)
-else
-_nginx_opt_flags = $(_lto_cflags)
-endif
 
 # configure vars
 _nginx_debug_cpuflags = -g -O0
@@ -185,12 +181,10 @@ ifeq ($(OPENSSL),1)
 	EXTRA_FLAGS += --with-http_ssl_module --with-http_spdy_module
 endif
 
-
 # patch directories
 _common_patches = $(wildcard patches/common/*)
 _current_patches := $(wildcard patches/$(CURRENT)/*)
 _pagespeed_patches = $(wildcard patches/pagespeed/*)
-
 
 # do we compile-in pagespeed?
 ifeq ($(PAGESPEED),1)
@@ -445,7 +439,7 @@ dependencies/zlib:
 	@echo "Preparing Zlib ASM..."
 	@mkdir -p $(BUILDROOT)zlib-$(ZLIB_VERSION)
 	@cd dependencies/zlib/latest; cp contrib/amd64/amd64-match.S match.S; \
-		CFLAGS="$(_nginx_gccflags) -DASMV" ./configure; \
+		CFLAGS="$(_nginx_gccflags) -DASMV" ./configure --static --64 --archs="-arch x86_64"; \
 		cp -Lp *.h $(BUILDROOT)zlib-$(ZLIB_VERSION)/; \
 		$(MAKE) -j $(JOBS) OBJA=match.o libz.a; \
 		cp -Lp *.a $(BUILDROOT)zlib-$(ZLIB_VERSION)/;

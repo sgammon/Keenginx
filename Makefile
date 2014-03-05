@@ -620,14 +620,14 @@ sources/pagespeed:
 
 	@echo "Extracting PSOL..."
 	@tar -xvf psol-$(PSOL_VERSION).tar.gz
-	@mv psol/ ngx_pagespeed-release-$(PAGESPEED_VERSION)/
+	@-mv psol/ ngx_pagespeed-release-$(PAGESPEED_VERSION)/
 
-	@echo "Fetching ngx_pagespeed..."
-	@mkdir -p sources/pagespeed/$(PAGESPEED_VERSION)/trunk;
-	cd sources/pagespeed/$(PAGESPEED_VERSION)/trunk; \
-		../../../../dependencies/depot_tools/gclient config http://modpagespeed.googlecode.com/svn/tags/$(PSOL_VERSION)/src; \
-		../../../../dependencies/depot_tools/gclient sync --force --jobs=8;
-		cd ../../../../;
+	#@echo "Fetching ngx_pagespeed..."
+	#@mkdir -p sources/pagespeed/$(PAGESPEED_VERSION)/trunk;
+	#cd sources/pagespeed/$(PAGESPEED_VERSION)/trunk; \
+	#	../../../../dependencies/depot_tools/gclient config http://modpagespeed.googlecode.com/svn/tags/$(PSOL_VERSION)/src; \
+	#	../../../../dependencies/depot_tools/gclient sync --force --jobs=8;
+	#	cd ../../../../;
 
 
 endif

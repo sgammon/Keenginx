@@ -540,13 +540,12 @@ dependencies/openssl:
 	@mv openssl-$(OPENSSL_SNAPSHOT)/ openssl-$(OPENSSL_SNAPSHOT).tar.gz dependencies/openssl/$(OPENSSL_SNAPSHOT)/
 	@ln -s $(OPENSSL_SNAPSHOT)/openssl-$(OPENSSL_SNAPSHOT) dependencies/openssl/latest
 
-	#sed -i Makefile -re "s#^CFLAG.*\$#CFLAG=${_cflags}#";
-
 	@echo "Preparing OpenSSL..."
 	@mkdir -p $(BUILDROOT)openssl-$(OPENSSL_SNAPSHOT)/openssl;
 	cd dependencies/openssl/latest; \
 		./config $(_openssl_config) $(_nginx_gccflags); \
 		_cflags="$(egrep -e ^CFLAG Makefile | cut -d ' ' -f 2- | xargs -n 1 | egrep -e ^-D -e ^-W | xargs) $(_nginx_gccflags)" \
+		sed -i Makefile -re "s#^CFLAG.*\$#CFLAG=${_cflags}#"; \
 		$(MAKE) -j $(JOBS) depend; \
 		$(MAKE) -j $(JOBS) build_libs; \
 		$(MAKE) -j $(JOBS); \

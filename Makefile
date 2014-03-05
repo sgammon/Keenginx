@@ -462,7 +462,7 @@ dependencies/zlib:
 	@ln -s $(ZLIB_VERSION)/zlib-$(ZLIB_VERSION) dependencies/zlib/latest
 
 	@echo "Copying Zlib sources to buildroot..."
-	@mkdir -p $(BUILDROOT)dependencies/zlib/zlib-$(ZLIB_VERSION)
+	@mkdir -p $(BUILDROOT)dependencies/zlib/$(ZLIB_VERSION)/zlib-$(ZLIB_VERSION)
 	@cp -fr dependencies/zlib/$(ZLIB_VERSION)/zlib-$(ZLIB_VERSION)/* $(BUILDROOT)dependencies/zlib/$(ZLIB_VERSION)/zlib-$(ZLIB_VERSION)/
 endif
 

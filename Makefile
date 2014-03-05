@@ -439,7 +439,7 @@ dependencies/zlib:
 	@echo "Preparing Zlib ASM..."
 	@mkdir -p $(BUILDROOT)zlib-$(ZLIB_VERSION)
 	@cd dependencies/zlib/latest; cp contrib/amd64/amd64-match.S match.S; \
-		CFLAGS="$(_nginx_gccflags) -DASMV" ./configure --static --64 --archs="-arch x86_64"; \
+		CFLAGS="$(_nginx_gccflags) -DASMV" ./configure --static --64; \
 		cp -Lp *.h $(BUILDROOT)zlib-$(ZLIB_VERSION)/; \
 		$(MAKE) -j $(JOBS) OBJA=match.o libz.a; \
 		cp -Lp *.a $(BUILDROOT)zlib-$(ZLIB_VERSION)/;

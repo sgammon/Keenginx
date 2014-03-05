@@ -510,7 +510,7 @@ dependencies/pcre:
 
 	@echo "Copying PCRE sources to buildroot..."
 	@mkdir -p $(BUILDROOT)pcre-$(PCRE_VERSION)
-	@cp -fr dependencies/pcre/$(PCRE_VERSION)/pcre-$(PCRE_VERSION) $(BUILDROOT)pcre-$(PCRE_VERSION)/
+	@cp -fr dependencies/pcre/$(PCRE_VERSION)/pcre-$(PCRE_VERSION)/* $(BUILDROOT)pcre-$(PCRE_VERSION)/
 endif
 
 ifeq ($(OPENSSL),1)

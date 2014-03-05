@@ -197,16 +197,6 @@ ifeq ($(PAGESPEED),1)
 	EXTRA_FLAGS += --add-module=modules/pagespeed/$(PAGESPEED_VERSION)
 endif
 
-# do we compile-in our version of PCRE?
-ifeq ($(PCRE),1)
-	EXTRA_FLAGS += --with-pcre=pcre-$(PCRE_VERSION) --with-pcre-jit --with-pcre-opt="$(_nginx_gccflags)"
-endif
-
-# do we compile-in our version of Zlib?
-ifeq ($(ZLIB),1)
-	EXTRA_FLAGS += --with-zlib=zlib-$(ZLIB_VERSION) --with-zlib-opt="$(_nginx_gccflags)"
-endif
-
 # do we compile-in libatomic?
 ifeq ($(LIBATOMIC),1)
 	EXTRA_FLAGS += --with-libatomic=dependencies/libatomic/7.2/libatomic_ops-7.2
@@ -441,6 +431,7 @@ endif
 
 #### ==== NGINX DEPENDENCIES ==== ####
 ifeq ($(STATIC),1)
+EXTRA_FLAGS += --with-zlib=zlib-$(ZLIB_VERSION) --with-zlib-opt="$(_nginx_gccflags)"
 dependencies/zlib:
 	@echo "Fetching Zlib..."
 	@mkdir -p dependencies/zlib/$(ZLIB_VERSION)
@@ -459,6 +450,7 @@ dependencies/zlib:
 		$(MAKE) -j $(JOBS) OBJA=match.o libz.a; \
 		cp -Lp *.a $(BUILDROOT)zlib-$(ZLIB_VERSION)/;
 else
+EXTRA_FLAGS += --with-zlib=dependencies/zlib/$(ZLIB_VERSION)/zlib-$(ZLIB_VERSION) --with-zlib-opt="$(_nginx_gccflags)"
 dependencies/zlib:
 	@echo "Fetching Zlib..."
 	@mkdir -p dependencies/zlib/$(ZLIB_VERSION)
@@ -470,12 +462,14 @@ dependencies/zlib:
 	@ln -s $(ZLIB_VERSION)/zlib-$(ZLIB_VERSION) dependencies/zlib/latest
 
 	@echo "Copying Zlib sources to buildroot..."
-	@mkdir -p $(BUILDROOT)zlib-$(ZLIB_VERSION)
-	@cp -fr dependencies/zlib/$(ZLIB_VERSION)/zlib-$(ZLIB_VERSION) $(BUILDROOT)zlib-$(ZLIB_VERSION)/
+	@mkdir -p $(BUILDROOT)dependencies/zlib/zlib-$(ZLIB_VERSION)
+	@cp -fr dependencies/zlib/$(ZLIB_VERSION)/zlib-$(ZLIB_VERSION)/* $(BUILDROOT)dependencies/zlib/$(ZLIB_VERSION)/zlib-$(ZLIB_VERSION)/
 endif
 
 ifeq ($(STATIC),1)
+EXTRA_FLAGS += --with-pcre=pcre-$(PCRE_VERSION) --with-pcre-jit --with-pcre-opt="$(_nginx_gccflags)"
 dependencies/pcre:
+
 	@echo "Fetching PCRE..."
 	@mkdir -p dependencies/pcre/$(PCRE_VERSION)
 	@curl --progress-bar ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/pcre-$(PCRE_VERSION).tar.gz > pcre-$(PCRE_VERSION).tar.gz
@@ -498,6 +492,7 @@ dependencies/pcre:
 		cd $(BUILDROOT)pcre-$(PCRE_VERSION)/; \
 		ln -s . .libs;
 else
+EXTRA_FLAGS += --with-pcre=dependencies/pcre/$(PCRE_VERSION)/pcre-$(PCRE_VERSION) --with-pcre-jit --with-pcre-opt="$(_nginx_gccflags)"
 dependencies/pcre:
 	@echo "Fetching PCRE..."
 	@mkdir -p dependencies/pcre/$(PCRE_VERSION)
@@ -509,8 +504,8 @@ dependencies/pcre:
 	@ln -s $(PCRE_VERSION)/pcre-$(PCRE_VERSION) dependencies/pcre/latest
 
 	@echo "Copying PCRE sources to buildroot..."
-	@mkdir -p $(BUILDROOT)pcre-$(PCRE_VERSION)
-	@cp -fr dependencies/pcre/$(PCRE_VERSION)/pcre-$(PCRE_VERSION)/* $(BUILDROOT)pcre-$(PCRE_VERSION)/
+	@mkdir -p $(BUILDROOT)dependencies/pcre/$(PCRE_VERSION)/pcre-$(PCRE_VERSION)
+	@cp -fr dependencies/pcre/$(PCRE_VERSION)/pcre-$(PCRE_VERSION)/* $(BUILDROOT)dependencies/pcre/$(PCRE_VERSION)/pcre-$(PCRE_VERSION)/
 endif
 
 ifeq ($(OPENSSL),1)

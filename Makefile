@@ -601,6 +601,10 @@ modules/pagespeed: dependencies/depot_tools sources/pagespeed
 		     BUILDTYPE=$(PAGESPEED_RELEASE) \
 	         all;
 
+	@echo "Adding PageSpeed sources to buildroot..."
+	@mkdir -p $(BUILDROOT)modules/pagespeed
+	@cp -fr ./modules/pagespeed/* $(BUILDROOT)modules/pagespeed
+
 sources/pagespeed:
 	@mkdir -p ./sources/pagespeed
 

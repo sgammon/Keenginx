@@ -1,8 +1,8 @@
 	@cp -f objs/nginx.dbg "/opt/keenginx-$(KEENGINX_STAMP)/sbin/nginx.dbg"
 	@cp -f objs/nginx.orig "/opt/keenginx-$(KEENGINX_STAMP)/sbin/nginx.orig"
-	@chmod +x /opt/keenginx-$KEENGINX_STAMP/sbin/*
+	@chmod +x /opt/keenginx-$(KEENGINX_STAMP)/sbin/*
 	@rm -f /sbin/nginx ;
-	@ln -s /opt/keenginx-$KEENGINX_STAMP/sbin/nginx /sbin/nginx
+	@ln -s /opt/keenginx-$(KEENGINX_STAMP)/sbin/nginx /sbin/nginx
 	@echo ""
 	@echo "!!!! --- Keenginx version $(KEENGINX_STAMP) install complete. --- !!!!"
 	@echo ""

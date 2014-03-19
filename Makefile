@@ -36,7 +36,7 @@ PAGESPEED_EXTRA_ENV ?=
 
 # pcre config
 PCRE ?= 1
-PCRE_VERSION ?= 8.32
+PCRE_VERSION ?= 8.34
 
 # pcre config
 ZLIB ?= 1

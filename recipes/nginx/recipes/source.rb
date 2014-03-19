@@ -90,7 +90,7 @@ end
 bash 'unarchive_source' do
   cwd  ::File.dirname(src_filepath)
   code <<-EOH
-    tar zxf #{::File.basename(src_filepath)} -C #{::File.dirname(src_filepath)}
+    tar zvxf #{::File.basename(src_filepath)} -C #{::File.dirname(src_filepath)}
   EOH
   not_if { ::File.directory?("#{Chef::Config['file_cache_path'] || '/tmp'}/nginx-#{node['nginx']['source']['version']}") }
 end
@@ -121,6 +121,7 @@ bash 'compile_nginx_source' do
     sudo chown -R www-data *;
     sudo chgrp -R www-data *;
     sudo chmod 777 -R *;
+    sudo rm -f /sbin/nginx;
     sudo make install;
   EOH
 
@@ -130,13 +131,10 @@ bash 'compile_nginx_source' do
       node.automatic_attrs['nginx']['version'] == node['nginx']['source']['version'] &&
       node.automatic_attrs['nginx']['configure_arguments'].sort == configure_flags.sort
   end
-
-  notifies :restart, 'service[nginx]'
-  notifies :reload,  'ohai[reload_nginx]', :immediately
 end
 
 
-link "/usr/sbin/nginx" do
+link "/sbin/nginx" do
   to "/opt/keenginx-#{node['nginx']['source']['version']}/sbin/nginx"
 end
 

@@ -704,7 +704,7 @@ patch_nginx_install:
 	@echo "Patching Nginx install routine..."
 
 	@echo "Adding debug-only and original binaries..."
-	@sed 's/\$STAMP/$(STAMP)/g' scripts/Makefile.append > $(BUILDROOT)objs/Makefile
+	@sed 's/\$STAMP/$(STAMP)/g' scripts/Makefile.append >> $(BUILDROOT)objs/Makefile
 
 strip_nginx: build_nginx patch_nginx_install
 	@echo "Performing binary post-processing..."

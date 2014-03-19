@@ -704,7 +704,7 @@ patch_nginx_install:
 	@echo "Patching Nginx install routine..."
 
 	@echo "Adding debug-only and original binaries..."
-	@cat KEENGINX_STAMP=$(STAMP) scripts/Makefile.append >> $(BUILDROOT)objs/Makefile
+	@cat scripts/Makefile.append >> $(BUILDROOT)objs/Makefile
 
 strip_nginx: build_nginx patch_nginx_install
 	@echo "Performing binary post-processing..."
@@ -732,5 +732,5 @@ strip_nginx: build_nginx patch_nginx_install
 install_nginx: strip_nginx
 	@echo "Installing Nginx..."
 	-cd $(BUILDROOT); \
-		$(MAKE) install; \
+		$(MAKE) install KEENGINX_STAMP="$(STAMP)"; \
 		cd ../../../;

@@ -15,12 +15,12 @@
 
 JOBS ?= 1
 DEBUG ?= 1
-STAMP = 1.5x110-alpha10
+STAMP = 1.5x120-alpha12
 WORKSPACE ?= trunk
 PROJECT ?= $(shell pwd)
 
 # nginx versioning
-trunk ?= 1.5.12
+trunk ?= 1.5.13
 stable ?= 1.4.3
 latest ?= 1.5.8
 
@@ -46,7 +46,7 @@ ZLIB_VERSION ?= 1.2.7
 OPENSSL ?= 1
 OPENSSL_TRUNK ?= 1
 OPENSSL_VERSION ?= 1.0.1f
-OPENSSL_SNAPSHOT ?= 1.0.2-stable-SNAP-20140304
+OPENSSL_SNAPSHOT ?= 1.0.2-stable-SNAP-20140319
 
 # libatomic config
 LIBATOMIC ?= 0

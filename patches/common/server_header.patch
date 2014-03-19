@@ -1,4 +1,4 @@
---- sources/1.5.11/nginx-1.5.11/src/http/ngx_http_header_filter_module.c	2014-01-11 14:18:06.202682011 -0800
+--- sources/1.5.13/nginx-1.5.13/src/http/ngx_http_header_filter_module.c	2014-01-11 14:18:06.202682011 -0800
 +++ workspace/src/http/ngx_http_header_filter_module.c	2014-01-11 14:18:52.205633783 -0800
 @@ -46,8 +46,8 @@
  };

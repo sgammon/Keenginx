@@ -15,7 +15,7 @@
 
 JOBS ?= 1
 DEBUG ?= 1
-STAMP = 1.5x120-alpha12
+STAMP = 1.5x130-beta1
 WORKSPACE ?= trunk
 PROJECT ?= $(shell pwd)
 
@@ -46,7 +46,7 @@ ZLIB_VERSION ?= 1.2.7
 OPENSSL ?= 1
 OPENSSL_TRUNK ?= 1
 OPENSSL_VERSION ?= 1.0.1f
-OPENSSL_SNAPSHOT ?= 1.0.2-stable-SNAP-20140319
+OPENSSL_SNAPSHOT ?= 1.0.2-stable-SNAP-20140328
 
 # libatomic config
 LIBATOMIC ?= 0

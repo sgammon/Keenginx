@@ -30,8 +30,8 @@ STATIC ?= 1
 
 # pagespeed config
 PAGESPEED ?= 0
-PSOL_VERSION ?= 1.7.30.3
-PAGESPEED_VERSION ?= 1.7.30.3-beta
+PSOL_VERSION ?= 1.7.30.4
+PAGESPEED_VERSION ?= 1.7.30.4-beta
 PAGESPEED_EXTRA_ENV ?=
 
 # pcre config

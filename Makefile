@@ -15,7 +15,7 @@
 
 JOBS ?= 1
 DEBUG ?= 1
-STAMP = 1.5x130-beta1
+STAMP = 1.5x130-beta2
 WORKSPACE ?= trunk
 PROJECT ?= $(shell pwd)
 

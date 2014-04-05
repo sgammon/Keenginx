@@ -242,7 +242,13 @@ _nginx_config_mainflags := --user=$(NGINX_USER) \
 
 
 #### ==== TOP-LEVEL RULES ==== ####
-all: sources modules workspace package
+all: sources modules workspace package stamp
+
+stamp:
+	@echo "Stamping build..."
+	@echo "$(STAMP)" > ./release.stamp
+	@echo "$(CURRENT)" > ./workspace.stamp
+	@echo "=== Finished Keen-Nginx build. ==="
 
 seal:
 	@echo "Removing omnibus..."
@@ -264,7 +270,6 @@ package: strip_nginx
 		tar -czvf ./keenginx-$(TARSTAMP).tar.gz keenginx-$(STAMP)
 	#@mv nginx-$(CURRENT)/pagespeed ./pagespeed
 	@mv build/keenginx-$(STAMP) build/nginx-$(CURRENT);
-	@echo "=== Finished Keen-Nginx build. ==="
 
 release:
 	@echo "------------------------------------"

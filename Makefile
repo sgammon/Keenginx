@@ -18,6 +18,7 @@ DEBUG ?= 1
 STAMP = 1.5x130-beta2
 WORKSPACE ?= trunk
 PROJECT ?= $(shell pwd)
+ENVIRONMENT ?= sandbox
 
 # nginx versioning
 trunk ?= 1.5.13
@@ -65,13 +66,13 @@ endif
 
 
 ##### Nginx Configuration
-NGINX_BASEPATH ?= opt/keenginx-$(STAMP)
-NGINX_CONFPATH ?= etc/nginx/nginx.conf
-NGINX_LOCKPATH ?= tmp/nginx.lock
+NGINX_BASEPATH ?= base/build//keenginx/$(STAMP)
+NGINX_CONFPATH ?= base/environments/$(ENVIRONMENT)/etc/nginx/nginx.conf
+NGINX_LOCKPATH ?= ns/lock/nginx
 NGINX_SBINPATH ?= $(NGINX_BASEPATH)/sbin/nginx
-NGINX_LOGPATH ?= var/log/nginx
+NGINX_LOGPATH ?= base/logs/nginx
 NGINX_TEMPPATH ?= tmp
-NGINX_PIDPATH ?= var/run/nginx.pid
+NGINX_PIDPATH ?= ns/pid/nginx
 NGINX_PERFTOOLS ?= 0
 NGINX_HG_ROOT ?= ssh://hg@bitbucket.org/sgammon/methginx
 
@@ -167,7 +168,6 @@ ifeq ($(OSNAME),Darwin)
 	endif
 	_openssl_config := no-shared no-threads no-krb5 zlib no-md2 no-jpake no-gmp no-ssl-trace
 else
-	CC := gcc-4.8-sandbox
 	EXTRA_FLAGS += --with-file-aio
 	ifeq ($(DEBUG),1)
 		_nginx_gccflags += -fno-stack-protector
@@ -674,7 +674,7 @@ build_nginx: nginx_makefile
 	@echo "Compiling Nginx..."
 	@mkdir -p build/ dist/
 	cd $(BUILDROOT); \
-		CC=$(CC) CFLAGS="$(_nginx_gccflags)" CXXFLAGS="$(CXXFLAGS)" $(NGINX_ENV) $(MAKE) CC=$(CC) CFLAGS="$(_nginx_gccflags)" CXXFLAGS="$(CXXFLAGS)";
+		CFLAGS="$(_nginx_gccflags)" CXXFLAGS="$(CXXFLAGS)" $(NGINX_ENV) $(MAKE) CFLAGS="$(_nginx_gccflags)" CXXFLAGS="$(CXXFLAGS)";
 
 	@echo "Patching Makefile..."
 	sed -i $(BUILDROOT)objs/Makefile -re "s/install:.*/install:/"
@@ -695,10 +695,10 @@ configure_nginx: workspace dependencies sources patch $(BUILDROOT)configure
 	@echo "Configuring Nginx..."
 	-cp -fr modules dependencies sources/$(CURRENT)/nginx-$(CURRENT); \
 		cd $(BUILDROOT); \
-		CC=$(CC) CFLAGS="$(_nginx_gccflags)" CXXFLAGS="$(CXXFLAGS)" $(BUILDROOT)configure $(_nginx_config_extras) $(_nginx_config_mainflags) --with-cc-opt="$(_nginx_gccflags)" --with-ld-opt="$(LDFLAGS)" --with-openssl-opt="$(_openssl_flags)";
+		CFLAGS="$(_nginx_gccflags)" CXXFLAGS="$(CXXFLAGS)" $(BUILDROOT)configure $(_nginx_config_extras) $(_nginx_config_mainflags) --with-cc-opt="$(_nginx_gccflags)" --with-ld-opt="$(LDFLAGS)" --with-openssl-opt="$(_openssl_flags)";
 	@echo "Stamping configuration..."
-	@echo "CC=gcc CFLAGS=\"$(_nginx_gccflags)\" CXXFLAGS=\"$(CXXFLAGS)\" LDFLAGS=\"$(LDFLAGS)\" ./configure --with-cc-opt=\"$(_nginx_gccflags)\" --with-ld-opt=\"$(LDFLAGS)\" --with-openssl-opt=\"$(_openssl_flags)\" $(_nginx_config_extras) $(_nginx_config_mainflags)" > $(BUILDROOT).build_cmd
-	@echo "CC=gcc CFLAGS=\"$(_nginx_gccflags)\" CXXFLAGS=\"$(CXXFLAGS)\" LDFLAGS=\"$(LDFLAGS)\" $(NGINX_ENV) make ;" > $(BUILDROOT).make_cmd
+	@echo "CFLAGS=\"$(_nginx_gccflags)\" CXXFLAGS=\"$(CXXFLAGS)\" LDFLAGS=\"$(LDFLAGS)\" ./configure --with-cc-opt=\"$(_nginx_gccflags)\" --with-ld-opt=\"$(LDFLAGS)\" --with-openssl-opt=\"$(_openssl_flags)\" $(_nginx_config_extras) $(_nginx_config_mainflags)" > $(BUILDROOT).build_cmd
+	@echo "CFLAGS=\"$(_nginx_gccflags)\" CXXFLAGS=\"$(CXXFLAGS)\" LDFLAGS=\"$(LDFLAGS)\" $(NGINX_ENV) make ;" > $(BUILDROOT).make_cmd
 	@cp -f $(BUILDROOT).build_cmd $(BUILDROOT).make_cmd workspace/
 
 patch_nginx_install:

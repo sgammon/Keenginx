@@ -5,7 +5,7 @@
 	cp -f objs/nginx.dbg "/base/software/keenginx/$STAMP/sbin/nginx.dbg"
 	cp -f objs/nginx.orig "/base/software/keenginx/$STAMP/sbin/nginx.orig"
 	chmod +x /base/software/keenginx/$STAMP/sbin/*
-	rm -f /sbin/nginx ;
+	sudo rm -f /sbin/nginx /base/software/sbin/nginx;
 	ln -s /base/software/keenginx/$STAMP/sbin/nginx /base/software/sbin/nginx
 	@echo ""
 	@echo "!!!! --- Keenginx version $STAMP install complete. --- !!!!"

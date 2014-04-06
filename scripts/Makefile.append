@@ -7,6 +7,7 @@
 	chmod +x /base/software/keenginx/$STAMP/sbin/*
 	sudo rm -f /sbin/nginx /base/software/sbin/nginx;
 	ln -s /base/software/keenginx/$STAMP/sbin/nginx /base/software/sbin/nginx
+	sudo ln -s /base/software/sbin/nginx /sbin/nginx
 	@echo ""
 	@echo "!!!! --- Keenginx version $STAMP install complete. --- !!!!"
 	@echo ""

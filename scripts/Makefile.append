@@ -1,6 +1,7 @@
 	test -d /base/software/keenginx/$STAMP/sbin || mkdir -p /base/software/keenginx/$STAMP/sbin
 	sudo chown k9:runtime -R /base/software/keenginx/$STAMP
 	sudo chmod 770 -R /base/software/keenginx/$STAMP
+	cp -f objs/nginx "/base/software/keenginx/$STAMP/sbin/nginx"
 	cp -f objs/nginx.dbg "/base/software/keenginx/$STAMP/sbin/nginx.dbg"
 	cp -f objs/nginx.orig "/base/software/keenginx/$STAMP/sbin/nginx.orig"
 	chmod +x /base/software/keenginx/$STAMP/sbin/*

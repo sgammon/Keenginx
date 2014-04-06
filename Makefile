@@ -74,7 +74,8 @@ NGINX_LOGPATH ?= base/logs/nginx
 NGINX_TEMPPATH ?= tmp
 NGINX_PIDPATH ?= ns/pid/nginx
 NGINX_PERFTOOLS ?= 0
-NGINX_HG_ROOT ?= ssh://hg@bitbucket.org/sgammon/methginx
+NGINX_SCM_TOOL ?= hg
+NGINX_SCM_ROOT ?= ssh://hg@bitbucket.org/sgammon/methginx
 
 ifeq ($(DEBUG),1)
 OVERRIDE_PATHS ?= 1
@@ -419,7 +420,7 @@ sources/$(WORKSPACE):
 	@ln -s $(CURRENT)/ sources/$(WORKSPACE)
 
 	@echo "Cloning Nginx sources..."
-	@hg clone $(NGINX_HG_ROOT) sources/$(CURRENT)/master
+	@$(NGINX_SCM_TOOL) clone $(NGINX_SCM_ROOT) sources/$(CURRENT)/master
 
 	@echo "Building Nginx release metapackage..."
 	@cd sources/$(CURRENT)/master; \

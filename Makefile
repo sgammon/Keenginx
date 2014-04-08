@@ -20,7 +20,7 @@ WORKSPACE ?= trunk
 PROJECT ?= $(shell pwd)
 
 # nginx versioning
-trunk ?= 1.5.13
+trunk ?= 1.5.14
 stable ?= 1.4.3
 latest ?= 1.5.8
 

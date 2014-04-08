@@ -164,7 +164,7 @@ ifeq ($(OSNAME),Darwin)
 	ifeq ($(DEBUG),0)
 		_nginx_gccflags += -mssse3
 	endif
-	_openssl_config := no-shared no-threads no-krb5 zlib no-md2 no-jpake no-gmp no-ssl-trace
+	_openssl_config := no-shared no-threads no-krb5 zlib no-md2 no-jpake no-gmp no-ssl-trace $(_openssl_flags)
 else
 	CC := gcc-4.8-sandbox
 	EXTRA_FLAGS += --with-file-aio
@@ -173,7 +173,7 @@ else
 	else
 		_nginx_gccflags += -w
 	endif
-	_openssl_config := enable-rc5 enable-rfc3779 enable-ec_nistp_64_gcc_128 no-shared no-threads no-krb5 zlib no-md2 no-jpake no-gmp no-ssl-trace
+	_openssl_config := enable-rc5 enable-rfc3779 enable-ec_nistp_64_gcc_128 no-shared no-threads no-krb5 zlib no-md2 no-jpake no-gmp no-ssl-trace $(_openssl_flags)
 endif
 
 # do we compile-in openssl?

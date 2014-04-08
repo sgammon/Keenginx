@@ -15,7 +15,7 @@
 
 JOBS ?= 1
 DEBUG ?= 1
-STAMP = 1.5x120-alpha12
+STAMP = 1.5x122-alpha15
 WORKSPACE ?= trunk
 PROJECT ?= $(shell pwd)
 
@@ -138,7 +138,7 @@ _nginx_debug_cpuflags = -g -O0
 _nginx_release_cpuflags := -Ofast -g0 -mtune=native -march=native -m64 -fomit-frame-pointer -fno-exceptions -fno-strict-aliasing -msse4.2 $(_nginx_opt_flags)
 
 # openssl flags
-_openssl_flags:=-DOPENSSL_EC_NISTP_64_GCC_128 -DOPENSSL_RC5
+_openssl_flags:=-DOPENSSL_EC_NISTP_64_GCC_128 -DOPENSSL_RC5 -DOPENSSL_NO_HEARTBEATS
 
 ifeq ($(DEBUG),0)
 	_nginx_gccflags = $(_nginx_release_cpuflags)
@@ -271,9 +271,7 @@ release:
 	@echo ""
 	@echo "This will most certainly take awhile. Today we'll be building four versions:"
 	@echo "--production with no pagespeed"
-	@echo "--production with pagespeed"
 	@echo "--debug with no pagespeed"
-	@echo "--debug with pagespeed"
 	@echo ""
 	@echo "Wait 5..."
 	@echo ""
@@ -281,23 +279,12 @@ release:
 
 	@echo ""
 	@echo "!!!!! Building production Keenginx WITHOUT pagespeed. !!!!!"
-	$(MAKE) -j $(JOBS) PAGESPEED=0 OPENSSL=$(OPENSSL) ZLIB=$(ZLIB) PCRE=$(PCRE) STATIC=$(STATIC) LTO=$(LTO) DEBUG=0 package
+	$(MAKE) -j $(JOBS) PAGESPEED=0 OPENSSL_TRUNK=$(OPENSSL_TRUNK) OPENSSL_SNAPSHOT=$(OPENSSL_SNAPSHOT) OPENSSL=$(OPENSSL) ZLIB=$(ZLIB) PCRE=$(PCRE) STATIC=1 LIBATOMIC=$(LIBATOMIC) LTO=1 DEBUG=0 package
 	@echo ""
 
 	@echo ""
 	@echo "!!!!! Building debug Keenginx WITHOUT pagespeed. !!!!!"
-	$(MAKE) -j $(JOBS) PAGESPEED=0 OPENSSL=$(OPENSSL) ZLIB=$(ZLIB) PCRE=$(PCRE) STATIC=0 LTO=0 DEBUG=1 package
-	@echo ""
-
-	@echo ""
-	@echo "!!!!! Building production Keenginx WITH pagespeed. !!!!!"
-	$(MAKE) -j $(JOBS) PAGESPEED=1 OPENSSL=$(OPENSSL) ZLIB=$(ZLIB) STATIC=0 LTO=0 DEBUG=0 modules/pagespeed package
-	@echo ""
-
-	@echo ""
-	@echo "!!!!! Building debug Keenginx WITH pagespeed. !!!!!"
-	$(MAKE) PAGESPEED=1 OPENSSL=$(OPENSSL) ZLIB=$(ZLIB) STATIC=0 LTO=0 DEBUG=1 package
-	@echo ""
+	$(MAKE) -j $(JOBS) PAGESPEED=0 OPENSSL_TRUNK=$(OPENSSL_TRUNK) OPENSSL_SNAPSHOT=$(OPENSSL_SNAPSHOT) OPENSSL=$(OPENSSL) ZLIB=$(ZLIB) PCRE=$(PCRE) STATIC=0 LIBATOMIC=$(LIBATOMIC) LTO=0 DEBUG=1 package
 	@echo ""
 	@echo "!!!!!!!!!! DONE :) !!!!!!!!!!"
 

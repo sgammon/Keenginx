@@ -164,7 +164,7 @@ ifeq ($(OSNAME),Darwin)
 	ifeq ($(DEBUG),0)
 		_nginx_gccflags += -mssse3
 	endif
-	_openssl_config := no-shared no-threads no-krb5 zlib no-md2 no-jpake no-gmp no-ssl-trace $(_openssl_flags)
+	_openssl_config := no-shared no-threads no-krb5 zlib no-md2 no-jpake no-gmp no-ssl-trace
 else
 	CC := gcc-4.8-sandbox
 	EXTRA_FLAGS += --with-file-aio
@@ -524,8 +524,8 @@ dependencies/openssl:
 	@echo "Preparing OpenSSL..."
 	@mkdir -p $(BUILDROOT)openssl-$(OPENSSL_SNAPSHOT)/openssl;
 	cd dependencies/openssl/latest; \
-		./config $(_openssl_config) $(_nginx_gccflags); \
-		_cflags="$(egrep -e ^CFLAG Makefile | cut -d ' ' -f 2- | xargs -n 1 | egrep -e ^-D -e ^-W | xargs) $(_nginx_gccflags)" \
+		./config $(_openssl_flags) $(_openssl_config) $(_nginx_gccflags); \
+		_cflags="$(egrep -e ^CFLAG Makefile | cut -d ' ' -f 2- | xargs -n 1 | egrep -e ^-D -e ^-W | xargs) $(_nginx_gccflags) $(_openssl_flags)" \
 		sed -i Makefile -re "s#^CFLAG.*\$#CFLAG=${_cflags}#"; \
 		$(MAKE) -j $(JOBS) depend; \
 		$(MAKE) -j $(JOBS) build_libs; \
